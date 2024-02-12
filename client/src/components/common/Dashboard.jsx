@@ -1,0 +1,138 @@
+import React, { useEffect, useState } from "react";
+import {
+  DollarCircleOutlined,
+  ShoppingCartOutlined,
+  ShoppingOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
+import DashboardCard from "./DashboardCard";
+import { useSelector } from "react-redux";
+import socket from "../../redux/api/socket";
+
+const Dashboard = () => {
+  const [userCount, setUserCount] = useState(0);
+  const { user } = useSelector((state) => state.fetch);
+  const { employee } = user;
+
+
+  const getPeriodOfDay = (hour) =>
+    hour >= 5 && hour < 12
+      ? "morning"
+      : hour >= 12 && hour < 18
+      ? "afternoon"
+      : "evening";
+
+  const [periodOfDay, setPeriodOfDay] = useState("");
+
+  useEffect(() => {
+    const currentHour = new Date().getHours();
+    setPeriodOfDay(currentHour === 12 ? "noon" : getPeriodOfDay(currentHour));
+
+    socket.connect();
+
+    // Listen for user count updates
+    const handleUserCountUpdate = (count) => {
+      setUserCount(count);
+    };
+
+    socket.on('userCounts', handleUserCountUpdate);
+
+    // Cleanup function to remove the listener
+    return () => {
+      socket.off('userCounts', handleUserCountUpdate);
+      socket.disconnect();
+    };
+
+
+  }, []);
+
+
+  return (
+    <>
+      <div
+        className="flex-col"
+        style={{
+          background: "#504BE4",
+        }}
+      >
+        <div className="xl:flex xl:justify-between">
+          <div className="p-5 flex-col text-white text-start">
+            <h1 className="text-3xl font-bold mb-4">
+              {`Good ${periodOfDay} `}
+              {employee?.fullname.charAt(0).toUpperCase() +
+                employee?.fullname.slice(1)}
+            </h1>
+            <div className="md:flex gap-3">
+              <div className="flex text-center justify-center gap-3">
+                <DashboardCard
+                  icon={
+                    <ShoppingCartOutlined
+                      className="text-sm md:text-2xl lg:p-4"
+                      style={{
+                        color: "green",
+                        backgroundColor: "#F8F8FB",
+                        borderRadius: 40,
+                      }}
+                    />
+                  }
+                  title="Tasks"
+                  value={`0`}
+                />
+                <DashboardCard
+                  icon={
+                    <ShoppingOutlined
+                      className="text-sm md:text-2xl lg:p-4"
+                      style={{
+                        color: "blue",
+                        backgroundColor: "#F8F8FB",
+                        borderRadius: 40,
+                      }}
+                    />
+                  }
+                  title={"Product"}
+                  value={`0`}
+                />
+              </div>
+              <div className="flex justify-center gap-3">
+                <DashboardCard
+                  icon={
+                    <UserOutlined
+                      className="text-sm  md:text-2xl lg:p-4"
+                      style={{
+                        color: "purple",
+                        backgroundColor: "#F8F8FB",
+                        borderRadius: 40,
+                      }}
+                    />
+                  }
+                  title={`Employee`}
+                  value={`${userCount}`}
+                />
+                <DashboardCard
+                  icon={
+                    <DollarCircleOutlined
+                      className="text-sm  md:text-2xl lg:p-4"
+                      style={{
+                        color: "red",
+                        backgroundColor: "#F8F8FB",
+                        borderRadius: 40,
+                      }}
+                    />
+                  }
+                  title={"Revenue"}
+                  value={`0`}
+                />
+              </div>
+            </div>
+          </div>
+          <div>
+            <img src="/welcome.png" alt="wekcome.jpg" className="mx-auto" />
+          </div>
+        </div>
+      </div>
+      {/* <ProductOrder/> */}
+    </>
+  );
+};
+
+export default Dashboard;

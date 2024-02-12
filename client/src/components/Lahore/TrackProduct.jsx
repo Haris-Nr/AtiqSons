@@ -1,0 +1,238 @@
+import React, { useContext, useEffect, useRef, useState } from "react";
+import { Button, Form, InputNumber, Table, message } from "antd";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  TrackingProduct,
+  getTrackingProduct,
+} from "../../redux/Features/Product/productSlice";
+import moment from "moment";
+
+const EditableContext = React.createContext(null);
+
+const EditableRow = ({ index, ...props }) => {
+  const [form] = Form.useForm();
+  return (
+    <Form form={form} component={false}>
+      <EditableContext.Provider value={form}>
+        <tr {...props} />
+      </EditableContext.Provider>
+    </Form>
+  );
+};
+
+const EditableCell = ({
+  title,
+  editable,
+  children,
+  dataIndex,
+  record,
+  handleSave,
+  ...restProps
+}) => {
+  const [editing, setEditing] = useState(false);
+  const inputRef = useRef(null);
+  const form = useContext(EditableContext);
+
+  useEffect(() => {
+    if (editing) {
+      inputRef.current.focus();
+    }
+  }, [editing]);
+
+  const toggleEdit = () => {
+    setEditing(!editing);
+    form.setFieldsValue({
+      [dataIndex]: record[dataIndex],
+    });
+  };
+
+  const save = async () => {
+    try {
+      const values = await form.validateFields();
+      toggleEdit();
+      handleSave({
+        ...record,
+        ...values,
+      });
+    } catch (errInfo) {
+      message.error(errInfo);
+    }
+  };
+
+  let childNode = children;
+  if (editable) {
+    childNode = editing ? (
+      <Form.Item
+        style={{
+          margin: 0,
+        }}
+        name={dataIndex}
+        rules={[
+          {
+            required: true,
+            message: `${title} is required.`,
+          },
+        ]}
+      >
+        <InputNumber ref={inputRef} onPressEnter={save} className="w-full" placeholder="Enter Sale" />
+      </Form.Item>
+    ) : (
+      <div
+        className="editable-cell-value-wrap"
+        style={{ paddingRight: 24 }}
+        onClick={toggleEdit}
+      >
+        {children}
+      </div>
+    );
+  }
+  return <td {...restProps}>{childNode}</td>;
+};
+
+const TrackProduct = ({ id }) => {
+
+  const dispatch = useDispatch();
+  const [dataSource, setDataSource] = useState([]);
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+  const [editableRows, setEditableRows] = useState({});
+  const [lastSaleEntryDate, setLastSaleEntryDate] = useState(null);
+
+  const { gettrackproduct } = useSelector((state) => state.product);
+
+  useEffect(() => {
+    dispatch(getTrackingProduct(id));
+  }, [dispatch, id]);
+
+  useEffect(() => {
+    if (gettrackproduct.data && gettrackproduct.success === true) {
+      const formattedData = gettrackproduct.data.map((item, index) => ({
+        key: (index++).toString(),
+        ...item,
+        date: new Date(item.date),
+      }));
+      setDataSource(formattedData);
+      const lastDate = formattedData.reduce((maxDate, item) => {
+        const date = moment(item.date).format("DD/MM/YYYY");
+        return date > maxDate ? date : maxDate;
+      }, null);
+      setLastSaleEntryDate(lastDate);
+    }
+
+
+  }, [gettrackproduct.data, gettrackproduct.success]);
+
+  const [count, setCount] = useState(dataSource.length - 1);
+
+  const defaultColumns = [
+    {
+      title: "Date",
+      dataIndex: "date",
+      render: (_, record) => moment(record.date).format("DD/MM/YYYY"),
+    },
+    {
+      title: "Sale",
+      dataIndex: "sale",
+      editable: true,
+    },
+  ];
+
+  useEffect(() => {
+    const initialEditability = dataSource.reduce((acc, item) => ({ ...acc, [item.key]: true }), {});
+    setEditableRows(initialEditability);
+  }, [dataSource]);
+  
+  const handleAdd = () => {
+    const newKey = `${count + 1}`;
+    const newData = {
+      key: newKey.toString(),
+      date: new Date(),
+      sale: 0,
+    };
+    setDataSource([...dataSource, newData]);
+    setCount(newKey);
+    setIsButtonDisabled(true);
+    setLastSaleEntryDate(moment(new Date()).format("DD/MM/YYYY"));
+    setEditableRows(prev => ({ ...prev, [newKey]: true }));
+  };
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const today = moment(new Date()).format("DD/MM/YYYY");
+      if (
+        dataSource.some(
+          (data) => moment(data.date).format("DD/MM/YYYY") !== today
+        )
+      ) {
+        setIsButtonDisabled(false);
+        setEditableRows(
+          dataSource.reduce((acc, item) => ({ ...acc, [item.key]: true }), {})
+        );
+      }
+    }, 86400000);
+
+    return () => clearInterval(timer);
+  }, [dataSource]);
+
+  const handleSave = (row) => {
+    const newData = [...dataSource];
+    const index = newData.findIndex((item) => row.key === item.key);
+    newData[index] = { ...newData[index], ...row };
+    setDataSource(newData);
+    setEditableRows({ ...editableRows, [row.key]: false });
+
+  
+    dispatch(TrackingProduct({ productId:id, date: row.date.toISOString(), sale: row.sale }));
+    dispatch(getTrackingProduct(id));
+    setEditableRows(prev => ({ ...prev, [row.key]: false }));
+  };
+
+  const components = {
+    body: {
+      row: EditableRow,
+      cell: EditableCell,
+    },
+  };
+
+  const columns = defaultColumns.map((col) => {
+    if (!col.editable) {
+      return col;
+    }
+    return {
+      ...col,
+      onCell: (record) => ({
+        record,
+        editable: editableRows[record.key],
+        dataIndex: col.dataIndex,
+        title: col.title,
+        handleSave,
+      }),
+    };
+  });
+
+  return (
+    <div className="space-y-5">
+      {Date.now() && (
+        <Button
+          onClick={handleAdd}
+          type="primary"
+          disabled={isButtonDisabled}
+          className="flex justify-start"
+        >
+          Add a Sale
+        </Button>
+      )}
+      <Table
+       size="middle"
+       bordered
+        components={components}
+        rowClassName={() => "editable-row"}
+        dataSource={dataSource}
+        columns={columns}
+        pagination={false}
+        scroll={{ x: true }}
+      />
+    </div>
+  );
+};
+
+export default TrackProduct;
