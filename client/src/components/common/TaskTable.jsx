@@ -39,7 +39,7 @@ const TaskTable = () => {
     {
       title: "Due Date",
       dataIndex: "dueDate",
-      render: (dueDate) => moment(dueDate).format('YYYY-MM-DD'),
+      render: (dueDate) => moment(dueDate).format('DD/MM/YYYY'),
     },
     {
       title: "Status",
@@ -56,7 +56,6 @@ const TaskTable = () => {
       render: (text, record) => {
         return (
             <ChangeTaskButton
-              itemType="task"
               Id={record._id}
               currentStatus={record.status}
               onChangeStatus={handleStatus}
@@ -68,7 +67,7 @@ const TaskTable = () => {
   ];
 
   const dataSourceWithKeys = fetchtaskData?.data
-  ? fetchtaskData?.data.map((item,index) => ({ ...item, key: index++ }))
+  ? fetchtaskData?.data.map((item,index) => ({ ...item, key: index }))
   : [];
 
   const rowClassName = (record) => {

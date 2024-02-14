@@ -10,12 +10,14 @@ import { DeleteOutlined } from "@ant-design/icons";
 
 
 const AdminTaskTable = () => {
+
   const dispatch = useDispatch();
 
   const { fetchtalltaskData, deleteTaskData,isLoading } = useSelector((state)=>state.task)
   
 
   useEffect(()=>{
+    
     socket.connect();
     dispatch(TasksAllEmployee())
     
@@ -37,28 +39,6 @@ useEffect(() => {
   }
 }, [deleteTaskData, dispatch]);
 
-// const deleteCompletedTasksAfterOneDay = () => {
-//   const currentDate = new Date();
-
-//   fetchtalltaskData?.data.forEach((task) => {
-//     if (task.status === 'complete') {
-//       const completionDate = new Date(task.dueDate);
-
-//       if (currentDate - completionDate > 24 * 60 * 60 * 1000) {
-//         handleDelete(task._id); 
-//       }
-//     }
-//   });
-// };
-
-// useEffect(() => {
-
-//   const intervalId = setInterval(deleteCompletedTasksAfterOneDay, 24 * 60 * 60 * 1000);
-
-//   return () => clearInterval(intervalId);
-
-// }, [fetchtalltaskData, dispatch]);
-
   const columns = [
     {
       title: "Employee Name",
@@ -74,7 +54,7 @@ useEffect(() => {
     {
       title: "Due Date",
       dataIndex: "dueDate",
-      render: (dueDate) => moment(dueDate).format('YYYY-MM-DD'),
+      render: (dueDate) => moment(dueDate).format('DD/MM/YYYY'),
     },
     {
       title: "Status",

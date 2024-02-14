@@ -7,6 +7,9 @@ import logReducer from './Features/auth/logSlice'
 import notifyReducer from './Features/Notification/notificationSlice'
 import taskReducer from './Features/Task/taskSlice'
 import dubaiReducer from './Features/Dubai/dubaiSlice'
+import orderReducer from './Features/Order/orderSlice'
+import exchangeRateReducer from './Features/ExchangeRate/exchangeRateSlice'
+import breakReducer from './Features/Break/breakSlice'
 
 export const store = configureStore({
   reducer: {
@@ -18,5 +21,8 @@ export const store = configureStore({
     notifications:notifyReducer,
     task: taskReducer,
     dubai: dubaiReducer,
+    order: orderReducer,
+    exchangeRate: exchangeRateReducer,
+    break: breakReducer,
   },
 });

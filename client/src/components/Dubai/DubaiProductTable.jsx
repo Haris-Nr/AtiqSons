@@ -1,5 +1,5 @@
 import { Table, Image, message } from "antd";
-import { useEffect} from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Highlighter from "react-highlight-words";
 import {
@@ -18,14 +18,16 @@ const DubaiProductTable = () => {
 
   const dispatch = useDispatch();
 
-  const { dubaiProductData, isLoading,currentPage,
+  const {
+    dubaiProductData,
+    isLoading,
+    currentPage,
     pageSize,
     totalItems,
     totalPages,
     search,
-    error } =
-    useSelector((state) => state.product);
-
+    error,
+  } = useSelector((state) => state.product);
 
   const renderColumnWithHighlight = (text) => (
     <Highlighter
@@ -42,11 +44,10 @@ const DubaiProductTable = () => {
   useEffect(() => {
     dispatch(DubaiProduct());
     socket.connect();
-    if(error.success === false){
-      message.error(error.message)
+    if (error.success === false) {
+      message.error(error.message);
     }
-  }, [dispatch, currentPage, pageSize, search,error.success,error.message]);
-
+  }, [dispatch, currentPage, pageSize, search, error.success, error.message]);
 
   const handleTableChange = (pagination) => {
     dispatch(setCurrentPage(pagination.current));
@@ -74,10 +75,8 @@ const DubaiProductTable = () => {
       title: "Product Name",
       dataIndex: "productName",
       key: "productName",
-      render:(text) => (
-        renderColumnWithHighlight(text)
-    ),
-  }
+      render: (text) => renderColumnWithHighlight(text),
+    },
   ];
 
   const onRowClick = (record) => {
@@ -90,29 +89,28 @@ const DubaiProductTable = () => {
 
   const dataSourceWithKeys = dubaiProductData.data
     ? dubaiProductData.data
-      .filter((item) =>
-        Object.values(item)
-          .join(" ")
-          .toLowerCase()
-          .includes(search.toLowerCase())
-      )
-      .map((item,index) => ({
-        ...item,
-        key: index,
-      }))
+        .filter((item) =>
+          Object.values(item)
+            .join(" ")
+            .toLowerCase()
+            .includes(search.toLowerCase())
+        )
+        .map((item, index) => ({
+          ...item,
+          key: index,
+        }))
     : [];
 
   const head = (
     <div className=" flex justify-starts">
-      <ProductSearch/>
-
+      <ProductSearch />
     </div>
   );
 
   return (
     <div>
       <Table
-      size="large"
+        size="large"
         bordered
         loading={isLoading}
         title={() => head}
@@ -121,8 +119,8 @@ const DubaiProductTable = () => {
         dataSource={dataSourceWithKeys}
         scroll={{ x: true }}
         pagination={{
-          showQuickJumper:true,
-          showSizeChanger:true,
+          showQuickJumper: true,
+          showSizeChanger: true,
           current: currentPage,
           pageSize: pageSize,
           total: totalItems,

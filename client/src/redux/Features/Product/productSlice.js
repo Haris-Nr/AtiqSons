@@ -12,7 +12,6 @@ const initialState = {
   productdata: {},
   SingleProductData: {},
   deleteProductData: {},
-  updateProductData: {},
   productStatusData: {},
   trackStatusData: {},
   TrackProductData: {},
@@ -98,17 +97,6 @@ export const deleteProductbyId = createAsyncThunk(
   }
 );
 
-export const updateProduct = createAsyncThunk(
-  "product/updateProduct",
-  async ({id,productData}, thunkAPI) => {
-    try {
-      const response = await productApi.updateProduct(id,productData);
-      return response;
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error);
-    }
-  }
-);
 
 export const ProductStatus = createAsyncThunk(
   "product/productstatus",
@@ -288,18 +276,6 @@ export const productSlice = createSlice({
       .addCase(deleteProductbyId.rejected, (state, action) => {
         state.isLoading = false;
         state.deleteProductData = action.payload;
-      })
-      // update product
-      .addCase(updateProduct.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(updateProduct.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.updateProductData = action.payload;
-      })
-      .addCase(updateProduct.rejected, (state, action) => {
-        state.isLoading = false;
-        state.updateProductData = action.payload;
       })
       // status
       .addCase(ProductStatus.pending, (state) => {

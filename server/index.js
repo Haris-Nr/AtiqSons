@@ -9,6 +9,7 @@ const morgan = require("morgan");
 require("dotenv").config();
 const dbConnect = require("./config/dbConnect");
 dbConnect();
+
 const io = socketIO(server);
 app.set("io", io);
 
@@ -16,18 +17,17 @@ app.use(morgan("tiny"));
 
 app.use(cors( {
   origin:  [
-    'http://localhost:5173',
+    [process.env.CLIENT_URL],
   ],
   methods: "*",
 }));
 
 
-app.use(cors());
 
 
 app.use(express.json());
 
-app.use(express.static(path.join(__dirname, '../client/dist')));
+app.use(express.static(path.join(__dirname, 'dist')));
 app.use(express.static(path.join(__dirname, "public")));
 
 // Routes import
@@ -37,6 +37,9 @@ const notificationsRoute = require("./routes/notificationsRoute");
 const taskRoute = require("./routes/taskRoutes");
 const logRoute = require("./routes/logRoute");
 const dubaiRoutes = require("./routes/dubaiRoutes");
+const orderRoutes = require("./routes/orderRoutes");
+const exchangeRateRoutes = require("./routes/exchangeRateRoutes");
+const breakRoutes = require("./routes/breakRoutes")
 
 // Define your routes
 app.use("/api/user", userRoutes);
@@ -45,6 +48,10 @@ app.use("/api/notification", notificationsRoute);
 app.use("/api/task", taskRoute);
 app.use("/api/log", logRoute);
 app.use("/api/dubai", dubaiRoutes);
+app.use("/api/order", orderRoutes);
+app.use("/api/exchange-rate", exchangeRateRoutes);
+app.use("/api/break", breakRoutes)
+
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist/index.html'));

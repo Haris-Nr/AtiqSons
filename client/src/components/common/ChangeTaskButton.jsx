@@ -2,30 +2,16 @@ import React from "react";
 import { Button, Popconfirm } from "antd";
 import PropTypes from "prop-types";
 
-const ChangeTaskButton = ({ Id, currentStatus, onChangeStatus, itemType }) => {
+const ChangeTaskButton = ({ Id, currentStatus, onChangeStatus }) => {
   const handleStatus = () => {
-    let newStatus;
-
-    if (itemType === "task") {
-      newStatus = currentStatus === "complete" ? "incomplete" : "complete";
-    }
+    let newStatus = currentStatus === "complete" ? "incomplete" : "complete";
 
     onChangeStatus(Id, newStatus);
   };
 
-  const popconfirmTitle =
-    itemType === "task"
-      ? `Are you sure to ${
-          currentStatus === "complete" ? "incomplete" : "complete"
-        } this Task?`
-      : "";
+  const popconfirmTitle = `Are you sure to complete this Task?`;
 
-  const okText =
-    itemType === "task"
-      ? currentStatus === "complete"
-        ? "InCompleted"
-        : "Completed"
-      : "";
+  const okText = "Complete";
 
   return (
     <Popconfirm
@@ -44,7 +30,6 @@ ChangeTaskButton.propTypes = {
   Id: PropTypes.string.isRequired,
   currentStatus: PropTypes.oneOf(["complete", "incomplete"]),
   onChangeStatus: PropTypes.func.isRequired,
-  itemType: PropTypes.oneOf(["task"]).isRequired,
 };
 
 export default ChangeTaskButton;

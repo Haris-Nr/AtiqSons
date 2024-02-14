@@ -17,6 +17,7 @@ import Dashboard from "./components/common/Dashboard";
 import NotifyTable from "./components/common/NotifyTable";
 import TaskTable from "./components/common/TaskTable";
 import SingleProductPage from "./components/common/SingleProductPage";
+import Settings from "./pages/employees/Settings"
 
 
 // auth pages
@@ -30,6 +31,9 @@ import LogTable from "./components/Admin/LogTable";
 import UserInfo from "./components/Admin/UserInfo";
 import AdminTaskTable from "./components/Admin/AdminTaskTable";
 import AdminProductTable from "./components/Admin/AdminProductTable";
+import ExchangeRatesTable from "./components/Admin/ExchangeRatesTable";
+import CBMCalculator from "./components/Admin/CBMCalculator";
+import BreakAndLeavePage from "./pages/admin/BreakAndLeavePage";
 
 // lahore pages
 import LahoreProductTable from "./components/Lahore/LahoreProductTable";
@@ -38,6 +42,9 @@ import IntrackingproductTable from "./components/Lahore/IntrackingproductTable";
 
 // Dubai pages
 import DubaiProductTable from "./components/Dubai/DubaiProductTable";
+
+// China pages
+import OrdersTable from "./components/common/OrdersTable";
 
 
 import AdminTable from "./components/Admin/AdminTable";
@@ -85,6 +92,12 @@ const router = createBrowserRouter(
         <Route path="adminTask" element={<AdminTaskTable />} />
         <Route path="adminTable" element={<AdminTable/>}/>
         <Route path="adminTable/:id" element={<UserInfo/>}/>
+
+        <Route path="orders" element={<OrdersTable />} />
+        <Route path="exchange-rates" element={<ExchangeRatesTable />} />
+        <Route path="cbm-calculator" element={<CBMCalculator />} />
+        <Route path="settings" element={<Settings />} />
+        <Route path="break-leave" element={<BreakAndLeavePage />} />
 
       </Route>
     </Route>

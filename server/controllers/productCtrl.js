@@ -274,44 +274,6 @@ const deleteProduct = async (req, res) => {
   }
 };
 
-//update the existing product by id
-const updateProduct = async (req, res) => {
-  try {
-    let image = "";
-    // Handle file upload if there's a new product image
-    if (req.file) {
-      image = req.file.path;
-      image =
-        "/" +
-        image
-          .replace(/\\/g, "/")
-          .split("/")
-          .filter((e) => e && e !== "public")
-          .join("/");
-      updates.image = image; // Update the image path in the updates object
-    }
-
-    const updatedProduct = await Product.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
-
-
-    // Optional: Send notification about product update
-    // await createNotification(...);
-
-    res.status(201).json({
-      success: true,
-      message: "Product updated successfully",
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
 
 /* change product status */
 const changeStatus = async (req, res) => {
@@ -550,7 +512,6 @@ module.exports = {
   createProduct,
   fetchProducts,
   deleteProduct,
-  updateProduct,
   changeStatus,
   singleProduct,
   allProduct,

@@ -6,7 +6,6 @@ import { useSelector, useDispatch } from "react-redux";
 import { loginUser, resetLoginState } from "../redux/Features/auth/authSlice";
 import { fetchUser } from "../redux/Features/auth/fetchSlice";
 const Login = () => {
-
   const [form] = Form.useForm();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -20,13 +19,17 @@ const Login = () => {
     const token = localStorage.getItem("token");
     if (token) {
       dispatch(fetchUser());
-      if (user?.employee?.dashboard) {
-        navigate(`/${user?.employee?.dashboard}`);
-      }
+    }
+  }, [dispatch, loginData]);
+
+  useEffect(() => {
+    if (user?.employee?.dashboard) {
+      navigate(`/${user?.employee?.dashboard}`);
     } else {
       navigate("/");
     }
-  }, [navigate, user, dispatch]);
+  }, [user, navigate]);
+
 
   const onFinish = (values) => {
     dispatch(loginUser(values));
@@ -36,7 +39,9 @@ const Login = () => {
     try {
       if (loginData.success === true) {
         localStorage.setItem("token", loginData.token);
-        dispatch(fetchUser());
+        if (!user) {
+          dispatch(fetchUser());
+        }
         message.success(loginData.message);
         dispatch(resetLoginState());
         if (user?.employee?.dashboard) {
@@ -50,6 +55,8 @@ const Login = () => {
       message.error(error);
     }
   }, [dispatch, navigate, loginData, user]);
+
+ 
 
   return (
     <div>
@@ -82,7 +89,7 @@ const Login = () => {
             prefix={<MailOutlined className="site-form-item-icon" />}
             placeholder="Enter your Email"
             className="text-lg"
-            autoComplete="username" 
+            autoComplete="username"
           />
         </Form.Item>
         <Form.Item

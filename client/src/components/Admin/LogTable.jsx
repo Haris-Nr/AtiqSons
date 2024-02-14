@@ -1,4 +1,4 @@
-import { Table } from "antd";
+import { Table, message } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import moment from "moment";
@@ -6,24 +6,46 @@ import {
   allLogs,
   setCurrentPage,
   setPageSize,
+  deleteAllLogs
 } from "../../redux/Features/auth/logSlice";
 import socket from "../../redux/api/socket";
 
 const LogTable = () => {
+
   const dispatch = useDispatch();
-  const { allLogsData, totalItems, currentPage, pageSize } = useSelector(
+
+  const { allLogsData, totalItems, currentPage, pageSize,error,isLoading } = useSelector(
     (state) => state.log
   );
 
   useEffect(() => {
     dispatch(allLogs());
     socket.connect();
-  }, [dispatch, currentPage, pageSize]);
+
+    const timer = setTimeout(() => {
+      dispatch(deleteAllLogs());
+    }, 32 * 24 * 60 * 60 * 1000);
+
+
+    return () => {
+      clearTimeout(timer);
+    };
+
+
+  }, [dispatch, currentPage, pageSize,error.message, error.success]);
+
+  useEffect(() => {
+    if (error.success === false) {
+      message.error(error.message);
+    }
+  }, [error.message, error.success]);
 
   const handleTableChange = (pagination) => {
     dispatch(setCurrentPage(pagination.current));
     dispatch(setPageSize(pagination.pageSize));
   };
+
+  
 
   const columns = [
     {
@@ -75,14 +97,16 @@ const LogTable = () => {
   
 
   const dataSourceWithKeys = allLogsData?.data
-    ? allLogsData?.data.map((item) => ({ ...item, key: item._id }))
+    ? allLogsData?.data.map((item,index) => ({ ...item, key: index }))
     : [];
 
   return (
     <div>
       <Table
+      size="middle"
         bordered
         columns={columns}
+        loading={isLoading}
         dataSource={dataSourceWithKeys}
         pagination={{
           current: currentPage,
@@ -91,7 +115,7 @@ const LogTable = () => {
           showTotal: (total) => `Total ${total} items`,
         }}
         onChange={handleTableChange}
-        scroll={{ x: 1500 }}
+        scroll={{ x: true }}
       />
     </div>
   );

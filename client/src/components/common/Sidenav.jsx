@@ -4,10 +4,12 @@ import { TfiControlForward } from "react-icons/tfi";
 import { Button, Menu } from "antd";
 import { useLocation, useNavigate } from "react-router-dom";
 import Sider from "antd/es/layout/Sider";
-import { FaProductHunt } from "react-icons/fa";
-import { FaTasks } from "react-icons/fa";
+import { FaProductHunt,FaShoppingCart, FaMoneyBillAlt } from "react-icons/fa";
+import { FaTasks,FaCog } from "react-icons/fa";
 import { FaPersonShelter } from "react-icons/fa6";
 import { BsPersonFill } from "react-icons/bs";
+import { BiCalculator } from "react-icons/bi";
+import { MdFreeBreakfast } from 'react-icons/md';
 import PropTypes from "prop-types";
 
 const Sidenav = ({
@@ -65,6 +67,20 @@ const Sidenav = ({
       key: "task",
       icon: <FaTasks />,
     },
+
+        // china
+        employeeDashboard === "china" && {
+          label: "Orders",
+          key: "orders",
+          icon: <FaProductHunt />,
+        },
+
+            // common for all employees
+    user?.employee?.role === "employee" && {
+      label: "Settings",
+      key: "settings",
+      icon: <FaCog />,
+    },
     
     //admin
     employeeDashboard === "admin" && {
@@ -86,6 +102,26 @@ const Sidenav = ({
       label: "Task",
       key: "admintask",
       icon: <FaTasks />,
+    },
+    employeeDashboard === "admin" && {
+      label: "Orders",
+      key: "orders",
+      icon: <FaShoppingCart />,
+    },
+    employeeDashboard === "admin" && {
+      label: "Exchange Rates",
+      key: "exchange-rates",
+      icon: <FaMoneyBillAlt />,
+    },
+    employeeDashboard === "admin" && {
+      label: "CBM Calculator",
+      key: "cbm-calculator",
+      icon: <BiCalculator />,
+    },
+    employeeDashboard === "admin" && {
+      label: "Break/Leave",
+      key: "break-leave",
+      icon: <MdFreeBreakfast />,
     },
 
     employeeDashboard === "admin" && user?.employee?.role === "superadmin"  &&  {

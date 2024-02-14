@@ -19,7 +19,6 @@ const Head = ({ collapsed, toggleCollapsed, isMobile, headerMobile, user }) => {
     boxSizing: "border-box",
     transition: "all 0.2s",
     marginLeft: isMobile ? "16px" : collapsed ? "96px" : "216px",
-    marginRight: "16px",
     height: `calc(8% - ${headerMobile ? -45 : collapsed ? 1 : 2}px)`,
   };
 

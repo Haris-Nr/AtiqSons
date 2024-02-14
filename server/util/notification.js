@@ -17,7 +17,7 @@ const createNotification = async (
   title,
   actionUser,
   image,
-  onClick
+  onClick,
 ) => {
   try {
     let users = [];
@@ -27,8 +27,8 @@ const createNotification = async (
       users = [userId];
     } else if (role) {
       // If no specific user ID is provided, target all users with the specified role
-      const adminUsers = await User.find({ role: role }).select("_id");
-      users = adminUsers.map((user) => user._id);
+      const usersByRole = await User.find({ role: role }).select("_id");
+      users = usersByRole.map((user) => user._id);
     }
 
     if (users.length > 0) {
@@ -37,20 +37,21 @@ const createNotification = async (
         whichUser: actionUser,
         message: message,
         title: title,
-        onClick: onClick ,
+        onClick: onClick,
         seen: false,
         image: image,
       });
       await newNotification.save();
 
-        // Emit notification to specific user or role
+      // Emit notification to specific user or role
+
       if (userId) {
         io.to(userId.toString()).emit('newNotification', newNotification);
       } else if (role) {
         // Emit to all users with the specified role
-        const usersWithRole = await User.find({ role: role }).select("_id");
-        usersWithRole.forEach((user) => {
-            io.to(user._id.toString()).emit('newNotification', newNotification);
+        const usersByRole = await User.find({ role: role }).select("_id");
+        usersByRole.forEach((user) => {
+          io.to(user._id.toString()).emit('newNotification', newNotification);
         });
       }
     }
@@ -59,4 +60,76 @@ const createNotification = async (
   }
 };
 
-module.exports = { createNotification };
+
+
+const createRoomNotification = async ({
+  io,
+  room,
+  message,
+  title,
+  actionUser,
+  image,
+  onClick
+}) => {
+  try {
+
+    let users = [];
+    if(room ==="employees"){
+      users = await User.find({ 
+        role: "employee" 
+      }).select("_id");
+      users = users.map((user) => user._id);
+    } else if(room==="china-employees"){
+      users = await User.find({ 
+        role: "employee",
+        dashboard: "china"
+      }).select("_id");
+      users = users.map((user) => user._id);
+    } else if(room === "dubai-employees"){
+      users = await User.find({ 
+        role: "employee",
+        dashboard: "dubai"
+      }).select("_id");
+      users = users.map((user) => user._id);
+    } else if(room === "lahore-employees"){
+      users = await User.find({ 
+        role: "employee",
+        dashboard: "lahore"
+      }).select("_id");
+      users = users.map((user) => user._id);
+    } else if(room === "all-admins"){
+      users = await User.find({ 
+        $or: [
+          { role: "admin" },
+          { role: "superadmin" },
+        ] 
+      }).select("_id");
+      users = users.map((user) => user._id);
+    } else if(room === "admins"){
+      users = await User.find({ 
+        role: "admin" 
+      }).select("_id");
+      users = users.map((user) => user._id);
+    } else if(room === "superadmins"){
+      users = await User.find({ 
+        role: "superadmin" 
+      }).select("_id");
+      users = users.map((user) => user._id);
+    }
+
+    const newNotification = new Notifications({
+      user: users,
+      whichUser: actionUser,
+      message: message,
+      title: title,
+      onClick: onClick,
+      seen: false,
+      image: image,
+    });
+    await newNotification.save();
+    io.to(room).emit('newNotification', newNotification);
+  } catch (error) {
+    console.error("Error creating notifications:", error);
+  }
+}
+module.exports = { createNotification, createRoomNotification };

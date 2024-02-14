@@ -118,6 +118,7 @@ const IntrackingproductTable = () => {
                 loading={isLoading}
                 columns={columns}
                 dataSource={dataSourceWithKeys}
+                pagination={true}
                 scroll={{
                     x: true,
                 }}

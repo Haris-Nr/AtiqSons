@@ -12,9 +12,6 @@ import { Link } from "react-router-dom";
 import socket from "../../redux/api/socket";
 
 
-
-
-
 const NotifyTable = () => {
   
   const dispatch = useDispatch();
@@ -53,6 +50,7 @@ const NotifyTable = () => {
     dispatch(seenNotify(id)).then(()=>{
       fetchInitialData()
     });
+    
   };
 
   const columns = [

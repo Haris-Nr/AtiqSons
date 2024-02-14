@@ -2,46 +2,36 @@ import React from "react";
 import { Button, Popconfirm } from "antd";
 import PropTypes from "prop-types";
 
-const ChangeTrackStatusButton = ({ 
-  Id,
-  currentStatus,
-  onChangeStatus,
-  itemType
-}) => {
-  const handleTrack = () => {
-    let newStatus;
+const ChangeTrackStatusButton = ({ Id, currentStatus, onChangeStatus }) => {
 
-    if (itemType === "product") {
-      newStatus =
-        currentStatus === "pending"
-          ? "tracking"
-          : currentStatus === "tracking"
-            ? "tracked"
-            : "tracking";
-    }
+  const handleTrack = () => {
+    let newStatus =
+      currentStatus === "pending"
+        ? "tracking"
+        : currentStatus === "tracking"
+        ? "tracked"
+        : "tracking";
     onChangeStatus(Id, newStatus);
   };
 
-  const popconfirmTitle = `Are you sure to ${currentStatus === "tracking" ? "tracked" : "start track"
-} this product?`;
+  const popconfirmTitle = `Are you sure to ${
+    currentStatus === "tracking" ? "stop tracking on" : "start tracking on "
+  } this product?`;
 
   const okText =
-    itemType === "product"
-      ? currentStatus === "tracking"
-        ? "Untracked"
-        : "Track"
-      : "";
+      currentStatus === "tracking"
+        ? "stop"
+        : "start";
 
   const buttonText =
-    itemType === "product"
-      ? currentStatus === "pending"
+
+      currentStatus === "pending"
         ? "Start Tracking"
         : currentStatus === "tracking"
-          ? "Stop Tracking"
-          : currentStatus === "tracked"
-            ? "Start Tracking"
-            : ""
-      : "";
+        ? "Stop Tracking"
+        : currentStatus === "tracked"
+        ? "Start Tracking"
+        : ""
 
   return (
     <Popconfirm
@@ -59,7 +49,6 @@ ChangeTrackStatusButton.propTypes = {
   Id: PropTypes.string.isRequired,
   currentStatus: PropTypes.oneOf(["pending", "tracking", "tracked"]),
   onChangeStatus: PropTypes.func.isRequired,
-  itemType: PropTypes.oneOf(["product"]).isRequired,
 };
 
 export default ChangeTrackStatusButton;

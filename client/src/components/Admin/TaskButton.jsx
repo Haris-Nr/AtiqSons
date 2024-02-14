@@ -12,7 +12,7 @@ import {
   resettaskState,
 } from "../../redux/Features/Task/taskSlice";
 
-const dateFormat = "YYYY/MM/DD";
+const dateFormat = "DD/MM/YYYY";
 
 const TaskButton = () => {
   const [open, setOpen] = useState(false);

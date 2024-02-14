@@ -51,14 +51,6 @@ const deleteProduct = async (id) => {
     }
 };
 
-const updateProduct = async (id,productData) => {
-    try {
-        const response = await axiosInstance.patch(`/api/product/updateProduct/${id}`, productData);
-        return response.data;
-    } catch (error) {
-        throw error.response.data;
-    }
-};
 
 const changeProductStatus = async (id, newStatus) => {
     try {
@@ -116,7 +108,6 @@ const productApi = {
     getAllProduct,
     deleteProduct,
     changeProductStatus,
-    updateProduct,
     getTrackProduct,
     changeTrackStatus,
     getIntrackingProduct,
