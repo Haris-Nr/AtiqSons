@@ -3,19 +3,6 @@ const { Schema } = mongoose;
 
 const dubaiSchema = new Schema(
     {
-        productId: {
-            type: Schema.Types.ObjectId,
-            ref: "products",
-            required: true,
-        },
-        image: {
-            type: String,
-            required: true,
-        },
-        sku: {
-            type: String,
-            required: true,
-        },
         productName: {
             type: String,
             required: true,
@@ -24,13 +11,13 @@ const dubaiSchema = new Schema(
             type: Number,
             required: true,
         },
-        reserve: {
-            type: Number,
+        asin: {
+            type: Schema.Types.Mixed,
             required: true,
+            unique: true,
         },
-        createdBy: {
-            type: Schema.Types.ObjectId,
-            ref: "users",
+        price: {
+            type: Number,
             required: true,
         },
     },

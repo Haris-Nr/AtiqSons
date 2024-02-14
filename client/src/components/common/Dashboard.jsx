@@ -1,5 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
+  DollarCircleOutlined,
+  ShoppingCartOutlined,
+  ShoppingOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import DashboardCard from "./DashboardCard";
@@ -21,6 +24,8 @@ const Dashboard = () => {
 
   const [periodOfDay, setPeriodOfDay] = useState("");
 
+
+
   useEffect(() => {
     const currentHour = new Date().getHours();
     setPeriodOfDay(currentHour === 12 ? "noon" : getPeriodOfDay(currentHour));
@@ -33,6 +38,8 @@ const Dashboard = () => {
     };
 
     socket.on('userCounts', handleUserCountUpdate);
+
+
 
     // Cleanup function to remove the listener
     return () => {
@@ -60,7 +67,36 @@ const Dashboard = () => {
                 employee?.fullname.slice(1)}
             </h1>
             <div className="md:flex gap-3">
-              
+              <div className="flex text-center justify-center gap-3">
+                <DashboardCard
+                  icon={
+                    <ShoppingCartOutlined
+                      className="text-sm md:text-2xl lg:p-4"
+                      style={{
+                        color: "green",
+                        backgroundColor: "#F8F8FB",
+                        borderRadius: 40,
+                      }}
+                    />
+                  }
+                  title="Tasks"
+                  value={`${userCount}`}
+                />
+                <DashboardCard
+                  icon={
+                    <ShoppingOutlined
+                      className="text-sm md:text-2xl lg:p-4"
+                      style={{
+                        color: "blue",
+                        backgroundColor: "#F8F8FB",
+                        borderRadius: 40,
+                      }}
+                    />
+                  }
+                  title={"Product"}
+                  value={`${userCount}`}
+                />
+              </div>
               <div className="flex justify-center gap-3">
                 <DashboardCard
                   icon={
@@ -76,6 +112,20 @@ const Dashboard = () => {
                   title={`Employee`}
                   value={`${userCount}`}
                 />
+                <DashboardCard
+                  icon={
+                    <DollarCircleOutlined
+                      className="text-sm  md:text-2xl lg:p-4"
+                      style={{
+                        color: "red",
+                        backgroundColor: "#F8F8FB",
+                        borderRadius: 40,
+                      }}
+                    />
+                  }
+                  title={"Revenue"}
+                  value={`${userCount}`}
+                />
               </div>
             </div>
           </div>
@@ -84,6 +134,7 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+      {/* <ProductOrder/> */}
     </>
   );
 };

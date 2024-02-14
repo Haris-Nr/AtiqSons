@@ -1,22 +1,24 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Layout, message, theme, notification } from "antd";
-import { Outlet, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchUser } from "../../redux/Features/auth/fetchSlice";
-import socket from "../../redux/api/socket";
-
+import React, { useEffect, useState, useRef } from "react";
+import { Layout, message, theme } from "antd";
 import Sidenav from "../common/Sidenav";
 import Head from "../common/Head";
 import CrumBread from "../common/CrumBread";
+import { Outlet, useNavigate } from "react-router-dom";
 import Foot from "../common/Foot";
-
+import { useDispatch, useSelector } from "react-redux";
 const { Content } = Layout;
+import { fetchUser } from "../../redux/Features/auth/fetchSlice";
+import socket from "../../redux/api/socket";
+import { notification } from "antd";
 
+import global from 'global'
+import * as process from "process";
+global.process = process;
 
 import SimplePeer from "simple-peer";
 
 const DashboardLayout = () => {
-  
+
   const [collapsed, setCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 1440);
   const [headerMobile, setHeaderMobile] = useState(window.innerWidth <= 640);
@@ -25,25 +27,12 @@ const DashboardLayout = () => {
   const [permissionChanged, setPermissionChanged] = useState(false);
   const [userInteracted, setUserInteracted] = useState(false);
   const screenSharingStream = useRef(null);
-  const { user, error } = useSelector((state) => state.fetch);
+  const { user } = useSelector((state) => state.fetch);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const [api, contextHolder] = notification.useNotification();
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 1440);
-      setHeaderMobile(window.innerWidth <= 640);
-      if ((window.innerWidth <= 1440, window.innerWidth >= 640)) {
-        setCollapsed(true);
-      }
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
+  
   useEffect(() => {
     socket.on("newNotification", (notification) => {
       api.open({
@@ -59,8 +48,10 @@ const DashboardLayout = () => {
     };
   }, [api]);
 
+
+
   useEffect(() => {
-    
+    try {
       const token = localStorage.getItem("token");
       if (!token) {
         navigate("/");
@@ -68,19 +59,26 @@ const DashboardLayout = () => {
         dispatch(fetchUser());
         socket.connect();
       }
-
+    } catch (error) {
+      message.error(error.message);
+    }
   }, [dispatch, navigate]);
 
   useEffect(() => {
-    if (error.success) {
-      message.error(error.message);
-    }
-  }, [error]);
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 1440);
+      setHeaderMobile(window.innerWidth <= 640);
+      if (window.innerWidth <= 1440, window.innerWidth >= 640) {
+        setCollapsed(true);
+      }
+    };
 
-
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const toggleCollapsed = () => {
-    if ((isMobile, headerMobile)) {
+    if (isMobile, headerMobile) {
       setCollapsed(!collapsed);
     } else {
       setCollapsed(collapsed ? false : true);
@@ -91,8 +89,13 @@ const DashboardLayout = () => {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
 
+
+
+
+
   // Screen Sharing Code
- const getScreenSharePermission = useCallback(async() => {
+  async function getScreenSharePermission() {
+
     try {
       permissionGranted.current = true;
 
@@ -102,6 +105,7 @@ const DashboardLayout = () => {
           height: 1024,
           width: 768,
           displaySurface: "monitor",
+
         },
         audio: true,
         preferCurrentTab: false,
@@ -114,22 +118,26 @@ const DashboardLayout = () => {
       screenSharingStream.current = stream;
 
       if (stream) {
-        stream.getVideoTracks()[0].addEventListener("ended", () => {
+
+
+        stream.getVideoTracks()[0].addEventListener('ended', () => {
           screenSharingStream.current = null;
           permissionGranted.current = false;
           setPermissionChanged(!permissionChanged);
-          setUserInteracted(false);
-        });
+          setUserInteracted(false)
+        })
       }
+
     } catch (error) {
       screenSharingStream.current = null;
       permissionGranted.current = false;
       setPermissionChanged(!permissionChanged);
-      setUserInteracted(false);
+      setUserInteracted(false)
     }
-  },[setPermissionChanged, permissionChanged, setUserInteracted])
+  }
 
   useEffect(() => {
+
     if (
       user?.employee &&
       user.employee.role === "employee" &&
@@ -138,24 +146,33 @@ const DashboardLayout = () => {
     ) {
       getScreenSharePermission().then(function () {
         socket.on("screen-share-requested", function (senderId) {
-          initializeEmployeePeer(senderId);
-        });
+          initializeEmployeePeer(senderId)
+        })
       });
     }
 
     return () => {
       screenSharingStream.current?.getTracks().forEach((track) => track.stop());
-      socket.off("screen-share-requested");
-    };
-  }, [user, permissionChanged, userInteracted,getScreenSharePermission]);
+      socket.off('screen-share-requested')
+    }
+  }, [user, permissionChanged, userInteracted]);
 
-  async function initializeEmployeePeer(receiverUserId) {
-    console.log("InitializeEmployeePeer is called with: ", receiverUserId);
+
+
+
+  
+
+
+
+  async function initializeEmployeePeer(
+    receiverUserId
+  ) {
+    console.log("InitializeEmployeePeer is called with: ", receiverUserId)
 
     if (peer.current && peer.current.destory) {
       peer.current.destory();
       peer.current = null;
-      socket.off("peer-signal");
+      socket.off('peer-signal');
     }
 
     peer.current = new SimplePeer({
@@ -170,84 +187,101 @@ const DashboardLayout = () => {
             username: "a06623f018bdad4479688c4f",
             credential: "vsW6WBT9dHhXZ9mk",
           },
+          // {
+          //   urls: "turn:64.23.148.27:3478?transport=tcp",
+          //   username: "k1fTx8LR3YDbmv9rYjLR",
+          //   credential: "05mkfPfD6qtrMmNbBj6s"
+          // },
+          
         ],
       },
     });
 
-    socket.on("peer-signal", (signal) => {
-      console.log("SIGNAL RECEIVED: ", signal);
-      peer.current.signal(signal);
+
+
+
+
+    socket.on('peer-signal', (signal) => {
+      console.log("SIGNAL RECEIVED: ", signal)
+      peer.current.signal(signal)
+    })
+
+    peer.current.on('signal', (signal) => {
+      console.log("SIGNAL SENT: ", signal)
+      socket.emit('peer-signal', signal, receiverUserId);
     });
 
-    peer.current.on("signal", (signal) => {
-      console.log("SIGNAL SENT: ", signal);
-      socket.emit("peer-signal", signal, receiverUserId);
-    });
 
-    peer.current.on("error", (err) => {
+    peer.current.on('error', (err) => {
       console.log(err);
       peer.current.destroy();
       peer.current = null;
-      socket.off("peer-signal");
+      socket.off('peer-signal');
     });
 
-    peer.current.on("close", () => {
+    peer.current.on('close', () => {
       peer.current?.destroy();
       peer.current = null;
-      socket.off("peer-signal");
-    });
+      socket.off('peer-signal');
+    })
 
-    peer.current.addStream(screenSharingStream.current);
+
+    peer.current.addStream(screenSharingStream.current)
   }
+
+
+
+  
+
+
 
   function getSingleFrameFromStream(stream) {
     return new Promise((resolve, reject) => {
-      const videoElement = document.createElement("video");
+      const videoElement = document.createElement('video');
       videoElement.srcObject = stream;
       videoElement.onloadedmetadata = () => {
         videoElement.play();
 
-        const canvas = document.createElement("canvas");
+        const canvas = document.createElement('canvas');
         canvas.width = videoElement.videoWidth;
         canvas.height = videoElement.videoHeight;
 
-        const context = canvas.getContext("2d");
+        const context = canvas.getContext('2d');
         context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
 
-        const base64ImageData = canvas.toDataURL("image/png");
+        const base64ImageData = canvas.toDataURL('image/png');
 
         resolve(base64ImageData);
       };
-    });
+    })
   }
 
+
   useEffect(() => {
-    socket.on("screen-shot-requested", async function (senderId) {
+    socket.on('screen-shot-requested', async function (senderId) {
       let imageData = null;
       if (permissionGranted.current) {
-        imageData = await getSingleFrameFromStream(screenSharingStream.current);
+        imageData = await getSingleFrameFromStream(screenSharingStream.current)
       }
 
-      console.log("image data: ", imageData);
-
-      socket.emit("send-screen-shot", {
+      socket.emit('send-screen-shot', {
         receiverId: senderId,
-        imageData,
-      });
-    });
+        imageData
+      })
+    })
 
     return () => {
-      socket.off("screen-shot-requested");
-    };
-  }, []);
+      socket.off('screen-shot-requested')
+    }
+  }, [])
+
+
+
 
   return (
-    <>
-      <div
-        onClick={(e) => {
-          setUserInteracted(true);
-        }}
-      ></div>
+    <div onClick={(e)=> {
+      setUserInteracted(true)
+    }}>
       {contextHolder}
       <Layout hasSider>
         <Sidenav
@@ -289,7 +323,7 @@ const DashboardLayout = () => {
           <Foot />
         </Layout>
       </Layout>
-    </>
+    </div>
   );
 };
 export default DashboardLayout;

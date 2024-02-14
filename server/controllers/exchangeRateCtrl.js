@@ -61,12 +61,13 @@ const getExchangeRates = async (req, res) => {
             .limit(limit)
             .skip((page - 1) * limit)
 
-
+        
+        const totalCount = await ExchangeRate.countDocuments(filter);
         res.json({
             exchangeRates,
             page,
             limit,
-            totalCount: exchangeRates.length
+            totalCount
         });
     } catch (error) {
         res.status(500).json({ message: error.message });

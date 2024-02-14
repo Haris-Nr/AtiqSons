@@ -17,7 +17,7 @@ const BreaksTable = () => {
             pageSize,
             search: search.trim()
         }));
-    }, [reload, page, pageSize, reload, dispatch, search]);
+    }, [reload, page, pageSize, reload]);
 
 
     useEffect(() => {
@@ -93,6 +93,17 @@ const BreaksTable = () => {
                 </Space>
             ),
         },
+        // {
+        //     title: 'Status',
+        //     dataIndex: 'status',
+        //     key: 'status',
+        //     render: (status) => (
+        //         <Tag color={status === 'PENDING' ? 'blue' : status === 'APPROVED' ? 'green' : 'volcano'} key={status}>
+        //             {status}
+        //         </Tag>
+        //     ),
+        // },
+
     ];
 
 

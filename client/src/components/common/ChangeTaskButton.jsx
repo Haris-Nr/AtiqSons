@@ -2,16 +2,35 @@ import React from "react";
 import { Button, Popconfirm } from "antd";
 import PropTypes from "prop-types";
 
-const ChangeTaskButton = ({ Id, currentStatus, onChangeStatus }) => {
+const ChangeTaskButton = ({
+  Id,
+  currentStatus,
+  onChangeStatus,
+  itemType,
+}) => {
+
   const handleStatus = () => {
-    let newStatus = currentStatus === "complete" ? "incomplete" : "complete";
+    let newStatus;
+
+    if (itemType === "task") {
+      newStatus = currentStatus === "complete" ? "incomplete" : "complete";
+    }
 
     onChangeStatus(Id, newStatus);
   };
 
-  const popconfirmTitle = `Are you sure to complete this Task?`;
+  const popconfirmTitle =
+    itemType === "task"
+        ? `Are you sure to ${currentStatus === "complete" ? "incomplete" : "complete"
+        } this Task?`
+        : "";
 
-  const okText = "Complete";
+  const okText =
+    itemType === "task"
+        ? currentStatus === "complete"
+          ? "InCompleted"
+          : "Completed"
+        : "";
 
   return (
     <Popconfirm
@@ -19,8 +38,12 @@ const ChangeTaskButton = ({ Id, currentStatus, onChangeStatus }) => {
       onConfirm={handleStatus}
       okText={okText}
     >
-      <Button disabled={currentStatus === "complete"}>
-        {currentStatus === "complete" ? "Completed" : "Complete Task"}
+      <Button type="primary">
+        {itemType === "task" && currentStatus === "completed"
+                ? "InCompleted"
+                : itemType === "task" && currentStatus === "incomplete"
+                  ? "Compeleted"
+                  : "Incompleted"}
       </Button>
     </Popconfirm>
   );
@@ -28,8 +51,12 @@ const ChangeTaskButton = ({ Id, currentStatus, onChangeStatus }) => {
 
 ChangeTaskButton.propTypes = {
   Id: PropTypes.string.isRequired,
-  currentStatus: PropTypes.oneOf(["complete", "incomplete"]),
+  currentStatus: PropTypes.oneOf([
+    "complete",
+    "incomplete",
+  ]),
   onChangeStatus: PropTypes.func.isRequired,
+  itemType: PropTypes.oneOf(["task"]).isRequired,
 };
 
 export default ChangeTaskButton;

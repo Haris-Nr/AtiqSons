@@ -5,7 +5,6 @@ import {
   TrackingProduct,
   getTrackingProduct,
 } from "../../redux/Features/Product/productSlice";
-import moment from "moment";
 
 const EditableContext = React.createContext(null);
 
@@ -90,12 +89,10 @@ const EditableCell = ({
 };
 
 const TrackProduct = ({ id }) => {
-
   const dispatch = useDispatch();
   const [dataSource, setDataSource] = useState([]);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [editableRows, setEditableRows] = useState({});
-  const [lastSaleEntryDate, setLastSaleEntryDate] = useState(null);
 
   const { gettrackproduct } = useSelector((state) => state.product);
 
@@ -111,14 +108,7 @@ const TrackProduct = ({ id }) => {
         date: new Date(item.date),
       }));
       setDataSource(formattedData);
-      const lastDate = formattedData.reduce((maxDate, item) => {
-        const date = moment(item.date).format("DD/MM/YYYY");
-        return date > maxDate ? date : maxDate;
-      }, null);
-      setLastSaleEntryDate(lastDate);
     }
-
-
   }, [gettrackproduct.data, gettrackproduct.success]);
 
   const [count, setCount] = useState(dataSource.length - 1);
@@ -127,7 +117,7 @@ const TrackProduct = ({ id }) => {
     {
       title: "Date",
       dataIndex: "date",
-      render: (_, record) => moment(record.date).format("DD/MM/YYYY"),
+      render: (_, record) => record.date.toISOString().split("T")[0],
     },
     {
       title: "Sale",
@@ -151,16 +141,15 @@ const TrackProduct = ({ id }) => {
     setDataSource([...dataSource, newData]);
     setCount(newKey);
     setIsButtonDisabled(true);
-    setLastSaleEntryDate(moment(new Date()).format("DD/MM/YYYY"));
     setEditableRows(prev => ({ ...prev, [newKey]: true }));
   };
 
   useEffect(() => {
     const timer = setInterval(() => {
-      const today = moment(new Date()).format("DD/MM/YYYY");
+      const today = new Date().toISOString().split("T")[0];
       if (
         dataSource.some(
-          (data) => moment(data.date).format("DD/MM/YYYY") !== today
+          (data) => data.date.toISOString().split("T")[0] !== today
         )
       ) {
         setIsButtonDisabled(false);
@@ -181,7 +170,7 @@ const TrackProduct = ({ id }) => {
     setEditableRows({ ...editableRows, [row.key]: false });
 
   
-    dispatch(TrackingProduct({ productId:id, date: row.date.toISOString(), sale: row.sale }));
+    dispatch(TrackingProduct({ ...row, date: row.date.toISOString(), sale: row.sale }));
     dispatch(getTrackingProduct(id));
     setEditableRows(prev => ({ ...prev, [row.key]: false }));
   };

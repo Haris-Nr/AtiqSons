@@ -182,7 +182,7 @@ const LahoreProductTable = () => {
           current: currentPage,
           pageSize: pageSize,
           total: totalItems,
-          showTotal: (total) => `Total ${total} product ${totalPages} page`,
+          showTotal: (total) => `Total ${total} items ${totalPages} page`,
         }}
         onChange={handleTableChange}
         scroll={{

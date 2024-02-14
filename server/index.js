@@ -10,24 +10,21 @@ require("dotenv").config();
 const dbConnect = require("./config/dbConnect");
 dbConnect();
 
+
 const io = socketIO(server);
 app.set("io", io);
 
 app.use(morgan("tiny"));
-
-app.use(cors( {
-  origin:  [
-    [process.env.CLIENT_URL],
-  ],
-  methods: "*",
-}));
-
-
+app.use(
+  cors({
+    origin: [process.env.CLIENT_URL],
+    methods: "*",
+  })
+);
 
 
 app.use(express.json());
-
-app.use(express.static(path.join(__dirname, 'dist')));
+app.use(express.static(path.join(__dirname, "dist")));
 app.use(express.static(path.join(__dirname, "public")));
 
 // Routes import
@@ -52,10 +49,13 @@ app.use("/api/order", orderRoutes);
 app.use("/api/exchange-rate", exchangeRateRoutes);
 app.use("/api/break", breakRoutes)
 
-
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist/index.html'));
 });
 
-const PORT = process.env.PORT;
+
+
+
+
+const PORT = process.env.PORT || 5555;
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));

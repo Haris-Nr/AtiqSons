@@ -1,5 +1,5 @@
 import { Button, Table, message } from "antd";
-import React, { useCallback, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   deleteAllNotify,
@@ -10,6 +10,9 @@ import {
 import DeleteButton from "./DeleteButton";
 import { Link } from "react-router-dom";
 import socket from "../../redux/api/socket";
+
+
+
 
 
 const NotifyTable = () => {
@@ -23,20 +26,13 @@ const NotifyTable = () => {
 
   let userId = user?.employee?._id
 
-  const fetchInitialData = useCallback(() => {
-    socket.emit("fetchNotifications", userId);
-    socket.emit("unseenCount", userId);
-  }, [userId]);
-
-
-
   const handleDelete = (id) => {
+    console.log(id)
     dispatch(deleteNotify(id)).then(() => {
-      fetchInitialData()
+      socket.emit('fetchNotifications', userId);
     });
   };
   useEffect(() => {
-    fetchInitialData();
     if (deleteNotificationStatus?.success === true) {
       message.success(deleteNotificationStatus?.message);
       dispatch(resetdeleteNotificationStatusState());
@@ -44,13 +40,12 @@ const NotifyTable = () => {
       message.error(deleteNotificationStatus?.message);
       dispatch(resetdeleteNotificationStatusState());
     }
-  }, [deleteNotificationStatus, dispatch,fetchInitialData]);
+  }, [deleteNotificationStatus, dispatch]);
 
   const handlSeen = (id) => {
     dispatch(seenNotify(id)).then(()=>{
-      fetchInitialData()
+      socket.emit('fetchNotifications', userId);
     });
-    
   };
 
   const columns = [
@@ -67,7 +62,7 @@ const NotifyTable = () => {
       render: (text, record) => {
         return (
           <Link
-            to={`../${record.onClick}`} relative="path"
+            to={`${record.onClick}`}
             onClick={() => {
               handlSeen(record._id);
             }}
@@ -106,7 +101,7 @@ const NotifyTable = () => {
 
   const deleteALl = () =>{
     dispatch(deleteAllNotify()).then(()=>{
-      fetchInitialData()
+      socket.emit('fetchNotifications', userId);
     })
   }
   
@@ -128,15 +123,14 @@ const NotifyTable = () => {
 
   return (
     <div>
+      {" "}
       <Table
-      size="middle"
-      bordered
        title={() => heading}
         columns={columns}
         dataSource={dataSourceWithKeys}
         pagination={true}
         scroll={{
-          x: true,
+          x: 1100,
         }}
       />
     </div>

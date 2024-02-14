@@ -93,7 +93,6 @@ export const exchangeRateSlice = createSlice({
         }
     },
     extraReducers: {
-        // getExchangeRate
         [getExchangeRate.pending]: state => {
             state.isLoading = true;
         },
@@ -106,7 +105,6 @@ export const exchangeRateSlice = createSlice({
             state.isLoading = false;
         },
 
-        // getExchangeRatesssssss
         [getExchangeRates.pending]: state => {
             state.isLoading = true;
         },
@@ -119,7 +117,6 @@ export const exchangeRateSlice = createSlice({
             state.isLoading = false;
         },
 
-        //  getCurrencyOptions
         [getCurrencyOptions.pending]: state => {
             state.isLoading = true;
         },
@@ -132,7 +129,6 @@ export const exchangeRateSlice = createSlice({
             state.isLoading = false;
         },
 
-        //  createExchangeRate
         [createExchangeRate.pending]: state => {
             state.isLoading = true;
         },
@@ -144,8 +140,6 @@ export const exchangeRateSlice = createSlice({
             state.errorMessage = action.payload.message;
             state.isLoading = false;
         },
-
-        // updateExchangeRate
         [updateExchangeRate.pending]: state => {
             state.isLoading = true;
         },
@@ -157,8 +151,6 @@ export const exchangeRateSlice = createSlice({
             state.errorMessage = action.payload.message;
             state.isLoading = false;
         },
-
-        // deleteExchangeRate
         [deleteExchangeRate.pending]: state => {
             state.isLoading = true;
         },

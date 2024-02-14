@@ -60,7 +60,7 @@ const createUser = async (req, res) => {
       success: true,
       message:
         "New user account created successfully!!" +
-        newUser.fullname,
+        newUser.fullname.toUpperCase(),
     });
   } catch (error) {
     res.status(500).json({
@@ -100,6 +100,7 @@ const loginUser = async (req, res) => {
     const io = req.app.get("io");
 
     if (user.role !== "admin" && user.role !== "superadmin") {
+      // If the user is neither admin nor superadmin, notify both roles
       await createNotification(
         io,
         "admin",
@@ -121,6 +122,7 @@ const loginUser = async (req, res) => {
         `employees/${user._id}`
       );
     } else if (user.role === "admin") {
+      // If the user is an admin, notify only superadmins
       await createNotification(
         io,
         "superadmin",
@@ -135,7 +137,7 @@ const loginUser = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: user.fullname + " Logged in",
+      message: user.fullname.toUpperCase() + " Logged in",
       token: token,
     });
   } catch (error) {

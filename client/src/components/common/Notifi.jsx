@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   setNotifications,
 } from "../../redux/Features/Notification/notificationSlice";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import moment from "moment";
 import { UserOutlined } from "@ant-design/icons";
 import PropTypes from "prop-types";
@@ -20,6 +20,8 @@ const Notifi = ({ headerMobile }) => {
   const { user } = useSelector((state) => state.fetch);
   let userId = user?.employee?._id;
   const [unseenCount, setUnseenCount] = useState(0);
+
+  const location = useLocation();
 
   const fetchInitialData = useCallback(() => {
     socket.emit("fetchNotifications", userId);
@@ -39,7 +41,6 @@ const Notifi = ({ headerMobile }) => {
     socket.on("notifications", (notifications) => {
       dispatch(setNotifications(notifications));
     });
-
     socket.on("unseenCount", (count) => {
       setUnseenCount(count);
     });
@@ -49,8 +50,7 @@ const Notifi = ({ headerMobile }) => {
       socket.off("notifications");
       socket.off("unseenCount");
     };
-    
-  }, [userId, dispatch,fetchInitialData]);
+  }, [userId, dispatch,fetchInitialData,location]);
   
 
 

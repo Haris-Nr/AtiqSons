@@ -40,7 +40,10 @@
 .ant-btn-danger{
   background-color: red !important;
 }
-  
+
+
+
+
 .custom-select-PENDING .ant-select-selection-item {
   color: #FA541C; /* Change color for 'PENDING' */
 }
@@ -60,3 +63,5 @@
 .custom-select-CANCELLED .ant-select-selection-item {
   color: #FF4D4F; /* Change color for 'CANCELLED' */
 }
+
+  

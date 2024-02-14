@@ -3,11 +3,13 @@ const decodeToken = require("../util/tokenDecoder");
 const Log = require("../models/logModel");
 const User = require("../models/userModel");
 const Notifications = require("../models/notificationModel");
+const { createNotification } = require("../util/notification");
 
 let loggedInEmployeeCount = 0;
 let loggedInAdminCount = 0;
 
 module.exports = (server) => {
+
   const io = socketIO(server, {
     cors: {
       origin: process.env.CLIENT_URL,
@@ -19,22 +21,23 @@ module.exports = (server) => {
   let onlineEmployees = [];
   let onlineAdmins = [];
 
-  const addUser = (userDetails, socket) => {
+  const addUser = (userDetails,  socket) => {
     const { _id, role, fullname, dashboard } = userDetails;
-    const userId = _id.toString();
-    const newUser = {
-      userId,
-      socketId: socket.id,
-      role,
-      fullname,
+    const userId = _id.toString()
+    const newUser = { 
+      userId, 
+      socketId: socket.id, 
+      role, 
+      fullname 
     };
     if (role === "employee") {
       onlineEmployees.push(newUser);
-      socket.join("employees");
-      socket.join(dashboard + "-employees");
+      socket.join('employees');
+      socket.join(dashboard+'-employees');
     } else if (role === "admin" || role === "superadmin") {
       onlineAdmins.push(newUser);
-      socket.join("admins");
+      socket.join('all-admins')
+      socket.join(role)   // admins/superadmins 
     }
   };
 
@@ -52,7 +55,7 @@ module.exports = (server) => {
   };
 
   io.on("connection", async (socket) => {
-    
+
     const token = socket.handshake.auth.token;
 
     const userDetails = await decodeToken(token);
@@ -73,15 +76,21 @@ module.exports = (server) => {
         "Employee connected. Total employees:",
         loggedInEmployeeCount
       );
-    } else if (
-      userDetails.role === "admin" ||
-      userDetails.role === "superadmin"
-    ) {
+    } else if (userDetails.role === "admin" || userDetails.role === "superadmin") {
       loggedInAdminCount++;
       console.log("Admin connected. Total admins:", loggedInAdminCount);
     }
 
     updateAndNotifyAdmins();
+
+    // const userConnectedNotification = {
+    //   message: `${userDetails.fullname} is now online`,
+    //   user: userDetails._id,
+    // };
+    // // Emit notification to all admins
+    // onlineAdmins.forEach((admin) => {
+    //   io.to(admin.socketId).emit("userStatusChange", userConnectedNotification);
+    // });
 
     const user = await User.findById(userDetails._id);
 
@@ -95,35 +104,33 @@ module.exports = (server) => {
     );
 
     socket.on("is-employee-online", async (employeeId, callback) => {
-      callback(
-        !!onlineEmployees.find((employee) => employee.userId === employeeId)
-      );
+      callback(!!onlineEmployees.find((employee) => employee.userId === employeeId));
     });
 
     socket.on("request-screen-share", (senderId, receiverId) => {
       io.to(receiverId).emit("screen-share-requested", senderId);
-    });
+    })
 
     socket.on("peer-signal", (signal, receiverId) => {
       io.to(receiverId).emit("peer-signal", signal);
-    });
+    })
+
+
 
     socket.on("request-screen-shot", (senderId, receiverId) => {
       console.log("Requesting screen shot from:", senderId, "to:", receiverId);
       io.to(receiverId).emit("screen-shot-requested", senderId);
-    });
+    })
 
     socket.on("send-screen-shot", ({ receiverId, imageData }) => {
       console.log("Sending screen shot to:", receiverId);
       io.to(receiverId).emit("screen-shot-received", { imageData });
-    });
+    })
 
-    socket.on("fetchNotifications", async (userId) => {
+    socket.on('fetchNotifications', async (userId) => {
       try {
-        const notifications = await Notifications.find({ user: userId }).sort({
-          createdAt: -1,
-        });
-        io.to(userId).emit("notifications", notifications);
+        const notifications = await Notifications.find({ user: userId }).sort({ createdAt: -1 });
+        io.to(userId).emit('notifications', notifications);
       } catch (error) {
         console.error("Error fetching notifications:", error);
       }
@@ -133,42 +140,36 @@ module.exports = (server) => {
       try {
         const user = await getUser(userId);
         if (user) {
-          const unseenCount = await Notifications.countDocuments({
-            user: userId,
-            seen: false,
-          });
-          io.to(user.userId).emit("unseenCount", unseenCount);
+          const unseenCount = await Notifications.countDocuments({ user: userId, seen: false });
+          io.to(user.userId).emit('unseenCount', unseenCount);
         }
       } catch (error) {
         console.error("Error fetching count:", error);
       }
-    });
+    })
 
-    socket.on("markNotificationAsSeen", async (notificationId) => {
+
+    socket.on('markNotificationAsSeen', async (notificationId) => {
       try {
-        const updatedNotification = await Notifications.findByIdAndUpdate(
-          notificationId,
-          { seen: true },
-          { new: true }
-        );
+        const updatedNotification = await Notifications.findByIdAndUpdate(notificationId, { seen: true }, { new: true });
 
         if (updatedNotification && updatedNotification.user) {
           for (const userId of updatedNotification.user) {
-            const unseenCount = await Notifications.countDocuments({
-              user: userId,
-              seen: false,
-            });
-            io.to(userId.toString()).emit("unseenCount", unseenCount);
-            const notifications = await Notifications.find({
-              user: userId,
-            }).sort({ createdAt: -1 });
-            io.to(userId).emit("notifications", notifications);
+            const unseenCount = await Notifications.countDocuments({ user: userId, seen: false });
+            io.to(userId.toString()).emit('unseenCount', unseenCount);
+            const notifications = await Notifications.find({ user: userId }).sort({ createdAt: -1 });
+            io.to(userId).emit('notifications', notifications);
+
           }
         }
       } catch (error) {
         console.error("Error marking notification as seen:", error);
       }
     });
+
+
+
+
 
     socket.on("disconnect", async () => {
       removeUser(socket.id);
@@ -178,15 +179,21 @@ module.exports = (server) => {
           "Employee disconnected. Total employees:",
           loggedInEmployeeCount
         );
-      } else if (
-        userDetails.role === "admin" ||
-        userDetails.role === "superadmin"
-      ) {
+      } else if (userDetails.role === "admin" || userDetails.role === "superadmin") {
         loggedInAdminCount--;
         console.log("Admin disconnected. Total admins:", loggedInAdminCount);
       }
 
       updateAndNotifyAdmins();
+
+      // const userDisconnectedNotification = {
+      //   message: `${user.fullname} is now offline`,
+      //   user: user._id,
+      // };
+      // // Emit notification to all admins
+      // onlineAdmins.forEach((admin) => {
+      //   io.to(admin.socketId).emit("userStatusChange", userDisconnectedNotification);
+      // });
 
       await Log.findOneAndUpdate(
         {

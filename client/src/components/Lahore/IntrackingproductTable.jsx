@@ -1,26 +1,55 @@
-import React, { useEffect } from "react";
-import { Table, Image, Tag } from "antd";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useRef, useState } from "react";
+import { Table, Input, Image, Tag } from "antd";
+import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { getIntrackingProduct} from "../../redux/Features/Product/productSlice";
-const baseURL = import.meta.env.VITE_API_BASE_URL;
+import { getIntrackingProduct, setCurrentPage, setPageSize } from "../../redux/Features/Product/productSlice";
+import Highlighter from "react-highlight-words";
+const { Search } = Input;
 
 const IntrackingproductTable = () => {
-    const navigate = useNavigate();
+    
     const dispatch = useDispatch();
     const { user } = useSelector((state) => state.fetch);
     const { employee } = user;
     const {
         IntrackingProductdata,
-        isLoading } = useSelector((state) => state.product);
+        isLoading,
+        totalItems,
+        currentPage,
+        pageSize, } = useSelector((state) => state.product);
+    const [searchText, setSearchText] = useState("");
+    const searchInput = useRef(null);
+
+    const handleSearch = (value) => {
+        setSearchText(value);
+    };
 
 
     useEffect(() => {
         if (employee?._id) {
             dispatch(getIntrackingProduct(employee?._id));
         }
-    }, [dispatch, employee]);
+    }, [dispatch, employee, currentPage, pageSize]);
 
+    const handleTableChange = (pagination) => {
+        dispatch(setCurrentPage(pagination.current));
+        dispatch(setPageSize(pagination.pageSize));
+    };
+
+
+
+
+    const renderColumnWithHighlight = (text) => (
+        <Highlighter
+            highlightStyle={{
+                backgroundColor: "#ffc069",
+                padding: 0,
+            }}
+            searchWords={[searchText]}
+            autoEscape
+            textToHighlight={text ? text.toString() : ""}
+        />
+    );
 
     const columns = [
         {
@@ -35,19 +64,27 @@ const IntrackingproductTable = () => {
             title: "Thumbnail",
             dataIndex: "url",
             render: (_, record) => {
-                const imageUrl = record.image ? `${baseURL}${record.image}` : "/no.png";
-                return <Image width={100} src={imageUrl} />;
+                return <Image width={100} src={record.image[0].url} />;
             },
         },
         {
             title: "Product Name",
             dataIndex: "productName",
             key: "productName",
+            render: (text, record) => {
+                return (
+                    <Link to={`${record._id}`} key={record._id}>
+                        {renderColumnWithHighlight(text)}
+                    </Link>
+                );
+            },
+            width: "30%",
         },
         {
             title: "Asin No",
             dataIndex: "asin",
             key: "asin",
+            render: (text) => renderColumnWithHighlight(text),
         },
         {
             title: "Track Progress",
@@ -55,6 +92,7 @@ const IntrackingproductTable = () => {
             key: "tracking",
             render: (text, { tracking }) => {
                 return (
+                    renderColumnWithHighlight(text),
                     (
                         <Tag
                             color={`${tracking === "pending"
@@ -65,7 +103,7 @@ const IntrackingproductTable = () => {
                                 }`}
                             key={tracking}
                         >
-                            {tracking}
+                            {tracking.toUpperCase()}
                         </Tag>
                     )
                 );
@@ -86,43 +124,58 @@ const IntrackingproductTable = () => {
                                     : "green"
                         }
                     >
-                        {status}
+                        {renderColumnWithHighlight(status.toUpperCase())}
                     </Tag>
                 </>
             ),
         },
     ];
 
-    const onRowClick = (record) => {
-        return {
-          onClick: () => {
-            navigate(record._id);
-          },
-        };
-      };
-
+    const heading = (
+        <div className="flex justify-between">
+            <Search
+                ref={searchInput}
+                size="medium"
+                style={{ marginBottom: 2, width: "30%" }}
+                onSearch={handleSearch}
+                placeholder="Search"
+                allowClear
+            />
+        </div>
+    );
 
     const dataSourceWithKeys = IntrackingProductdata.data
         ? IntrackingProductdata.data
-            .map((item,index) => ({
+            .filter((item) =>
+                Object.values(item)
+                    .join(" ")
+                    .toLowerCase()
+                    .includes(searchText.toLowerCase())
+            )
+            .map((item) => ({
                 ...item,
-                key: index,
+                key: item._id,
             }))
         : [];
 
     return (
         <div>
             <Table
-            size="middle"
                 bordered
                 loading={isLoading}
+                title={() => heading}
                 columns={columns}
                 dataSource={dataSourceWithKeys}
-                pagination={true}
-                scroll={{
-                    x: true,
+                pagination={{
+                    current: currentPage,
+                    pageSize: pageSize,
+                    total: totalItems,
+                    showTotal: (total) => `Total ${total} items`,
                 }}
-                onRow={onRowClick}
+                onChange={handleTableChange}
+                scroll={{
+                    x: 1500,
+                }}
             />
         </div>
     );

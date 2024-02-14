@@ -1,5 +1,6 @@
 import {
     Table,
+    Tag,
     Space,
     Button,
     Modal,
@@ -29,7 +30,6 @@ import { defaultCurrency } from '../../utils/currencyOptions';
 import ConfirmationModal from './ConfirmationModal';
 
 const OrdersTable = () => {
-    
     const dispatch = useDispatch();
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
@@ -72,7 +72,7 @@ const OrdersTable = () => {
 
     useEffect(() => {
         dispatch(getCurrencyOptions());
-    }, [dispatch]);
+    }, []);
 
     useEffect(() => {
         setCurrentPage(1);
@@ -84,7 +84,7 @@ const OrdersTable = () => {
             pageSize,
             search: search.trim()
         }));
-    }, [dispatch, currentPage, pageSize, reload,search]);
+    }, [dispatch, currentPage, pageSize, reload]);
 
 
     useEffect(() => {
@@ -203,11 +203,11 @@ const OrdersTable = () => {
                             defaultValue={status}
                             onChange={(value) => handleOrderStatusChangeBtnClick(value, record._id)}
                         >
-                            <Select.Option value="PENDING">Pending</Select.Option>
-                            <Select.Option value="PROCESSING">Processing</Select.Option>
-                            <Select.Option value="IN TRANSIT">In Transit</Select.Option>
-                            <Select.Option value="DELIVERED">Delivered</Select.Option>
-                            <Select.Option value="CANCELLED">Cancelled</Select.Option>
+                            <Option value="PENDING">Pending</Option>
+                            <Option value="PROCESSING">Processing</Option>
+                            <Option value="IN TRANSIT">In Transit</Option>
+                            <Option value="DELIVERED">Delivered</Option>
+                            <Option value="CANCELLED">Cancelled</Option>
                         </Select>
                     </div>
                 );

@@ -69,7 +69,6 @@ const breakSlice = createSlice({
     initialState: initialState,
     reducers: {},
     extraReducers: {
-        //get break
         [getBreaks.pending]: (state) => {
             state.loading = true;
         },
@@ -81,7 +80,7 @@ const breakSlice = createSlice({
             state.loading = false;
             state.error = action.error.message;
         },
-        // get leave
+
         [getLeaves.pending]: (state) => {
             state.loading = true;
         },
@@ -94,19 +93,18 @@ const breakSlice = createSlice({
             state.error = action.error.message;
         },
 
-        // createBreak
+
         [createBreak.pending]: (state) => {
             state.loading = true;
         },
         [createBreak.fulfilled]: (state, action) => {
             state.loading = false;
-            state.breaks.push(action.payload);
         },
         [createBreak.rejected]: (state, action) => {
             state.loading = false;
             state.error = action.error.message;
         },
-        // approve leave
+
         [approveLeave.pending]: (state) => {
             state.loading = true;
         },
@@ -123,7 +121,6 @@ const breakSlice = createSlice({
             state.loading = false;
             state.error = action.error.message;
         },
-        // reject leave
         [rejectLeave.pending]: (state) => {
             state.loading = true;
         },

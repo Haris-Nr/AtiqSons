@@ -94,7 +94,7 @@ const createOrder = async (req, res) => {
         const savedOrder = await order.save();
         
         createRoomNotification({
-            io,
+            io: req.app.get('io'),
             room: "china-employees",
             actionUser: req.user._id,
             title: "New Order",

@@ -99,6 +99,7 @@ const AdminProductTable = () => {
       key: "status",
       render: (text, { status }) => {
         return (
+          renderColumnWithHighlight(text),
           (
             <Tag
               color={`${
@@ -110,7 +111,7 @@ const AdminProductTable = () => {
               }`}
               key={status}
             >
-            {renderColumnWithHighlight(status)},
+              {status.toUpperCase()}
             </Tag>
           )
         );
@@ -123,7 +124,7 @@ const AdminProductTable = () => {
       key: "tracking",
       render: (text, { tracking }) => {
         return (
-          
+          renderColumnWithHighlight(text),
           (
             <Tag
               color={`${
@@ -135,7 +136,7 @@ const AdminProductTable = () => {
               }`}
               key={tracking}
             >
-              {renderColumnWithHighlight(tracking)}
+              {tracking.toUpperCase()}
             </Tag>
           )
         );

@@ -16,6 +16,7 @@ import {
   addProduct,
   resetProductState,
 } from "../../redux/Features/Product/productSlice";
+import { Option } from "antd/es/mentions";
 
 const ProductButton = () => {
   const dispatch = useDispatch();
@@ -48,7 +49,6 @@ const ProductButton = () => {
       dispatch(Productsbyemployee(employee?._id));
     });
   };
-
 
   useEffect(() => {
     if (productdata.success) {
@@ -122,9 +122,9 @@ const ProductButton = () => {
       }}
       onChange={handleCurrencyChange}
     >
-      <Select.Option value="$">$</Select.Option>
-      <Select.Option value="AED">AED</Select.Option>
-      <Select.Option value="SAU">SAU</Select.Option>
+      <Option value="$">$</Option>
+      <Option value="AED">AED</Option>
+      <Option value="SAU">SAU</Option>
     </Select>
   );
 
@@ -258,7 +258,7 @@ const ProductButton = () => {
             message="Please select which item"
             hasFeedback
           >
-            <Select placeholder="Select a Item" size="middle" options={items}/>
+            <Select placeholder="Select a Item" size="middle" options={items} />
           </Form.Item>
 
           <Form.Item

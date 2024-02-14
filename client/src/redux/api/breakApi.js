@@ -29,6 +29,8 @@ const createBreak = async (startTime, endTime, isLeave, onSucess, onFail) => {
             isLeave
         });
 
+        console.log(response);
+
         if (response.status === 201 || response.status === 200) {
             onSucess();
             return response.data;

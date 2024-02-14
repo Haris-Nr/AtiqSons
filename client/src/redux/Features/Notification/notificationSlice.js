@@ -1,24 +1,50 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
+  AddNotification,
   DeleteAllNotifications,
   DeleteNotification,
+  FetchAllNotifications,
   SeenSingleNotification,
 } from "../../api/notificationApi";
 
 const initialState = {
   isLoading: false,
+  getNotificationdata: [],
   deleteNotificationStatus: null,
   seenNotificationStatus: {},
   deleteAllNotificationsStatus: null,
   notify:[]
 };
 
+export const addNotify = createAsyncThunk(
+  "notifi/addNotification",
+  async (data, thunkAPI) => {
+    try {
+      const response = await AddNotification(data);
+      return response;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
 
+export const FetchNotifications = createAsyncThunk(
+  "notifi/allNotification",
+  async (_, thunkAPI) => {
+    try {
+      const response = await FetchAllNotifications();
+      return response;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
 
 export const deleteNotify = createAsyncThunk(
   "notification/deleteNotification",
   async (id, thunkAPI) => {
     try {
+      console.log(id);
       const response = await DeleteNotification(id);
       return response;
     } catch (error) {
@@ -71,6 +97,17 @@ export const notificationSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(FetchNotifications.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(FetchNotifications.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.getNotificationdata = action.payload;
+      })
+      .addCase(FetchNotifications.rejected, (state, action) => {
+        state.isLoading = false;
+        state.getNotificationdata = action.payload;
+      })
       // Handle deleteNotify
       .addCase(deleteNotify.pending, (state) => {
         state.isLoading = true;

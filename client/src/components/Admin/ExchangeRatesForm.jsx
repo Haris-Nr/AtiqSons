@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { Form, InputNumber, Button, Select } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Form, Input, InputNumber, Button, Select } from 'antd';
 import currencyOptions from '../../utils/currencyOptions';
 const { Option } = Select;
 

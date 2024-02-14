@@ -1,33 +1,26 @@
-import { Table, Image, message } from "antd";
-import { useEffect } from "react";
+import { Table, Tag, Image, Space,} from "antd";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Highlighter from "react-highlight-words";
+import Search from "antd/es/input/Search";
 import {
   DubaiProduct,
-  setCurrentPage,
-  setPageSize,
 } from "../../redux/Features/Product/productSlice";
-import { useNavigate } from "react-router-dom";
-import ProductSearch from "../common/ProductSearch";
-import socket from "../../redux/api/socket";
-
-const baseURL = import.meta.env.VITE_API_BASE_URL;
+import { Link } from "react-router-dom";
+import Find from "./Find";
 
 const DubaiProductTable = () => {
-  const navigate = useNavigate();
 
   const dispatch = useDispatch();
 
-  const {
-    dubaiProductData,
-    isLoading,
-    currentPage,
-    pageSize,
-    totalItems,
-    totalPages,
-    search,
-    error,
-  } = useSelector((state) => state.product);
+  const { dubaiProductData, isLoading } =
+    useSelector((state) => state.product);
+
+  const [searchText, setSearchText] = useState("");
+  const searchInput = useRef(null);
+  const handleSearch = (value) => {
+    setSearchText(value);
+  };
 
   const renderColumnWithHighlight = (text) => (
     <Highlighter
@@ -35,7 +28,7 @@ const DubaiProductTable = () => {
         backgroundColor: "yellow",
         padding: 0,
       }}
-      searchWords={[search]}
+      searchWords={[searchText]}
       autoEscape
       textToHighlight={text ? text.toString() : ""}
     />
@@ -43,23 +36,15 @@ const DubaiProductTable = () => {
 
   useEffect(() => {
     dispatch(DubaiProduct());
-    socket.connect();
-    if (error.success === false) {
-      message.error(error.message);
-    }
-  }, [dispatch, currentPage, pageSize, search, error.success, error.message]);
+  }, [dispatch]);
 
-  const handleTableChange = (pagination) => {
-    dispatch(setCurrentPage(pagination.current));
-    dispatch(setPageSize(pagination.pageSize));
-  };
 
   const columns = [
     {
       title: "SrNo",
       key: "srNo",
       render: (text, record, index) => {
-        return (currentPage - 1) * pageSize + index + 1;
+        return index + 1;
       },
     },
     {
@@ -67,66 +52,129 @@ const DubaiProductTable = () => {
       title: "Thumbnail",
       dataIndex: "url",
       render: (_, record) => {
-        const imageUrl = record.image ? `${baseURL}${record.image}` : "/no.png";
-        return <Image width={100} src={imageUrl} />;
+        return <Image width={100} src={record.image[0].url} />;
       },
     },
     {
       title: "Product Name",
       dataIndex: "productName",
       key: "productName",
+      render: (text, record) => {
+        return (
+          <Link to={`${record._id}`} key={record._id}>
+            {renderColumnWithHighlight(text)}
+          </Link>
+        );
+      },
+      width: "30%",
+    },
+    {
+      title: "Seller",
+      dataIndex: "seller",
+      key: "quantity",
       render: (text) => renderColumnWithHighlight(text),
+    },
+    {
+      title: "Asin No",
+      dataIndex: "asin",
+      key: "asin",
+      render: (text) => renderColumnWithHighlight(text),
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      render: (text, { status }) => {
+        return (
+          renderColumnWithHighlight(text),
+          (
+            <Tag
+              color={`${status === "pending"
+                  ? "yellow"
+                  : status === "rejected"
+                    ? "red"
+                    : "green"
+                }`}
+              key={status}
+            >
+              {status.toUpperCase()}
+            </Tag>
+          )
+        );
+      },
+    },
+    {
+      title: "Track Progress",
+      dataIndex: "tracking",
+      key: "tracking",
+      render: (text, { tracking }) => {
+        return (
+          renderColumnWithHighlight(text),
+          (
+            <Tag
+              color={`${tracking === "pending"
+                ? "yellow"
+                : tracking === "tracked"
+                  ? "purple"
+                  : "green"
+                }`}
+              key={tracking}
+            >
+              {tracking.toUpperCase()}
+            </Tag>
+          )
+        );
+      },
+    },
+    {
+      title: "Action",
+      dataIndex: "action",
+      render: () => (
+        <Space size="middle">
+          <Find/>
+        </Space>
+      ),
+      key: "action",
     },
   ];
 
-  const onRowClick = (record) => {
-    return {
-      onClick: () => {
-        navigate(record._id);
-      },
-    };
-  };
-
   const dataSourceWithKeys = dubaiProductData.data
     ? dubaiProductData.data
-        .filter((item) =>
-          Object.values(item)
-            .join(" ")
-            .toLowerCase()
-            .includes(search.toLowerCase())
-        )
-        .map((item, index) => ({
-          ...item,
-          key: index,
-        }))
+      .filter((item) =>
+        Object.values(item)
+          .join(" ")
+          .toLowerCase()
+          .includes(searchText.toLowerCase())
+      )
+      .map((item,index) => ({
+        ...item,
+        key: index,
+      }))
     : [];
 
   const head = (
-    <div className=" flex justify-starts">
-      <ProductSearch />
+    <div className="flex justify-between ">
+      <Search
+        ref={searchInput}
+        size="medium"
+        style={{ marginBottom: 2, width: "30%" }}
+        onSearch={handleSearch}
+        placeholder="Search"
+        allowClear
+      />
     </div>
   );
 
   return (
     <div>
       <Table
-        size="large"
         bordered
         loading={isLoading}
         title={() => head}
         columns={columns}
-        onRow={onRowClick}
         dataSource={dataSourceWithKeys}
-        scroll={{ x: true }}
-        pagination={{
-          showQuickJumper: true,
-          showSizeChanger: true,
-          current: currentPage,
-          pageSize: pageSize,
-          total: totalItems,
-          showTotal: (total) => `Total ${total} items and ${totalPages} Pages`,
-        }}
-        onChange={handleTableChange}
+        scroll={{ x: 1500 }}
+        pagination={{ pageSize: 8 }}
       />
     </div>
   );

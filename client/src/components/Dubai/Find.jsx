@@ -1,43 +1,18 @@
-import React, { useState, useRef, useEffect } from "react";
-import { Button, Modal, Form, Input, InputNumber, message, Upload } from "antd";
-import { useDispatch, useSelector } from "react-redux";
-import {
-    AllProduct,
-    createDubaiProduct,
-    resetDubaiProductState,
-} from "../../redux/Features/Dubai/dubaiSlice";
-import { UploadOutlined } from "@ant-design/icons";
+import React, { useState, useRef, useEffect } from 'react';
+import { Button, Modal, Form, Input, InputNumber, message } from 'antd';
+import { useDispatch, useSelector } from 'react-redux';
+import { createDubaiProduct, resetDubaiProductState } from '../../redux/Features/Dubai/dubaiSlice';
 
-const Find = ({ id }) => {
-    const [fileList, setFileList] = useState([]);
+const Find = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [confirmLoading, setConfirmLoading] = useState(false);
-    const { user } = useSelector((state) => state.fetch);
-    const { employee } = user;
+
 
     const dispatch = useDispatch();
-    const { addDubaiProductData, isLoading } = useSelector(
-        (state) => state.dubai
-    );
+    const { addDubaiProductData, isLoading } = useSelector((state) => state.dubai);
 
     const onFinish = (values) => {
-        const formData = new FormData();
-        formData.append("productId", id);
-        formData.append("createdBy", employee?._id);
-
-        for (const [key, value] of Object.entries(values)) {
-            if (key !== "image") {
-                formData.append(key, value);
-            }
-        }
-
-        if (fileList.length > 0) {
-            formData.append("image", fileList[0].originFileObj);
-        }
-
-        dispatch(createDubaiProduct(formData)).then(() => {
-            dispatch(AllProduct(id));
-        });
+        dispatch(createDubaiProduct(values));
     };
 
     useEffect(() => {
@@ -60,7 +35,6 @@ const Find = ({ id }) => {
 
     const resetFormAndCloseModal = () => {
         formRef?.current?.resetFields();
-        setFileList([]);
         setIsModalOpen(false);
     };
 
@@ -73,19 +47,24 @@ const Find = ({ id }) => {
                 if (isLoading) {
                     resetFormAndCloseModal();
                     setConfirmLoading(false);
+                    dispatch(createDubaiProduct());
                 }
             })
             .catch((errorInfo) => {
                 message.error(errorInfo);
             });
-                    dispatch(AllProduct(id));
+
     };
     const handleCancel = () => {
         resetFormAndCloseModal();
     };
     return (
         <>
-            <Button type="primary" onClick={showModal} shape="round">
+            <Button
+                type="primary"
+                onClick={showModal}
+                shape="round"
+            >
                 Find
             </Button>
             <Modal
@@ -94,8 +73,12 @@ const Find = ({ id }) => {
                 onOk={handleOk}
                 onCancel={handleCancel}
                 confirmLoading={confirmLoading}
+
             >
-                <Form name="find product" ref={formRef} onFinish={onFinish}>
+                <Form
+                    name="addProductForm"
+                    ref={formRef}
+                    onFinish={onFinish}>
                     <Form.Item
                         label="Product Name"
                         name="productName"
@@ -112,32 +95,43 @@ const Find = ({ id }) => {
                     >
                         <Input />
                     </Form.Item>
-
                     <Form.Item
                         label="Quantity"
                         name="quantity"
-                        rules={[{ required: true, message: "Please enter the quantity!" }]}
+                        rules={[
+                            { required: true, message: "Please enter the quantity!" },
+                            {
+                                type: "number",
+                                min: 0,
+                                message: "quantity must be a non-negative number!",
+                            },
+                        ]}
                     >
-                        <InputNumber style={{ width: "100%" }} />
+                        <InputNumber />
                     </Form.Item>
-
                     <Form.Item
-                        label="SKU"
-                        name="sku"
+                        label="ASIN"
+                        name="asin"
                         rules={[
                             {
                                 required: true,
-                                message: "Please enter sky!",
+                                message: "Please enter ASIN number!",
                             },
                         ]}
                     >
                         <Input />
                     </Form.Item>
-
                     <Form.Item
-                        label="Reserve"
-                        name="reserve"
-                        rules={[{ required: true, message: "Please enter!" }]}
+                        label="Price"
+                        name="price"
+                        rules={[
+                            { required: true, message: "Please enter the price!" },
+                            {
+                                type: "number",
+                                min: 0,
+                                message: "Price must be a non-negative number!",
+                            },
+                        ]}
                     >
                         <InputNumber
                             formatter={(value) =>
@@ -145,18 +139,8 @@ const Find = ({ id }) => {
                             }
                             parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
                             style={{ width: "100%" }}
-                        />
-                    </Form.Item>
 
-                    <Form.Item label="Image Upload" name="image" hasFeedback>
-                        <Upload
-                            maxCount={1}
-                            fileList={fileList}
-                            onChange={({ fileList: newFileList }) => setFileList(newFileList)}
-                            beforeUpload={() => false}
-                        >
-                            <Button icon={<UploadOutlined />}>Click to Upload</Button>
-                        </Upload>
+                        />
                     </Form.Item>
                 </Form>
             </Modal>

@@ -1,17 +1,16 @@
-import { message, Table, Tag } from "antd";
+import { message, Space, Table, Tag } from "antd";
+import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from "react";
 import { TasksForEmployee, changeTaskStatus, resetStatusState } from "../../redux/Features/Task/taskSlice";
 import ChangeTaskButton from "./ChangeTaskButton";
 import moment from "moment";
-import socket from "../../redux/api/socket";
 
 const TaskTable = () => {
     const dispatch = useDispatch()
     const { fetchtaskData, changeStatusdata } = useSelector((state)=>state.task)
 
     useEffect(()=>{
-      socket.connect();
         dispatch(TasksForEmployee())
     },[dispatch])
 
@@ -39,7 +38,7 @@ const TaskTable = () => {
     {
       title: "Due Date",
       dataIndex: "dueDate",
-      render: (dueDate) => moment(dueDate).format('DD/MM/YYYY'),
+      render: (dueDate) => moment(dueDate).format('YYYY-MM-DD'),
     },
     {
       title: "Status",
@@ -55,11 +54,15 @@ const TaskTable = () => {
       dataIndex: "action",
       render: (text, record) => {
         return (
+          <Space size="middle">
+            {/* <DeleteButton onConfirmDelete={() => handleDelete(record._id)} /> */}
             <ChangeTaskButton
+              itemType="task"
               Id={record._id}
               currentStatus={record.status}
               onChangeStatus={handleStatus}
             />
+          </Space>
         );
       },
       key: "action",
@@ -67,8 +70,9 @@ const TaskTable = () => {
   ];
 
   const dataSourceWithKeys = fetchtaskData?.data
-  ? fetchtaskData?.data.map((item,index) => ({ ...item, key: index }))
+  ? fetchtaskData?.data.map((item,index) => ({ ...item, key: index++ }))
   : [];
+  console.log(fetchtaskData);
 
   const rowClassName = (record) => {
     const isIncomplete = record.status.toLowerCase() !== 'complete';
@@ -88,13 +92,13 @@ const TaskTable = () => {
 
   return (
       <Table
-      size="middle"
-      bordered
         columns={columns}
         dataSource={dataSourceWithKeys}
-        pagination={true}
+        pagination={{
+          pageSize: 8,
+        }}
         scroll={{
-          x: true,
+          x: 1500,
         }}
         rowClassName={rowClassName}
       />

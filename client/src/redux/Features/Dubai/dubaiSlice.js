@@ -5,7 +5,6 @@ const initialState = {
     addDubaiProductData: {},
     AllProductData: [],
     isLoading: false,
-    error:{}
 };
 
 export const createDubaiProduct = createAsyncThunk(
@@ -22,9 +21,9 @@ export const createDubaiProduct = createAsyncThunk(
 
 export const AllProduct = createAsyncThunk(
     "dubai/allproduct",
-    async (id, thunkAPI) => {
+    async (_, thunkAPI) => {
         try {
-            const response = await dubaiApi.allProduct(id);
+            const response = await dubaiApi.allProduct();
             return response;
         } catch (error) {
             return thunkAPI.rejectWithValue(error);
@@ -55,7 +54,6 @@ export const dubaiSlice = createSlice({
                 state.isLoading = false;
                 state.addDubaiProductData = action.payload;
             })
-            // all products
             .addCase(AllProduct.pending, (state) => {
                 state.isLoading = true;
             })
@@ -65,7 +63,7 @@ export const dubaiSlice = createSlice({
             })
             .addCase(AllProduct.rejected, (state, action) => {
                 state.isLoading = false;
-                state.error = action.payload;
+                state.AllProductData = action.payload;
             })
     },
 });

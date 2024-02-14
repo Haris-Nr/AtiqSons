@@ -4,7 +4,6 @@ import authApi from "../../api/authApi";
 const initialState = {
     allLogsData: [],
   isLoading: false,
-  error:{},
   currentPage: 1,
   pageSize: 10,
   totalPages: 0,
@@ -24,18 +23,6 @@ export const allLogs = createAsyncThunk(
     }
 );
 
-export const deleteAllLogs = createAsyncThunk(
-  "logs/deleteAll",
-  async (_, { rejectWithValue }) => {
-      try {
-          const response = await authApi.deleteAllLogs();
-          return response;
-      } catch (error) {
-          return rejectWithValue(error);
-      }
-  }
-);
-
 export const logSlice = createSlice({
     name: "logs",
     initialState,
@@ -50,7 +37,6 @@ export const logSlice = createSlice({
     
     extraReducers: (builder) => {
         builder
-        // show logs
             .addCase(allLogs.pending, (state) => {
                 state.isLoading = true;
             })
@@ -63,19 +49,8 @@ export const logSlice = createSlice({
             })
             .addCase(allLogs.rejected, (state, action) => {
                 state.isLoading = false;
-                state.error = action.payload;
-            })
-            // delete all logs
-            .addCase(deleteAllLogs.pending, (state) => {
-              state.isLoading = true;
-          })
-          .addCase(deleteAllLogs.fulfilled, (state) => {
-              state.isLoading = false;
-          })
-          .addCase(deleteAllLogs.rejected, (state, action) => {
-              state.isLoading = false;
-              state.error = action.payload;
-          });
+                state.allLogsData = action.payload;
+            });
     },
 });
 export const { setCurrentPage, setPageSize } = logSlice.actions;

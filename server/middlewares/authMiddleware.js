@@ -1,7 +1,8 @@
 const jwt = require("jsonwebtoken");
 const secret = process.env.JWT_SECRET;
+const User = require("../models/userModel");
 
-module.exports = (req, res, next) => {
+module.exports = async (req, res, next) => {
     try {
 
         if (!req.headers.authorization) {
@@ -16,6 +17,8 @@ module.exports = (req, res, next) => {
 
         const decodedToken = jwt.verify(token, secret);
         req.body.userId = decodedToken.userId;
+        const user = await User.findById(req.body.userId).select("-password");
+        req.user = user; 
         next();
     } catch (error) {
         res.status(401).json({

@@ -15,13 +15,17 @@ import DeleteButton from "../common/DeleteButton";
 import socket from "../../redux/api/socket";
 import { useNavigate } from "react-router-dom";
 
+import global from 'global'
+import * as process from "process";
+global.process = process;
+
 import SimplePeer from "simple-peer";
+
 
 const UserInfo = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   let { id } = useParams();
-
   const peer = useRef(null);
   const remoteVideo = useRef(null);
   const [showScreenShareModal, setShowScreenShareModal] = useState(false);
@@ -81,6 +85,10 @@ const UserInfo = () => {
       dispatch(resetDeleteState());
     }
   }, [deleteEmployeedata, dispatch]);
+
+
+
+
 
   const items = [
     {
@@ -146,21 +154,28 @@ const UserInfo = () => {
     {
       key: "10",
       label: "See User Screen",
-      children: <button onClick={handleSeeUserScreenClick}>Click Here</button>,
+      children: (
+        <button onClick={handleSeeUserScreenClick}>
+          Click Here
+        </button>
+      ),
     },
     {
       key: "11",
       label: "Capture Screen Shot",
       children: (
-        <button onClick={handleCaptureScreenShotClick}>Click Here</button>
+        <button onClick={handleCaptureScreenShotClick}>
+          Click Here
+        </button>
       ),
     },
     {
       key: "12",
       label: "",
       children: null,
-    },
+    }
   ];
+
 
   function isEmployeeOnline() {
     return new Promise((resolve, reject) => {
@@ -174,25 +189,30 @@ const UserInfo = () => {
     const isOnline = await isEmployeeOnline();
 
     if (!isOnline) {
-      return message.error(
-        "Employee is not online. Please try again some other time."
-      );
+      return message.error("Employee is not online. Please try again some other time.");
     }
 
     setScreenShareLoading(Date.now());
     setShowScreenShareModal(true);
-    await initializeAdminPeer(id);
+    await initializeAdminPeer(id)
     socket.emit("request-screen-share", user.employee._id, id);
   }
 
-  async function initializeAdminPeer(receiverUserId) {
-    console.log("InitializeAdminPeer is called with: ", receiverUserId);
+
+
+
+
+
+  async function initializeAdminPeer(
+    receiverUserId
+  ) {
+    console.log("InitializeAdminPeer is called with: ", receiverUserId)
 
     if (peer.current && peer.current.destory) {
       peer.current.destory();
       peer.current = null;
       remoteVideo.current.srcObject = null;
-      socket.off("peer-signal");
+      socket.off('peer-signal');
     }
 
     peer.current = new SimplePeer({
@@ -207,76 +227,86 @@ const UserInfo = () => {
             username: "a06623f018bdad4479688c4f",
             credential: "vsW6WBT9dHhXZ9mk",
           },
+          // {
+          //   urls: "turn:64.23.148.27:3478?transport=tcp",
+          //   username: "k1fTx8LR3YDbmv9rYjLR",
+          //   credential: "05mkfPfD6qtrMmNbBj6s"
+          // },
+          
         ],
       },
     });
 
-    socket.on("peer-signal", (signal) => {
-      console.log("SIGNAL RECEIVED: ", signal);
-      peer.current.signal(signal);
+    socket.on('peer-signal', (signal) => {
+      console.log("SIGNAL RECEIVED: ", signal)
+      peer.current.signal(signal)
+    })
+
+    peer.current.on('signal', (signal) => {
+      console.log("SIGNAL SENT: ", signal)
+      socket.emit('peer-signal', signal, receiverUserId);
     });
 
-    peer.current.on("signal", (signal) => {
-      console.log("SIGNAL SENT: ", signal);
-      socket.emit("peer-signal", signal, receiverUserId);
-    });
-
-    peer.current.on("stream", (stream) => {
+    peer.current.on('stream', (stream) => {
       remoteVideo.current.srcObject = stream;
       remoteVideo.current.play();
-      remoteVideo.current.addEventListener("loadedmetadata", () => {
+      remoteVideo.current.addEventListener('loadedmetadata', () => {
         setScreenShareLoading(false);
-      });
+      })
     });
 
-    peer.current.on("close", () => {
+    peer.current.on('close', () => {
       remoteVideo.current.srcObject = null;
       peer.current?.destroy();
       peer.current = null;
-      socket.off("peer-signal");
+      socket.off('peer-signal');
     });
 
-    peer.current.on("error", (err) => {
+    peer.current.on('error', (err) => {
       console.log(err);
       if (remoteVideo.current) {
         remoteVideo.current.srcObject = null;
       }
-      socket.off("peer-signal");
+      socket.off('peer-signal');
       peer.current.destroy();
       peer.current = null;
     });
   }
 
+
+
   function hideScreenShareModal() {
     peer.current.destroy();
     peer.current = null;
     remoteVideo.current.srcObject = null;
-    socket.off("peer-signal");
+    socket.off('peer-signal');
     setShowScreenShareModal(false);
   }
+
+
 
   useEffect(() => {
     if (!!screenShareLoading) {
       setTimeout(() => {
         if (!!screenShareLoading) {
           // if still loading after 5 seconds, show error message
-          message.error(
-            "Screen Share request timed out. Most probable reason is that screen share is not allowed by Employee yet. Please try again."
-          );
-          setScreenShareLoading(false);
-          setShowScreenShareModal(false);
+          message.error("Screen Share request timed out. Most probable reason is that screen share is not allowed by Employee yet. Please try again.")
+          setScreenShareLoading(false)
+          setShowScreenShareModal(false)
         }
       }, parseFloat(import.meta.env.VITE_SCREEN_SHARE_TIMEOUT) * 1000);
     }
-  }, [screenShareLoading]);
+  }, [screenShareLoading])
+
+
+
+
 
   async function handleCaptureScreenShotClick() {
     const isOnline = await isEmployeeOnline();
 
     if (!isOnline) {
-      return message.error(
-        "Employee is not online. Please try again some other time."
-      );
+      return message.error("Employee is not online. Please try again some other time.");
     }
 
     setScreenShotLoading(true);
@@ -284,20 +314,31 @@ const UserInfo = () => {
     socket.emit("request-screen-shot", user.employee._id, id);
     socket.on("screen-shot-received", function ({ imageData }) {
       if (!imageData) {
-        return message.error(
-          "Employee has not allowed screen sharing yet. Please try again later."
-        );
+        return message.error("Employee has not allowed screen sharing yet. Please try again later.")
       }
       setScreenShotLoading(false);
       setScreenShotData(imageData);
-    });
+    })
   }
+
 
   function hideScreenShotModal() {
     setScreenShotLoading(false);
     setShowScreenShotModal(false);
     setScreenShotData(null);
   }
+
+
+  // function downloadImage(dataUrl) {
+  //   const a = document.createElement('a');
+
+  //   a.href = dataUrl;
+  //   a.download = `screenshot-${Date.now()}.png`;
+  //   a.click();
+  // }
+
+
+
 
   return (
     <>
@@ -306,7 +347,7 @@ const UserInfo = () => {
         bordered
         items={items}
         extra={
-          <div className="space-x-3">
+          <>
             <ChangeStatusButton
               itemType="employee"
               Id={id}
@@ -314,7 +355,8 @@ const UserInfo = () => {
               onChangeStatus={handleStatus}
             />
             <DeleteButton onConfirmDelete={() => handleDelete(id)} />
-          </div>
+
+          </>
         }
       />
       <Modal
@@ -323,14 +365,20 @@ const UserInfo = () => {
         onCancel={hideScreenShareModal}
         footer={null}
       >
-        <Spin size="large" spinning={!!screenShareLoading} />
+        <Spin
+          size="large"
+          spinning={!!screenShareLoading}
+        />
+
 
         <video
           ref={remoteVideo}
           autoPlay
           playsInline
-          hidden={!!screenShareLoading}
-        ></video>
+          hidden={!!screenShareLoading}>
+
+        </video>
+
       </Modal>
 
       <Modal
@@ -339,12 +387,11 @@ const UserInfo = () => {
         onCancel={hideScreenShotModal}
         footer={null}
       >
-        <Spin size="large" spinning={screenShotLoading} />
-        <img
-          src={screenShotData}
-          hidden={screenShotLoading}
-          alt="Screen Shot"
+        <Spin
+          size="large"
+          spinning={screenShotLoading}
         />
+        <img src={screenShotData} hidden={screenShotLoading} alt="Screen Shot" />
       </Modal>
     </>
   );

@@ -47,14 +47,6 @@ const getAllLogs = async (page,limit) => {
     }
 }
 
-const deleteAllLogs = async () => {
-    try {
-        const {data} = await axiosInstance.delete(`/api/log/logs`);
-        return data;
-    } catch (error) {
-        throw error.response.data;
-    }
-};
 
 const authApi = {
     signup,
@@ -62,8 +54,7 @@ const authApi = {
     currentUser,
     resetPassword,
     logout,
-    getAllLogs,
-    deleteAllLogs
+    getAllLogs
 };
 
 export default authApi;

@@ -4,21 +4,19 @@ import { useDispatch , useSelector } from 'react-redux';
 import TaskButton from './TaskButton';
 import { TasksAllEmployee , deleteTaskbyId, resetDeleteState } from "../../redux/Features/Task/taskSlice";
 import moment from "moment";
-import socket from '../../redux/api/socket';
-import { DeleteOutlined } from "@ant-design/icons";
 
 
 
 const AdminTaskTable = () => {
-
   const dispatch = useDispatch();
 
-  const { fetchtalltaskData, deleteTaskData,isLoading } = useSelector((state)=>state.task)
+  const { fetchtalltaskData, deleteTaskData } = useSelector((state)=>state.task)
+  
+
+  console.log(fetchtalltaskData);
   
 
   useEffect(()=>{
-    
-    socket.connect();
     dispatch(TasksAllEmployee())
     
 },[dispatch])
@@ -39,41 +37,54 @@ useEffect(() => {
   }
 }, [deleteTaskData, dispatch]);
 
+const deleteCompletedTasksAfterOneDay = () => {
+  const currentDate = new Date();
+
+  fetchtalltaskData?.data.forEach((task) => {
+    if (task.status === 'complete') {
+      const completionDate = new Date(task.dueDate);
+
+      if (currentDate - completionDate > 24 * 60 * 60 * 1000) {
+        handleDelete(task._id); // Delete the task
+      }
+    }
+  });
+};
+
+useEffect(() => {
+  const intervalId = setInterval(deleteCompletedTasksAfterOneDay, 24 * 60 * 60 * 1000);
+
+  // Cleanup the interval when the component unmounts
+  return () => clearInterval(intervalId);
+}, [fetchtalltaskData, dispatch]);
+
   const columns = [
     {
       title: "Employee Name",
       dataIndex: "fullname",
-      render:(_,record)=>(
-        record.employee.fullname
-      )
+      width: 300,
     },
     {
       title: "Task",
       dataIndex: "taskDetails",
+      width: 300,
     },
     {
       title: "Due Date",
       dataIndex: "dueDate",
-      render: (dueDate) => moment(dueDate).format('DD/MM/YYYY'),
+      width: 50,
+      render: (dueDate) => moment(dueDate).format('YYYY-MM-DD'),
     },
     {
       title: "Status",
       dataIndex: "status",
+      width: 50,
       render: (_, { status }) => (
         <Tag color={`${status === "incomplete" ? "red" : "green"}`} key={status}>
             {status.toUpperCase()}
           </Tag>
       ),
     },
-    {
-      title:"Delete",
-      dataIndex:"delete",
-      render:(text,record)=>(
-        <DeleteOutlined onClick={()=>{
-          handleDelete(record._id);
-        }} />
-      )
-    }
   ];
   
   const head = (
@@ -85,7 +96,8 @@ useEffect(() => {
 const dataSourceWithKeys = fetchtalltaskData?.data
   ? fetchtalltaskData?.data.map((item, index) => ({
       ...item,
-      key: index,
+      key: index++,
+      fullname: item.employee?.fullname || '', 
     }))
   : [];
 
@@ -110,12 +122,12 @@ const dataSourceWithKeys = fetchtalltaskData?.data
       <Table
        bordered
        size="middle"
-       loading={isLoading}
+      //  loading={isLoading}
         title={() => head}
         dataSource={dataSourceWithKeys}
         columns={columns}
         scroll={{ x: true }}
-        pagination={true}
+        pagination={{ pageSize: 8 }}
         rowClassName={rowClassName}
         />
     </div>

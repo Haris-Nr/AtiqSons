@@ -1,14 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  ProductStatus,
-  SingleProduct,
-  TrackStatus,
-  deleteProductbyId,
-  resetDeleteState,
-  resetProductStatusState,
-  resetTrackStatusState,
-} from "../../redux/Features/Product/productSlice";
+import { ProductStatus, SingleProduct, TrackStatus, deleteProductbyId, resetDeleteState, resetProductStatusState, resetTrackStatusState } from "../../redux/Features/Product/productSlice";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Image, Tag, Descriptions, message } from "antd";
 import TrackProduct from "../Lahore/TrackProduct";
@@ -18,9 +10,6 @@ import moment from "moment";
 import DeleteButton from "./DeleteButton";
 import ChangeStatusButton from "./ChangeStatusButton";
 import ChangeTrackStatusButton from "./ChangeTrackStatusButton";
-import AdminTrackData from "../Admin/AdminTrackData";
-import Find from "../Dubai/Find";
-import DubaiProductData from "../Admin/DubaiProductData";
 
 const baseURL = import.meta.env.VITE_API_BASE_URL;
 
@@ -31,12 +20,9 @@ const SingleProductPage = () => {
 
   const { user } = useSelector((state) => state.fetch);
 
-  const {
-    SingleProductData,
-    deleteProductData,
-    productStatusData,
-    trackStatusData,
-  } = useSelector((state) => state.product);
+  const { SingleProductData,deleteProductData,productStatusData,trackStatusData } = useSelector(
+    (state) => state.product
+  );
   useEffect(() => {
     if (id) {
       dispatch(SingleProduct(id));
@@ -45,7 +31,8 @@ const SingleProductPage = () => {
     if (SingleProductData.success === false) {
       message.error(SingleProductData.message);
     }
-  }, [dispatch, id, SingleProductData.success, SingleProductData.message]);
+
+  }, [dispatch, id,SingleProductData.success,SingleProductData.message]);
 
   const product = SingleProductData?.data;
 
@@ -53,13 +40,13 @@ const SingleProductPage = () => {
   const tracking = product?.tracking;
   const imageUrl = product?.image ? `${baseURL}${product.image}` : "/no.png";
 
-  const handleDelete = (id) => {
+    const handleDelete = (id) => {
     dispatch(deleteProductbyId(id)).then(() => {
       navigate("..", { relative: "path" });
     });
   };
 
-  useEffect(() => {
+   useEffect(() => {
     if (deleteProductData.success === true) {
       message.success(deleteProductData.message);
       dispatch(resetDeleteState());
@@ -85,7 +72,7 @@ const SingleProductPage = () => {
     }
   }, [productStatusData, dispatch]);
 
-  const handleTrack = (id, newStatus) => {
+    const handleTrack = (id, newStatus) => {
     dispatch(TrackStatus({ id, newStatus })).then(() => {
       dispatch(SingleProduct(id));
     });
@@ -104,18 +91,17 @@ const SingleProductPage = () => {
   const items = [
     {
       key: "1",
-      label: "Product Name",
-      children: product?.productName,
-      span: 3,
-    },
-    {
-      key: "2",
       label: "Product Image",
       children: (
         <>
-          <Image width={100} src={imageUrl} alt={product?.productName} />
+            <Image width={100} src={imageUrl} alt={product?.productName}/>
         </>
       ),
+    },
+    {
+      key: "2",
+      label: "Product Name",
+      children: product?.productName,
     },
     {
       key: "3",
@@ -184,30 +170,25 @@ const SingleProductPage = () => {
     {
       key: "10",
       label: "Seller",
-      children: product?.seller,
+      children: product?.seller
     },
     {
       key: "11",
       label: "Created At",
-      children: moment(product?.createdAt).format("DD/MM/YYYY"),
+      children: ( moment(product?.createdAt).format("DD/MM/YYYY"))
     },
     {
       key: "12",
       label: "selectItem",
-      children: product?.selectItem,
+      children: product?.selectItem
     },
     {
       key: "13",
       label: "Amazon",
       children: (
-        <Link
-          to={product?.url}
-          target="_blank"
-          className="text-blue-500 hover:underline"
-        >
-          Go to Amazon
-        </Link>
-      ),
+        <Link to={product?.url} target="_blank" className="text-blue-500 hover:underline">
+        Go to Amazon
+        </Link>)
     },
     {
       key: "14",
@@ -219,64 +200,43 @@ const SingleProductPage = () => {
   return (
     <div className="space-y-5">
       <Descriptions
-        size="middle"
         layout="horizontal"
-        title="Details"
-        labelStyle={{ width: "150px", fontWeight: "bold" }}
+        title="Product Description"
         bordered
         column={{
           xs: 1,
-          sm: 1,
-          md: 2,
+          sm: 2,
+          md: 3,
           lg: 3,
-          xl: 3,
+          xl: 4,
           xxl: 3,
         }}
         items={items}
         extra={
-          <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
-            {user?.employee?.role === "admin" ||
-              (user?.employee?.role === "superadmin" && (
-                <ChangeStatusButton
-                  itemType="product"
-                  Id={id}
-                  currentStatus={status}
-                  onChangeStatus={handleStatus}
-                />
-              ))}
-            {user?.employee?.role === "admin" ||
-              (user?.employee?.role === "superadmin" && (
-                <ChangeTrackStatusButton
-                  Id={id}
-                  currentStatus={tracking}
-                  onChangeStatus={handleTrack}
-                />
-              ))}
-
-            {!(user?.employee?.dashboard === "dubai") ? (
-              <DeleteButton onConfirmDelete={() => handleDelete(id)} />
-            ) : (
-              <Find id={id} />
-            )}
+          <div className="space-x-2">
+            {user?.employee?.role ==="admin" || user?.employee?.role ==="superadmin" &&
+            <ChangeStatusButton
+              itemType="product"
+              Id={id}
+              currentStatus={status}
+              onChangeStatus={handleStatus}
+            />}
+            <DeleteButton onConfirmDelete={() => handleDelete(id)} />
+            {user?.employee?.role ==="admin" || user?.employee?.role ==="superadmin" &&
+           <ChangeTrackStatusButton
+             itemType="product"
+             Id={id}
+             currentStatus={tracking}
+             onChangeStatus={handleTrack}
+          />
+        }
           </div>
         }
       />
-      <div>
-        {(user?.employee?.dashboard === "dubai" ||
-          user?.employee?.dashboard === "admin") && (
-          <DubaiProductData id={id} />
-        )}
-
-        {user?.employee?.role === "admin" ||
-          (user?.employee?.role === "superadmin" && (
-            <div className="space-y-2">
-              <h2>Track Details</h2>
-              <AdminTrackData id={id} />
-            </div>
-          ))}
-      </div>
       {user?.employee?.dashboard === "lahore" && tracking === "tracking" && (
-        <TrackProduct id={id} />
+        <TrackProduct
+          id={id}
+        />
       )}
     </div>
   );

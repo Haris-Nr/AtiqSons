@@ -8,21 +8,24 @@ const createTask = async (req, res) => {
     const newTask = new Task(req.body);
 
     await newTask.save();
-    
-    const user = await User.findById(newTask.employee);
-    const admin = await User.findById(req.body.userId)
 
+    // Retrieve user information for notification
+    const user = await User.find(newTask.createdBy);
+
+    // Get the Socket.IO instance from the app
     const io = req.app.get('io');
 
+    // Create notification
     await createNotification(
       io,
+      "employee",
       null,
-      user._id,
-      `New task assigned by ${admin.role}`,
+      `New task assigned by ${user[0].role}`,
       "New Task",
-      admin.fullname,
-      null,
-      `task`,
+      user[0].fullname,
+      // Assuming newTask.image[0].url is valid; adjust accordingly
+      `${newTask.taskDetails}`,
+      `${newTask._id}`,
     );
 
     res.status(201).json({
@@ -43,18 +46,29 @@ const deleteTask = async (req, res) => {
     const deletedTask = await Task.findByIdAndDelete(req.params.id);
 
     if (!deletedTask) {
-      throw new Error( "Task not found for deletion" );
+      return res.status(404).json({ error: "Task not found for deletion" });
     }
 
-    res.status(200).json({
-      success: true,
-      message:"Task deleted successfully"
-    });
+    res.status(200).send("Task has been deleted!");
   } catch (error) {
-    res.status(500).json({
-      success: true,
-      message:error.message
-    });
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+const getTask = async (req, res) => {
+  try {
+    const foundTask = await Task.findById(req.params.id);
+
+    if (!foundTask) {
+      console.error("Task not found");
+      return res.status(404).json({ error: "Task not found" });
+    }
+
+    res.status(200).json(foundTask);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
@@ -62,14 +76,14 @@ const deleteTask = async (req, res) => {
 const fetchTasksAllemployee = async (req, res) => {
   try {
 
-    const tasks = await Task.find().populate("employee", "fullname").sort({ createdAt: -1 });
+    const tasks = await Task.find().populate("employee", "fullname");
 
-    res.status(200).json({
+    return res.json({
       success: true,
       data: tasks,
     });
   } catch (error) {
-   res.status(500).json({
+    return res.json({
       success: false,
       message: error.message,
     });
@@ -80,7 +94,8 @@ const fetchTasksAllemployee = async (req, res) => {
 
 const fetchTasksForEmployee = async (req, res) => {
   try {
-      const userId = req.body.userId;
+      // If not an admin, proceed with fetching tasks for the specific user
+      const userId = req.body.userId; // Assuming you send userId in the request body
       const tasks = await Task.find({ employee: userId }).sort({ createdAt: -1 });
 
       return res.json({
@@ -100,31 +115,21 @@ const changeTaskStatus = async (req, res) => {
     const { status } = req.body;
     const updatedTask = await Task.findByIdAndUpdate(req.params.id, {
       status,
-    },{new:true});
+    });
 
     const employee = await User.findById(req.body.userId);
-
+    // send notification to task assignee or relevant users
     const io = req.app.get('io');
-
     await createNotification(
       io,
-      'admin',
       null,
-      `Task completed by ${employee.fullname}`,
+      updatedTask.assigneeId, // Update this with the appropriate field for task assignee
+      `Admin task ${updatedTask.taskDetails} is now ${status} by ${employee.fullname}`,
       "Task Status Updated",
       employee.fullname,
-      null,
-      'admintask'
-    );
-    await createNotification(
-      io,
-      'superadmin',
-      null,
-      `Task completed by ${employee.fullname}`,
-      "Task Status Updated",
-      employee.fullname,
-      null,
-      'admintask'
+      // You can add additional details for the notification related to the task
+      // For example: `${updatedTask.someField}`,
+      // `${updatedTask._id}`,
     );
 
     res.json({
@@ -145,6 +150,7 @@ const changeTaskStatus = async (req, res) => {
 module.exports = {
   createTask,
   deleteTask,
+  getTask,
   fetchTasksForEmployee,
   changeTaskStatus,
   fetchTasksAllemployee

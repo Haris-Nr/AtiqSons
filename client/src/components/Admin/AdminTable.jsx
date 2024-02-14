@@ -1,6 +1,7 @@
-import React, { useState,useEffect } from "react";
+import React, { useState } from "react";
 import { Table, Tag } from "antd";
 import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
 import { getAdmin } from "../../redux/Features/Employees/employeeSlice";
 import { useNavigate } from "react-router-dom";
 import moment from "moment";

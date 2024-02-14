@@ -10,7 +10,6 @@ import { useNavigate } from "react-router-dom";
 import socket from "../../redux/api/socket";
 
 function EmpolyeeTable() {
-  
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -70,7 +69,7 @@ function EmpolyeeTable() {
       render: (text, { status }) => {
         return (
           <Tag color={`${status === "blocked" ? "red" : "green"}`} key={status}>
-            {status}
+            {status.toUpperCase()}
           </Tag>
         );
       },
@@ -100,6 +99,7 @@ function EmpolyeeTable() {
           key: index,
         }))
     : [];
+        console.log(dataSourceWithKeys)
   const heading = (
     <div className="flex justify-end">
       <EmployeeButton />
@@ -114,6 +114,7 @@ function EmpolyeeTable() {
         bordered
         loading={isLoading}
         columns={columns}
+        responsive="stack"
         dataSource={dataSourceWithKeys}
         scroll={{
           x: true,

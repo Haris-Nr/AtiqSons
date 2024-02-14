@@ -9,9 +9,9 @@ const addDubaiProduct = async (productData) => {
     }
 };
 
-const allProduct = async (id) => {
+const allProduct = async () => {
     try {
-        const response = await axiosInstance.get(`/api/dubai/allproduct/${id}`);
+        const response = await axiosInstance.get(`/api/dubai/allproduct`);
         return response.data;
     } catch (error) {
         throw error.response.data

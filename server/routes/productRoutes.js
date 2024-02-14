@@ -5,6 +5,7 @@ const adminCheck = require("../middlewares/adminCheck");
 const {
   createProduct,
   deleteProduct,
+  updateProduct,
   fetchProducts,
   changeStatus,
   singleProduct,
@@ -38,6 +39,8 @@ router.post(
 router.post("/fetchProductsbyemployee", authMiddleware, fetchProducts);
 
 router.delete("/deleteproduct/:id", authMiddleware, deleteProduct);
+
+router.patch("/updateProduct/:id", authMiddleware, updateProduct);
 
 router.get("/fetchSingleProduct/:id", authMiddleware, singleProduct);
 

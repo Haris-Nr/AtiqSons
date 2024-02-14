@@ -6,9 +6,9 @@ const notificationSchema = new Schema(
       type: String,
       required: true,
     },
-    whichUser:{
-      type:String,
-      required:true
+    whichUser: {
+      type: String,
+      required: true
     },
     message: {
       type: String,
@@ -18,18 +18,18 @@ const notificationSchema = new Schema(
       type: String,
       required: true,
     },
-     user: [{ 
+    user: [{
       type: Schema.Types.ObjectId,
-       ref: 'users',
-       required: true
-       }],
-     seen:{
-        type: Boolean,
-        default: false,
+      ref: 'users',
+      required: true
+    }],
+    seen: {
+      type: Boolean,
+      default: false,
     },
-    image:{
+    image: {
       type: String,
-  },
+    },
   },
   {
     timestamps: true,

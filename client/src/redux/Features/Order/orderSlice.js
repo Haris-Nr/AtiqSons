@@ -96,10 +96,10 @@ export const orderSlice = createSlice({
             .addCase(createOrder.pending, (state) => {
                 state.isLoading = true;
             })
-            .addCase(createOrder.fulfilled, (state) => {
+            .addCase(createOrder.fulfilled, (state, action) => {
                 state.isLoading = false;
             })
-            .addCase(createOrder.rejected, (state) => {
+            .addCase(createOrder.rejected, (state, action) => {
                 state.isLoading = false;
             })
             // get orders
@@ -118,10 +118,10 @@ export const orderSlice = createSlice({
             .addCase(getOrder.pending, (state) => {
                 state.isLoading = true;
             })
-            .addCase(getOrder.fulfilled, (state) => {
+            .addCase(getOrder.fulfilled, (state, action) => {
                 state.isLoading = false;
             })
-            .addCase(getOrder.rejected, (state) => {
+            .addCase(getOrder.rejected, (state, action) => {
                 state.isLoading = false;
             })
             // update order
@@ -137,7 +137,7 @@ export const orderSlice = createSlice({
                     return order;
                 })
             })
-            .addCase(updateOrder.rejected, (state) => {
+            .addCase(updateOrder.rejected, (state, action) => {
                 state.isLoading = false;
             })
 
@@ -145,10 +145,10 @@ export const orderSlice = createSlice({
             .addCase(reOrder.pending, (state) => {
                 state.isLoading = true;
             })
-            .addCase(reOrder.fulfilled, (state) => {
+            .addCase(reOrder.fulfilled, (state, action) => {
                 state.isLoading = false;
             })
-            .addCase(reOrder.rejected, (state) => {
+            .addCase(reOrder.rejected, (state, action) => {
                 state.isLoading = false;
             })
 
@@ -156,10 +156,10 @@ export const orderSlice = createSlice({
             .addCase(deleteOrder.pending, (state) => {
                 state.isLoading = true;
             })
-            .addCase(deleteOrder.fulfilled, (state) => {
+            .addCase(deleteOrder.fulfilled, (state, action) => {
                 state.isLoading = false;
             })
-            .addCase(deleteOrder.rejected, (state) => {
+            .addCase(deleteOrder.rejected, (state, action) => {
                 state.isLoading = false;
             });
 

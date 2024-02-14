@@ -3,8 +3,7 @@ const User = require("../models/userModel");
 const Track = require("../models/trackModels");
 const { createNotification } = require("../util/notification");
 const path = require("path");
-const fs = require("fs").promises;
-const Dubai = require("../models/dubaiModels");
+const fs = require("fs");
 
 // add product
 const createProduct = async (req, res) => {
@@ -12,9 +11,7 @@ const createProduct = async (req, res) => {
     // find product by asin NO
     const findproduct = await Product.findOne({ asin: req.body.asin });
     if (findproduct) {
-      throw new Error(
-        "Product already in product list added by " + findproduct.seller
-      );
+      throw new Error("Product already in product list");
     }
     let image = "";
     if (req.file) {
@@ -91,7 +88,7 @@ const fetchProducts = async (req, res) => {
     const limit = parseInt(req.query.limit);
     const skip = (page - 1) * limit;
     const search = req.query.search;
-
+    
     if (!req.body.createdBy) {
       throw new Error("Creator ID (createdBy) must be provided");
     }
@@ -105,18 +102,18 @@ const fetchProducts = async (req, res) => {
           { productName: { $regex: search, $options: "i" } },
           { asin: { $regex: search, $options: "i" } },
           { status: { $regex: search, $options: "i" } },
-          { tracking: { $regex: search, $options: "i" } },
-        ],
+          { trackProgress: { $regex: search, $options: "i" } }
+        ]
       };
     }
 
     const totalCount = await Product.countDocuments(query);
 
     const products = await Product.find(query)
+      .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
       .select("image productName asin status tracking")
-      .sort({ createdAt: -1 })
       .exec();
 
     res.status(200).json({
@@ -125,7 +122,7 @@ const fetchProducts = async (req, res) => {
       currentPage: page,
       itemsPerPage: limit,
       totalPages: Math.ceil(totalCount / limit),
-      search: search,
+      search:search
     });
   } catch (error) {
     res.status(500).json({
@@ -151,8 +148,8 @@ const allProduct = async (req, res) => {
           { seller: { $regex: search, $options: "i" } },
           { asin: { $regex: search, $options: "i" } },
           { status: { $regex: search, $options: "i" } },
-          { trackProgress: { $regex: search, $options: "i" } },
-        ],
+          { trackProgress: { $regex: search, $options: "i" } }
+        ]
       };
     }
     const products = await Product.find(queryObj)
@@ -162,17 +159,18 @@ const allProduct = async (req, res) => {
       .select("image productName seller asin status tracking")
       .exec();
 
-    const totalProduct = await Product.countDocuments(queryObj);
-    const totalPages = Math.ceil(totalProduct / limit);
+      const totalProduct = await Product.countDocuments(queryObj);
+      const totalPages = Math.ceil(totalProduct / limit);
 
     res.status(200).json({
       data: products,
-      page: page,
-      limit: limit,
-      totalProduct: totalProduct,
+      page:page,
+      limit:limit,
+      totalProduct:totalProduct,
       totalPages: totalPages,
-      search: search,
+      search:search
     });
+
   } catch (error) {
     res.status(400).json({
       success: false,
@@ -187,11 +185,6 @@ const deleteProduct = async (req, res) => {
     const { id } = req.params;
 
     const product = await Product.findById(id);
-    const dubaiProduct = await Dubai.findOne({productId:id});
-    const trackProduct = await Track.findOne({productId:id});
-
-
-
 
     if (!product) {
       throw new Error("Product not found");
@@ -199,16 +192,7 @@ const deleteProduct = async (req, res) => {
 
     if (product.image) {
       const filePath = path.join(__dirname, "../public", product.image);
-      await fs.unlink(filePath, (err) => {
-        if (err) {
-          throw new Error(err);
-        }
-      });
-    }
-
-    if (dubaiProduct.image) {
-      const filePath = path.join(__dirname, "../public", dubaiProduct.image);
-     await fs.unlink(filePath, (err) => {
+      fs.unlink(filePath, (err) => {
         if (err) {
           throw new Error(err);
         }
@@ -216,15 +200,10 @@ const deleteProduct = async (req, res) => {
     }
 
     await Product.findByIdAndDelete(id);
-    
-    if (dubaiProduct) {
-      await Dubai.findByIdAndDelete(dubaiProduct._id);
-    }
-    if (trackProduct) {
-      await Track.findByIdAndDelete(trackProduct._id);
-    }
 
     const user = await User.findById(req.body.userId);
+
+    console.log(product)
 
     const io = req.app.get("io");
 
@@ -233,7 +212,7 @@ const deleteProduct = async (req, res) => {
         io,
         "admin",
         null,
-        `${product.productName.slice(0, 20)} deleted`,
+        `${product.productName.slice(0,20)} deleted`,
         `${user.fullname} deleted this Product`,
         user.fullname,
         `${product.image}`,
@@ -243,7 +222,7 @@ const deleteProduct = async (req, res) => {
         io,
         "superadmin",
         null,
-        `${product.productName.slice(0, 20)} deleted`,
+        `${product.productName.slice(0,20)} deleted`,
         `${user.fullname} deleted this Product`,
         user.fullname,
         `${product.image}`,
@@ -254,7 +233,7 @@ const deleteProduct = async (req, res) => {
         io,
         "superadmin",
         null,
-        `${product.productName.slice(0, 20)} deleted`,
+        `${product.productName.slice(0,20)} deleted`,
         `${user.fullname} deleted this Product`,
         user.fullname,
         `${product.image}`,
@@ -274,18 +253,30 @@ const deleteProduct = async (req, res) => {
   }
 };
 
+//update the existing product by id
+const updateProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Product.findByIdAndUpdate(id, req.body);
+    res.json({
+      success: true,
+      message: "Product updated successfully",
+    });
+  } catch (error) {
+    res.json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
 /* change product status */
 const changeStatus = async (req, res) => {
   try {
     const { status } = req.body;
-    const updatedProduct = await Product.findByIdAndUpdate(
-      req.params.id,
-      {
-        status,
-      },
-      { new: true }
-    );
+    const updatedProduct = await Product.findByIdAndUpdate(req.params.id, {
+      status,
+    }, { new: true });
 
     const user = await User.findById(req.body.userId);
 
@@ -295,24 +286,19 @@ const changeStatus = async (req, res) => {
       io,
       null,
       updatedProduct.createdBy,
-      `${updatedProduct.productName.slice(0, 20)} has been ${status} by ${
-        user.fullname
-      }`,
+      `${updatedProduct.productName.slice(0,20)} has been ${status} by ${user.fullname}`,
       "Product Status Updated",
       user.fullname,
       `${updatedProduct.image}`,
       `${updatedProduct._id}`
     );
 
-    if (user.role === "admin" && updatedProduct.createdBy !== user._id) {
+    if (user.role === 'admin' && updatedProduct.createdBy !== user._id) {
       await createNotification(
         io,
         "superadmin",
         null,
-        `${updatedProduct.productName.slice(
-          0,
-          20
-        )} status changed to ${status} by ${user.fullname}`,
+        `${updatedProduct.productName.slice(0,20)} status changed to ${status} by ${user.fullname}`,
         "Product Status Updated",
         user.fullname,
         `${updatedProduct.image}`,
@@ -340,6 +326,7 @@ const singleProduct = async (req, res) => {
     res.status(200).json({
       data: product,
     });
+    
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -362,24 +349,19 @@ const changeTrackStatus = async (req, res) => {
       io,
       null,
       updatedProduct.createdBy,
-      `${updatedProduct.productName.slice(0, 20)} add in ${tracking} state by ${
-        admin.fullname
-      }`,
+      `${updatedProduct.productName} add in ${tracking} state by ${admin.fullname}`,
       "Product Status Updated",
       admin.fullname,
       `${updatedProduct.image}`,
       `${updatedProduct._id}`
     );
 
-    if (admin.role === "admin" && updatedProduct.createdBy !== admin._id) {
+    if (admin.role === 'admin' && updatedProduct.createdBy !== admin._id) {
       await createNotification(
         io,
         "superadmin",
         null,
-        `${updatedProduct.productName.slice(
-          0,
-          20
-        )} add in ${tracking} state by ${admin.fullname}`,
+        `${updatedProduct.productName} add in ${tracking} state by ${admin.fullname}`,
         "Product Status Updated",
         admin.fullname,
         `${updatedProduct.image}`,
@@ -388,7 +370,7 @@ const changeTrackStatus = async (req, res) => {
     }
     res.json({
       success: true,
-      message: "Product " + tracking,
+      message: "Product Tracking Start successfully",
     });
   } catch (error) {
     res.json({
@@ -448,7 +430,7 @@ const getIntrackingProduct = async (req, res) => {
     };
 
     const trackingProducts = await Product.find(query)
-      .select("image productName asin tracking status")
+      .populate("createdBy")
       .sort({ createdAt: -1 });
 
     if (!trackingProducts.length) {
@@ -456,6 +438,7 @@ const getIntrackingProduct = async (req, res) => {
     }
 
     res.json({
+      success: true,
       data: trackingProducts,
     });
   } catch (error) {
@@ -469,49 +452,26 @@ const getIntrackingProduct = async (req, res) => {
 // Dubai products
 const DubaiProduct = async (req, res) => {
   try {
-    const page = parseInt(req.query.page);
-    const limit = parseInt(req.query.limit);
-    const skip = (page - 1) * limit;
-    const search = req.query.search;
-
-    let query = { status: "approved" };
-
-    if (search) {
-      query = {
-        status: "approved",
-        $or: [{ productName: { $regex: search, $options: "i" } }],
-      };
-    }
-
-    const products = await Product.find(query)
-      .skip(skip)
-      .limit(limit)
-      .select("image productName")
-      .sort({ createdAt: -1 });
-      
-    const totalCount = await Product.countDocuments(query);
-
+    const products = await Product.find({ status: 'approved' }).sort({ createdAt: -1 });
+    console.log(products)
+  
     res.status(200).json({
       success: true,
       data: products,
-      totalItems: totalCount,
-      currentPage: page,
-      itemsPerPage: limit,
-      totalPages: Math.ceil(totalCount / limit),
-      search: search,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       message: error.message,
     });
-  }
+  }  
 };
 
 module.exports = {
   createProduct,
   fetchProducts,
   deleteProduct,
+  updateProduct,
   changeStatus,
   singleProduct,
   allProduct,

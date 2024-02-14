@@ -1,4 +1,5 @@
 const Break = require('../models/breakModel');
+const decodeToken = require('../util/tokenDecoder');
 const {createRoomNotification} = require('../util/notification');
 
 const createBreak = async (req, res) => {
@@ -35,10 +36,8 @@ const createBreak = async (req, res) => {
         _break.save();
 
 
-        const io = req.app.get('io');
-
         createRoomNotification({
-            io,
+            io: req.app.get('io'),
             room: "all-admins",
             actionUser: req.user._id,
             title: `New ${isLeave ? 'Leave' : 'Break'} Request`,

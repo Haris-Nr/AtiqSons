@@ -4,7 +4,7 @@ import authApi from "../../api/authApi";
 
 const initialState = {
     user: {},
-    error:{},
+    isLoading: false,
 };
 
 export const fetchUser = createAsyncThunk("user/fetch", async (_, thunkAPI) => {
@@ -21,16 +21,20 @@ export const fetchSlice = createSlice({
     reducers: {
         resetFetchState: (state) => {
             state.user = {};
-            state.error = {};
         },
     },
     extraReducers: (builder) => {
         builder
+            .addCase(fetchUser.pending, (state) => {
+                state.isLoading = true;
+            })
             .addCase(fetchUser.fulfilled, (state, action) => {
+                state.isLoading = false;
                 state.user = action.payload;
             })
             .addCase(fetchUser.rejected, (state, action) => {
-                state.error = action.payload;
+                state.isLoading = false;
+                state.user = action.payload;
             });
     },
 });

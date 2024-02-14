@@ -6,6 +6,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { loginUser, resetLoginState } from "../redux/Features/auth/authSlice";
 import { fetchUser } from "../redux/Features/auth/fetchSlice";
 const Login = () => {
+
   const [form] = Form.useForm();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -22,14 +23,17 @@ const Login = () => {
     }
   }, [dispatch, loginData]);
 
+
+
   useEffect(() => {
+
     if (user?.employee?.dashboard) {
       navigate(`/${user?.employee?.dashboard}`);
     } else {
       navigate("/");
     }
-  }, [user, navigate]);
 
+  }, [user, navigate]);
 
   const onFinish = (values) => {
     dispatch(loginUser(values));
@@ -55,8 +59,6 @@ const Login = () => {
       message.error(error);
     }
   }, [dispatch, navigate, loginData, user]);
-
- 
 
   return (
     <div>

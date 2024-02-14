@@ -1,4 +1,4 @@
-import { Table, Space, Tag, Input, Button, message } from 'antd';
+import { Table, Space, Tag, Input, Button } from 'antd';
 import Highlighter from 'react-highlight-words';
 import React, { useEffect, useState } from 'react';
 import {
@@ -8,7 +8,7 @@ import {
 } from '../../redux/Features/Break/breakSlice';
 import { useDispatch, useSelector } from 'react-redux';
 
-const LeavesTable = () => {
+const BreaksTable = () => {
     const dispatch = useDispatch();
     const { leaves, loading } = useSelector((state) => state.break);
     const [page, setPage] = useState(1);
@@ -21,7 +21,7 @@ const LeavesTable = () => {
             pageSize,
             search: search.trim()
         }));
-    }, [reload, page, pageSize, reload, dispatch, search]);
+    }, [reload, page, pageSize, reload]);
 
 
     useEffect(() => {
@@ -103,7 +103,7 @@ const LeavesTable = () => {
             ),
         },
         {
-            title: 'Start Time',
+            title: 'Start Date',
             key: 'startTime',
             render: (text, record) => (
                 <Space size="middle">
@@ -112,7 +112,7 @@ const LeavesTable = () => {
             ),
         },
         {
-            title: 'End Time',
+            title: 'End Date',
             key: 'endTime',
             render: (text, record) => (
                 <Space size="middle">
@@ -208,4 +208,4 @@ const LeavesTable = () => {
         loading={loading}
     />;
 }
-export default LeavesTable;
+export default BreaksTable;

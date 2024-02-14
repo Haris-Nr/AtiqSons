@@ -3,6 +3,7 @@ import productApi from "../../api/productApi";
 import axiosInstance from "../../api/axiosInstance";
 
 const initialState = {
+
   fetchProductData: [],
   AllProductData: [],
   IntrackingProductdata: [],
@@ -12,6 +13,7 @@ const initialState = {
   productdata: {},
   SingleProductData: {},
   deleteProductData: {},
+  updateProductData: {},
   productStatusData: {},
   trackStatusData: {},
   TrackProductData: {},
@@ -97,6 +99,17 @@ export const deleteProductbyId = createAsyncThunk(
   }
 );
 
+export const updateProduct = createAsyncThunk(
+  "product/updateProduct",
+  async (id, thunkAPI) => {
+    try {
+      const response = await productApi.updateProduct(id);
+      return response;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
 
 export const ProductStatus = createAsyncThunk(
   "product/productstatus",
@@ -162,15 +175,12 @@ export const getIntrackingProduct = createAsyncThunk(
 
 export const DubaiProduct = createAsyncThunk(
   "/product/dubairoduct",
-  async (_, { getState, rejectWithValue }) => {
+  async (_, thunkAPI) => {
     try {
-      const { currentPage, pageSize, search } = getState().product;
-      const response = await productApi.dubaiProduct(    currentPage,
-        pageSize,
-        search);
+      const response = await productApi.dubaiProduct();
       return response;
     } catch (error) {
-      return rejectWithValue(error);
+      return thunkAPI.rejectWithValue(error);
     }
   }
 );
@@ -217,7 +227,7 @@ export const productSlice = createSlice({
         state.isLoading = false;
         state.productdata = action.payload;
       })
-
+      
       // products by employee
       .addCase(Productsbyemployee.pending, (state) => {
         state.isLoading = true;
@@ -254,7 +264,7 @@ export const productSlice = createSlice({
       })
       .addCase(AllProduct.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.AllProductData = action?.payload?.data;
+        state.AllProductData = action.payload.data;
         state.currentPage = action.payload?.page;
         state.pageSize = action.payload?.limit;
         state.totalItems = action.payload?.totalProduct;
@@ -277,7 +287,19 @@ export const productSlice = createSlice({
         state.isLoading = false;
         state.deleteProductData = action.payload;
       })
-      // status
+      // update product
+      .addCase(updateProduct.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(updateProduct.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.updateProductData = action.payload;
+      })
+      .addCase(updateProduct.rejected, (state, action) => {
+        state.isLoading = false;
+        state.updateProductData = action.payload;
+      })
+        // status
       .addCase(ProductStatus.pending, (state) => {
         state.isLoading = true;
       })
@@ -323,7 +345,7 @@ export const productSlice = createSlice({
       })
       .addCase(getIntrackingProduct.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
+        state.IntrackingProductdata = action.error;
       })
       // get Tracking Product
       .addCase(getTrackingProduct.pending, (state) => {
@@ -344,11 +366,6 @@ export const productSlice = createSlice({
       .addCase(DubaiProduct.fulfilled, (state, action) => {
         state.isLoading = false;
         state.dubaiProductData = action.payload;
-        state.currentPage = action.payload?.page;
-        state.pageSize = action.payload?.limit;
-        state.totalItems = action.payload?.totalProduct;
-        state.totalPages = action.payload?.totalPages;
-        state.search = action.payload?.search;
       })
       .addCase(DubaiProduct.rejected, (state, action) => {
         state.isLoading = false;

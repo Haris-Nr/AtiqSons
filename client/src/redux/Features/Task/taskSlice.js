@@ -112,7 +112,7 @@ export const taskSlice = createSlice({
             })
             .addCase(TasksForEmployee.rejected, (state, action) => {
                 state.isLoading = false;
-                state.error = action.payload;
+                state.fetchtaskData = action.payload;
             })
             //All Task 
             .addCase(TasksAllEmployee.pending, (state) => {
@@ -124,7 +124,7 @@ export const taskSlice = createSlice({
             })
             .addCase(TasksAllEmployee.rejected, (state, action) => {
                 state.isLoading = false;
-                state.error = action.payload;
+                state.fetchtalltaskData = action.payload;
             })
             //change status
             .addCase(changeTaskStatus.pending, (state) => {

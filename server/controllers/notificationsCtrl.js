@@ -1,6 +1,6 @@
 const Notification = require("../models/notificationModel");
 
-// add a new notification   /// not using right now in frontend
+// add a new notification
 const newNotification = async (req, res) => {
   try {
     const newNotification = new Notification(req.body);
@@ -8,6 +8,25 @@ const newNotification = async (req, res) => {
     res.send({
       success: true,
       message: "Notification added successfully!!",
+    });
+  } catch (error) {
+    res.send({
+      success: false,
+      message: error.message,
+    });
+  }
+};1
+
+// all Notification by particular employee
+const allNotification = async (req, res) => {
+  try {
+    const notifications = await Notification.find({
+      user: req.body.userId,
+    }).sort({ createdAt: -1 });
+    
+    res.send({
+      success: true,
+      data: notifications,
     });
   } catch (error) {
     res.send({
@@ -46,11 +65,11 @@ const seenNotification = async (req, res) => {
       { new: true }
     );
     
-    res.status(200).json({
+    res.send({
       success: true,
     });
   } catch (error) {
-    res.status(500).json({
+    res.send({
       success: false,
       message: error.message,
     });
@@ -80,6 +99,7 @@ const deleteAllNotifications = async (req, res) => {
 
 module.exports = {
   newNotification,
+  allNotification,
   deleteNotification,
   seenNotification,
   deleteAllNotifications,

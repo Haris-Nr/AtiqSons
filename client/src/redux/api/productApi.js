@@ -51,6 +51,14 @@ const deleteProduct = async (id) => {
     }
 };
 
+const updateProduct = async (id) => {
+    try {
+        const response = await axiosInstance.patch(`/api/product/updateProduct/${id}`);
+        return response.data;
+    } catch (error) {
+        throw error.response.data;
+    }
+};
 
 const changeProductStatus = async (id, newStatus) => {
     try {
@@ -89,9 +97,9 @@ const getIntrackingProduct = async (productData) => {
     
 };
 
-const dubaiProduct = async (page,limit,search) => {
+const dubaiProduct = async () => {
     try {
-        const response = await axiosInstance.get(`/api/product/dubaiproduct?page=${page}&limit=${limit}&search=${search}`);
+        const response = await axiosInstance.get(`/api/product/dubaiproduct`);
         return response.data;
     } catch (error) {
         throw error.response.data;
@@ -108,6 +116,7 @@ const productApi = {
     getAllProduct,
     deleteProduct,
     changeProductStatus,
+    updateProduct,
     getTrackProduct,
     changeTrackStatus,
     getIntrackingProduct,

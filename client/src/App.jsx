@@ -4,6 +4,7 @@ import {
   RouterProvider,
   createBrowserRouter,
   createRoutesFromElements,
+  useParams
 } from "react-router-dom";
 
 
@@ -18,7 +19,6 @@ import NotifyTable from "./components/common/NotifyTable";
 import TaskTable from "./components/common/TaskTable";
 import SingleProductPage from "./components/common/SingleProductPage";
 import Settings from "./pages/employees/Settings"
-
 
 // auth pages
 import Signup from "./pages/Signup";
@@ -43,11 +43,13 @@ import IntrackingproductTable from "./components/Lahore/IntrackingproductTable";
 // Dubai pages
 import DubaiProductTable from "./components/Dubai/DubaiProductTable";
 
+
 // China pages
 import OrdersTable from "./components/common/OrdersTable";
 
 
 import AdminTable from "./components/Admin/AdminTable";
+
 
 
 const router = createBrowserRouter(
@@ -69,7 +71,7 @@ const router = createBrowserRouter(
         <Route path="notification" element={<NotifyTable />} />
         <Route path="/:dashboard/:id" element={<SingleProductPage />} />
 
-       
+
 
 
         {/* Lahore Routes */}
@@ -90,25 +92,23 @@ const router = createBrowserRouter(
         <Route path="productTable" element={<AdminProductTable />} />
         <Route path="productTable/:id" element={<SingleProductPage />} />
         <Route path="adminTask" element={<AdminTaskTable />} />
-        <Route path="adminTable" element={<AdminTable/>}/>
-        <Route path="adminTable/:id" element={<UserInfo/>}/>
+        <Route path="adminTable" element={<AdminTable />} />
+        <Route path="adminTable/:id" element={<UserInfo />} />
 
         <Route path="orders" element={<OrdersTable />} />
         <Route path="exchange-rates" element={<ExchangeRatesTable />} />
         <Route path="cbm-calculator" element={<CBMCalculator />} />
         <Route path="settings" element={<Settings />} />
         <Route path="break-leave" element={<BreakAndLeavePage />} />
-
       </Route>
     </Route>
   )
 );
 
 function App() {
- 
+
   return (
     <>
-
       <RouterProvider router={router} />
     </>
   );
