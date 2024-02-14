@@ -25,7 +25,7 @@ const AdminProductTable = () => {
     totalItems,
     totalPages,
     search,
-    error
+    error,
   } = useSelector((state) => state.product);
 
   const renderColumnWithHighlight = (text) => (
@@ -43,10 +43,10 @@ const AdminProductTable = () => {
   useEffect(() => {
     dispatch(AllProduct());
     socket.connect();
-    if(error.success === false){
-      message.error(error.message)
+    if (error.success === false) {
+      message.error(error.message);
     }
-  }, [dispatch, currentPage, pageSize, search,error.success,error.message]);
+  }, [dispatch, currentPage, pageSize, search, error.success, error.message]);
 
   const handleTableChange = (pagination) => {
     dispatch(setCurrentPage(pagination.current));
@@ -99,20 +99,18 @@ const AdminProductTable = () => {
       key: "status",
       render: (text, { status }) => {
         return (
-          (
-            <Tag
-              color={`${
-                status === "pending"
-                  ? "yellow"
-                  : status === "rejected"
-                  ? "red"
-                  : "green"
-              }`}
-              key={status}
-            >
+          <Tag
+            color={`${
+              status === "pending"
+                ? "yellow"
+                : status === "rejected"
+                ? "red"
+                : "green"
+            }`}
+            key={status}
+          >
             {renderColumnWithHighlight(status)},
-            </Tag>
-          )
+          </Tag>
         );
       },
       className: "text-center",
@@ -123,21 +121,18 @@ const AdminProductTable = () => {
       key: "tracking",
       render: (text, { tracking }) => {
         return (
-          
-          (
-            <Tag
-              color={`${
-                tracking === "pending"
-                  ? "yellow"
-                  : tracking === "tracked"
-                  ? "purple"
-                  : "green"
-              }`}
-              key={tracking}
-            >
-              {renderColumnWithHighlight(tracking)}
-            </Tag>
-          )
+          <Tag
+            color={`${
+              tracking === "pending"
+                ? "yellow"
+                : tracking === "tracked"
+                ? "purple"
+                : "green"
+            }`}
+            key={tracking}
+          >
+            {renderColumnWithHighlight(tracking)}
+          </Tag>
         );
       },
       className: "text-center",
@@ -153,22 +148,20 @@ const AdminProductTable = () => {
   };
 
   const dataSourceWithKeys = AllProductData
-    ? AllProductData
-        .filter((item) =>
-          Object.values(item)
-            .join(" ")
-            .toLowerCase()
-            .includes(search.toLowerCase())
-        )
-        .map((item,index) => ({
-          ...item,
-          key: index,
-        }))
+    ? AllProductData.filter((item) =>
+        Object.values(item)
+          .join(" ")
+          .toLowerCase()
+          .includes(search.toLowerCase())
+      ).map((item, index) => ({
+        ...item,
+        key: index,
+      }))
     : [];
 
   const head = (
     <div className="flex justify-between ">
-      <ProductSearch/>
+      <ProductSearch />
       <div className=" relative w-full px-4 max-w-full flex-grow flex-1 text-right ">
         <ProductButton />
       </div>
@@ -186,8 +179,8 @@ const AdminProductTable = () => {
         dataSource={dataSourceWithKeys}
         scroll={{ x: true }}
         pagination={{
-          showQuickJumper:true,
-          showSizeChanger:true,
+          showQuickJumper: true,
+          showSizeChanger: true,
           current: currentPage,
           pageSize: pageSize,
           total: totalItems,
