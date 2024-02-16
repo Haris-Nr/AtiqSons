@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from "react";
-import {
-  UserOutlined,
-} from "@ant-design/icons";
+import { UserOutlined } from "@ant-design/icons";
 import DashboardCard from "./DashboardCard";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import socket from "../../redux/api/socket";
+import { getEmployee } from "../../redux/Features/Employees/employeeSlice";
 
 const Dashboard = () => {
+  const dispatch = useDispatch();
   const [userCount, setUserCount] = useState(0);
   const { user } = useSelector((state) => state.fetch);
   const { employee } = user;
 
+  const { totalItems } = useSelector((state) => state.employee);
 
   const getPeriodOfDay = (hour) =>
     hour >= 5 && hour < 12
@@ -24,7 +25,7 @@ const Dashboard = () => {
   useEffect(() => {
     const currentHour = new Date().getHours();
     setPeriodOfDay(currentHour === 12 ? "noon" : getPeriodOfDay(currentHour));
-
+    dispatch(getEmployee());
     socket.connect();
 
     // Listen for user count updates
@@ -32,17 +33,14 @@ const Dashboard = () => {
       setUserCount(count);
     };
 
-    socket.on('userCounts', handleUserCountUpdate);
+    socket.on("userCounts", handleUserCountUpdate);
 
     // Cleanup function to remove the listener
     return () => {
-      socket.off('userCounts', handleUserCountUpdate);
+      socket.off("userCounts", handleUserCountUpdate);
       socket.disconnect();
     };
-
-
   }, []);
-
 
   return (
     <>
@@ -60,25 +58,23 @@ const Dashboard = () => {
                 employee?.fullname.slice(1)}
             </h1>
             <div className="md:flex gap-3">
-              
               <div className="flex justify-center gap-3">
-                
-                {employee?.dashboard === "admin" && 
-                <DashboardCard
-                  icon={
-                    <UserOutlined
-                      className="text-sm  md:text-2xl lg:p-4"
-                      style={{
-                        color: "purple",
-                        backgroundColor: "#F8F8FB",
-                        borderRadius: 40,
-                      }}
-                    />
-                  }
-                  title={`Employee`}
-                  value={`${userCount}`}
-                />
-}
+                {employee?.dashboard === "admin" && (
+                  <DashboardCard
+                    icon={
+                      <UserOutlined
+                        className="text-sm  md:text-2xl lg:p-4"
+                        style={{
+                          color: "purple",
+                          backgroundColor: "#F8F8FB",
+                          borderRadius: 40,
+                        }}
+                      />
+                    }
+                    title={`Employee`}
+                    value={`${totalItems}/${userCount}`}
+                  />
+                )}
               </div>
             </div>
           </div>

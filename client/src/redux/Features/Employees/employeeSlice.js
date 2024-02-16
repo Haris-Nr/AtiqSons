@@ -10,6 +10,7 @@ const initialState = {
     employeeDetails: {},
     isLoading: false,
     error: {},
+    totalItems:null
 };
 
 export const getEmployee = createAsyncThunk(
@@ -110,7 +111,7 @@ export const employeeSlice = createSlice({
             })
             .addCase(getEmployee.rejected, (state, action) => {
                 state.isLoading = false;
-                state.getEmployeedata = action.error;
+                state.error = action.payload;
             })
 
             // deleteEmployee
@@ -149,7 +150,7 @@ export const employeeSlice = createSlice({
             })
             .addCase(getEmployeeDetails.rejected, (state, action) => {
                 state.isLoading = false;
-                state.error = action.error;
+                state.error = action.payload;
             });
     },
 });

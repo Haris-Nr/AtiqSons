@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { Button, Form, InputNumber, Table, message } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -6,6 +6,7 @@ import {
   getTrackingProduct,
 } from "../../redux/Features/Product/productSlice";
 import moment from "moment";
+import { configConsumerProps } from "antd/es/config-provider";
 
 const EditableContext = React.createContext(null);
 
@@ -97,12 +98,13 @@ const TrackProduct = ({ id }) => {
   const [dataSource, setDataSource] = useState([]);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [editableRows, setEditableRows] = useState({});
+  const [edit, setEdit] = useState(true);
 
 
   const { gettrackproduct } = useSelector((state) => state.product);
 
   useEffect(() => {
-    dispatch(getTrackingProduct(id));
+    dispatch(getTrackingProduct(id))
   }, [dispatch, id]);
 
   useEffect(() => {
@@ -129,7 +131,7 @@ const TrackProduct = ({ id }) => {
     {
       title: "Sale",
       dataIndex: "sale",
-      editable: true,
+      editable: edit
     },
   ];
 
@@ -165,7 +167,6 @@ const TrackProduct = ({ id }) => {
         );
       }
     }, 86400000);
-
     return () => clearInterval(timer);
   }, [dataSource]);
 
@@ -176,18 +177,18 @@ const TrackProduct = ({ id }) => {
   }, [dataSource]);
   
 
-  const handleSave = (row) => {
+  const handleSave = useCallback((row) => {
     const newData = [...dataSource];
     const index = newData.findIndex((item) => row.key === item.key);
     const updatedRow = { ...newData[index], ...row, date: moment(row.date).toDate() };
     newData[index] = updatedRow
     setDataSource(newData);
-    dispatch(TrackingProduct({ productId:id, date: row.date.toISOString(), sale: row.sale }));
-    setEditableRows(prev => ({ ...prev, [row.key]: false }));
-    dispatch(getTrackingProduct(id));
-  };
-
-  
+    dispatch(TrackingProduct({ productId:id, date: row.date.toISOString(), sale: row.sale })).then(() => {
+      dispatch(getTrackingProduct(id));
+      setEdit(false)
+      setEditableRows(prev => ({ ...prev, [row.key]: false }));
+    });
+  },[dispatch,dataSource,id])
 
   const components = {
     body: {

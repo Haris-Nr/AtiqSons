@@ -214,7 +214,7 @@ const SingleProductPage = () => {
     {
       key: "14",
       label: "About This Item",
-      children: product?.description,
+      children: product?.description
     },
   ];
 
