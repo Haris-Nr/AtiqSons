@@ -184,38 +184,36 @@ const allProduct = async (req, res) => {
 // delete product
 const deleteProduct = async (req, res) => {
   try {
+    
     const { id } = req.params;
 
     const product = await Product.findById(id);
+
     const dubaiProduct = await Dubai.findOne({productId:id});
+
     const trackProduct = await Track.findOne({productId:id});
-
-    console.log(trackProduct);
-
-
-
 
     if (!product) {
       throw new Error("Product not found");
     }
 
-    // if (product.image) {
-    //   const filePath = path.join(__dirname, "../public", product.image);
-    //   await fs.unlink(filePath, (err) => {
-    //     if (err) {
-    //       throw new Error(err);
-    //     }
-    //   });
-    // }
+    if (product.image) {
+      const filePath = path.join(__dirname, "../public", product.image);
+      await fs.unlink(filePath, (err) => {
+        if (err) {
+          throw new Error(err);
+        }
+      });
+    }
 
-    // if (dubaiProduct.image) {
-    //   const filePath = path.join(__dirname, "../public", dubaiProduct.image);
-    //  await fs.unlink(filePath, (err) => {
-    //     if (err) {
-    //       throw new Error(err);
-    //     }
-    //   });
-    // }
+    if (dubaiProduct && dubaiProduct.image) {
+      const filePath = path.join(__dirname, "../public", dubaiProduct.image);
+     await fs.unlink(filePath, (err) => {
+        if (err) {
+          throw new Error(err);
+        }
+      });
+    }
 
     await Product.findByIdAndDelete(id);
     
@@ -225,44 +223,6 @@ const deleteProduct = async (req, res) => {
     if (trackProduct) {
       await Track.findByIdAndDelete(trackProduct._id);
     }
-
-    // const user = await User.findById(req.body.userId);
-
-    // const io = req.app.get("io");
-
-    // if (user.role !== "admin" && user.role !== "superadmin") {
-    //   await createNotification(
-    //     io,
-    //     "admin",
-    //     null,
-    //     `${product.productName.slice(0, 20)} deleted`,
-    //     `${user.fullname} deleted this Product`,
-    //     user.fullname,
-    //     null,
-    //     `..`
-    //   );
-    //   await createNotification(
-    //     io,
-    //     "superadmin",
-    //     null,
-    //     `${product.productName.slice(0, 20)} deleted`,
-    //     `${user.fullname} deleted this Product`,
-    //     user.fullname,
-    //     null,
-    //     `..`
-    //   );
-    // } else if (user.role === "admin") {
-    //   await createNotification(
-    //     io,
-    //     "superadmin",
-    //     null,
-    //     `${product.productName.slice(0, 20)} deleted`,
-    //     `${user.fullname} deleted this Product`,
-    //     user.fullname,
-    //     null,
-    //     `..`
-    //   );
-    // }
 
     res.status(200).json({
       success: true,
