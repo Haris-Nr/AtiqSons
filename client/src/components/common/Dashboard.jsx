@@ -62,6 +62,8 @@ const Dashboard = () => {
             <div className="md:flex gap-3">
               
               <div className="flex justify-center gap-3">
+                
+                {employee?.dashboard === "admin" && 
                 <DashboardCard
                   icon={
                     <UserOutlined
@@ -76,6 +78,7 @@ const Dashboard = () => {
                   title={`Employee`}
                   value={`${userCount}`}
                 />
+}
               </div>
             </div>
           </div>

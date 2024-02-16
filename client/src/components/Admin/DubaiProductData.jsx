@@ -62,7 +62,7 @@ const DubaiProductData = ({ id }) => {
 
   return (
     <div>
-    <Table size="middle" bordered dataSource={dataSource} columns={columns} loading={isLoading}  scroll={{ x: true }}/>;
+    <Table size="small" bordered dataSource={dataSource} columns={columns} loading={isLoading}  scroll={{ x: true }}/>;
 </div>
   )
 }

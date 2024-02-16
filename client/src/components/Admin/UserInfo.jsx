@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Badge, Descriptions, message, Modal, Spin } from "antd";
+import { Badge, Button, Descriptions, message, Modal, Spin } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import {
   changeUserStatus,
@@ -26,7 +26,6 @@ const UserInfo = () => {
   const remoteVideo = useRef(null);
   const [showScreenShareModal, setShowScreenShareModal] = useState(false);
   const [screenShareLoading, setScreenShareLoading] = useState(false);
-
   const [showScreenShotModal, setShowScreenShotModal] = useState(false);
   const [screenShotLoading, setScreenShotLoading] = useState(false);
   const [screenShotData, setScreenShotData] = useState(null);
@@ -146,13 +145,13 @@ const UserInfo = () => {
     {
       key: "10",
       label: "See User Screen",
-      children: <button onClick={handleSeeUserScreenClick}>Click Here</button>,
+      children: <Button type="primary" onClick={handleSeeUserScreenClick}>Click Here</Button>,
     },
     {
       key: "11",
       label: "Capture Screen Shot",
       children: (
-        <button onClick={handleCaptureScreenShotClick}>Click Here</button>
+        <Button type="primary" onClick={handleCaptureScreenShotClick}>Click Here</Button>
       ),
     },
     {
@@ -256,9 +255,9 @@ const UserInfo = () => {
   }
 
   useEffect(() => {
-    if (!!screenShareLoading) {
+    if (screenShareLoading) {
       setTimeout(() => {
-        if (!!screenShareLoading) {
+        if (screenShareLoading) {
           // if still loading after 5 seconds, show error message
           message.error(
             "Screen Share request timed out. Most probable reason is that screen share is not allowed by Employee yet. Please try again."

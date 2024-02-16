@@ -10,6 +10,8 @@ import moment from "moment";
 const EditableContext = React.createContext(null);
 
 const EditableRow = ({ index, ...props }) => {
+
+
   const [form] = Form.useForm();
   return (
     <Form form={form} component={false}>
@@ -95,7 +97,7 @@ const TrackProduct = ({ id }) => {
   const [dataSource, setDataSource] = useState([]);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [editableRows, setEditableRows] = useState({});
-  const [lastSaleEntryDate, setLastSaleEntryDate] = useState(null);
+
 
   const { gettrackproduct } = useSelector((state) => state.product);
 
@@ -106,20 +108,15 @@ const TrackProduct = ({ id }) => {
   useEffect(() => {
     if (gettrackproduct.data && gettrackproduct.success === true) {
       const formattedData = gettrackproduct.data.map((item, index) => ({
-        key: (index++).toString(),
+        key: index.toString(),
         ...item,
         date: new Date(item.date),
       }));
       setDataSource(formattedData);
-      const lastDate = formattedData.reduce((maxDate, item) => {
-        const date = moment(item.date).format("DD/MM/YYYY");
-        return date > maxDate ? date : maxDate;
-      }, null);
-      setLastSaleEntryDate(lastDate);
     }
-
-
   }, [gettrackproduct.data, gettrackproduct.success]);
+
+
 
   const [count, setCount] = useState(dataSource.length - 1);
 
@@ -151,7 +148,6 @@ const TrackProduct = ({ id }) => {
     setDataSource([...dataSource, newData]);
     setCount(newKey);
     setIsButtonDisabled(true);
-    setLastSaleEntryDate(moment(new Date()).format("DD/MM/YYYY"));
     setEditableRows(prev => ({ ...prev, [newKey]: true }));
   };
 
@@ -173,18 +169,25 @@ const TrackProduct = ({ id }) => {
     return () => clearInterval(timer);
   }, [dataSource]);
 
+  useEffect(() => {
+    const today = moment().startOf('day');
+    const lastSaleDate = dataSource.length > 0 ? moment(dataSource[dataSource.length - 1].date).startOf('day') : null;
+    setIsButtonDisabled(today.isSame(lastSaleDate, 'day'));
+  }, [dataSource]);
+  
+
   const handleSave = (row) => {
     const newData = [...dataSource];
     const index = newData.findIndex((item) => row.key === item.key);
-    newData[index] = { ...newData[index], ...row };
+    const updatedRow = { ...newData[index], ...row, date: moment(row.date).toDate() };
+    newData[index] = updatedRow
     setDataSource(newData);
-    setEditableRows({ ...editableRows, [row.key]: false });
+    dispatch(TrackingProduct({ productId:id, date: row.date.toISOString(), sale: row.sale }));
+    setEditableRows(prev => ({ ...prev, [row.key]: false }));
+    dispatch(getTrackingProduct(id));
+  };
 
   
-    dispatch(TrackingProduct({ productId:id, date: row.date.toISOString(), sale: row.sale }));
-    dispatch(getTrackingProduct(id));
-    setEditableRows(prev => ({ ...prev, [row.key]: false }));
-  };
 
   const components = {
     body: {
@@ -192,6 +195,7 @@ const TrackProduct = ({ id }) => {
       cell: EditableCell,
     },
   };
+
 
   const columns = defaultColumns.map((col) => {
     if (!col.editable) {

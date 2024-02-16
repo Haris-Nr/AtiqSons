@@ -37,11 +37,13 @@ const SingleProductPage = () => {
     productStatusData,
     trackStatusData,
   } = useSelector((state) => state.product);
+
   useEffect(() => {
     if (id) {
       dispatch(SingleProduct(id));
       socket.connect();
     }
+    socket.connect();
     if (SingleProductData.success === false) {
       message.error(SingleProductData.message);
     }
@@ -261,7 +263,8 @@ const SingleProductPage = () => {
           </div>
         }
       />
-      <div>
+
+      <div> 
         {(user?.employee?.dashboard === "dubai" ||
           user?.employee?.dashboard === "admin") && (
           <DubaiProductData id={id} />
@@ -270,7 +273,6 @@ const SingleProductPage = () => {
         {user?.employee?.role === "admin" ||
           (user?.employee?.role === "superadmin" && (
             <div className="space-y-2">
-              <h2>Track Details</h2>
               <AdminTrackData id={id} />
             </div>
           ))}
