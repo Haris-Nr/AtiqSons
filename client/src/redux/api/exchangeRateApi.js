@@ -29,11 +29,17 @@ export const getExchangeRates = async (page, pageSize, search) => {
     }
 }
 
-export const createExchangeRate = async (values) => {
+export const createExchangeRate = async (values, onSuccess, onFail ) => {
     try {
         const response = await axiosInstance.post(`/api/exchange-rate`, values);
+        if (response.status === 201 || response.status === 200) {
+            onSuccess();
+        } else {
+            onFail();
+        }
         return response.data;
     } catch (error) {
+        onFail();
         throw error.response.data
     }
 }

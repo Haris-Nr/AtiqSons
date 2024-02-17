@@ -18,7 +18,7 @@ const orderSchema = new Schema({
     },
     price: {
         type: Number,
-        required: true,
+        default: -1,
     },
     picture: {
         type: String,
@@ -26,7 +26,7 @@ const orderSchema = new Schema({
     },
     status:{
         type: String,
-        enum: ['PENDING', 'IN TRANSIT', 'DELIVERED', 'CANCELLED'],
+        enum: ['PENDING','PROCESSING','IN TRANSIT', 'DELIVERED', 'CANCELLED'],
         default: 'PENDING',
     },
 }, {

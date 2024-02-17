@@ -3,6 +3,7 @@ import productApi from "../../api/productApi";
 import axiosInstance from "../../api/axiosInstance";
 
 const initialState = {
+  selectItemProducts: [],
   fetchProductData: [],
   AllProductData: [],
   IntrackingProductdata: [],
@@ -21,6 +22,7 @@ const initialState = {
   totalItems: 0,
   totalPages: 0,
   search: "",
+  totalProduct:0,
 
   isLoading: false,
   error: {},
@@ -45,6 +47,24 @@ export const Productsbyemployee = createAsyncThunk(
       const { currentPage, pageSize, search } = getState().product;
       const response = await productApi.fetchProductsbyemployee(
         productDataId,
+        currentPage,
+        pageSize,
+        search
+      );
+      return response;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
+export const fetchProductsBySelectItem = createAsyncThunk(
+  "product/fetchProductsBySelectItem",
+  async (selectItem, { getState, rejectWithValue }) => {
+    try {
+      const { currentPage, pageSize, search } = getState().product;
+      const response = await productApi.fetchProductsBySelectItem(
+        selectItem,
         currentPage,
         pageSize,
         search
@@ -96,7 +116,6 @@ export const deleteProductbyId = createAsyncThunk(
     }
   }
 );
-
 
 export const ProductStatus = createAsyncThunk(
   "product/productstatus",
@@ -165,9 +184,11 @@ export const DubaiProduct = createAsyncThunk(
   async (_, { getState, rejectWithValue }) => {
     try {
       const { currentPage, pageSize, search } = getState().product;
-      const response = await productApi.dubaiProduct(    currentPage,
+      const response = await productApi.dubaiProduct(
+        currentPage,
         pageSize,
-        search);
+        search
+      );
       return response;
     } catch (error) {
       return rejectWithValue(error);
@@ -234,6 +255,22 @@ export const productSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload;
       })
+      // products by select item
+      .addCase(fetchProductsBySelectItem.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(fetchProductsBySelectItem.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.selectItemProducts = action.payload.data;
+        state.currentPage = action.payload?.currentPage;
+        state.totalPages = action.payload?.totalPages;
+        state.totalItems = action.payload?.totalItems;
+        state.search = action.payload?.search;
+      })
+      .addCase(fetchProductsBySelectItem.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
 
       // single product
       .addCase(SingleProduct.pending, (state) => {
@@ -257,7 +294,7 @@ export const productSlice = createSlice({
         state.AllProductData = action?.payload?.data;
         state.currentPage = action.payload?.page;
         state.pageSize = action.payload?.limit;
-        state.totalItems = action.payload?.totalProduct;
+        state.totalProduct = action.payload?.totalProduct;
         state.totalPages = action.payload?.totalPages;
         state.search = action.payload?.search;
       })

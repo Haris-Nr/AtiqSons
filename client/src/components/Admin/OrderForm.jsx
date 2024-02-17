@@ -14,7 +14,6 @@ const OrderForm = ({ onSubmit, order }) => {
         sku: order.sku,
         productName: order.productName,
         quantity: order.quantity,
-        price: order.price,
         status: order.status,
       });
     }
@@ -71,14 +70,6 @@ const OrderForm = ({ onSubmit, order }) => {
         rules={[{ required: true, message: 'Please enter quantity!' }]}
       >
         <InputNumber min={1} />
-      </Form.Item>
-
-      <Form.Item
-        label="Price"
-        name="price"
-        rules={[{ required: true, message: 'Please enter price!' }]}
-      >
-        <InputNumber min={0} step={0.01} />
       </Form.Item>
 
       <Form.Item

@@ -49,9 +49,9 @@ export const getCurrencyOptions = createAsyncThunk(
 
 export const createExchangeRate = createAsyncThunk(
     "exchangeRate/createExchangeRate",
-    async (values, thunkAPI) => {
+    async ({ values, onSuccess, onFail}, thunkAPI) => {
         try {
-            const response = await exchangeRateApi.createExchangeRate(values);
+            const response = await exchangeRateApi.createExchangeRate(values, onSuccess, onFail);
             return response;
         } catch (error) {
             return thunkAPI.rejectWithValue(error);

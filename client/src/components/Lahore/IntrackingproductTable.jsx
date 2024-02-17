@@ -102,8 +102,8 @@ const IntrackingproductTable = () => {
       };
 
 
-    const dataSourceWithKeys = IntrackingProductdata.data
-        ? IntrackingProductdata.data
+    const dataSourceWithKeys = IntrackingProductdata?.data
+        ? IntrackingProductdata?.data
             .map((item,index) => ({
                 ...item,
                 key: index,

@@ -11,13 +11,20 @@ const BreaksTable = () => {
     const [pageSize, setPageSize] = useState(10);
     const [search, setSearch] = useState('');
     const [reload, setReload] = useState(false);
+    const user = useSelector((state) => state.fetch.user);
+    
+    const isAdmin = () => {
+        return user.employee?.role === 'admin' || user.employee?.role === 'superadmin';
+    }
+
     useEffect(() => {
         dispatch(getBreaks({
             page,
             pageSize,
-            search: search.trim()
+            search: search.trim(),
+            filter: isAdmin() ? 'all' : 'mine' 
         }));
-    }, [reload, page, pageSize, reload, dispatch, search]);
+    }, [user, reload, page, pageSize, reload, dispatch,search]);
 
 
     useEffect(() => {
@@ -98,7 +105,7 @@ const BreaksTable = () => {
 
     const searchMarkup = <div className="flex justify-between w-full">
         <Input
-            placeholder="Search order"
+            placeholder="Search in Breaks"
             className='mt-2'
             onChange={(e) => setSearch(e.target.value)}
             onBlur={() => setReload(!reload)}
@@ -132,13 +139,13 @@ const BreaksTable = () => {
         columns={columns}
         dataSource={breaks.breaks}
         rowKey={(record) => record._id}
+        scroll={{ x: true }}
         pagination={{
             total: breaks.totalBreaks,
             pageSize: pageSize,
             current: page,
             showSizeChanger: true,
             showQuickJumper: true,
-            showTotal: (total) => `Total ${total} items and ${Math.ceil(total / pageSize)} Pages`,
         }}
         onChange={handleTableChange}
         title={getHeadSection}

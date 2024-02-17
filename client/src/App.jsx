@@ -18,6 +18,7 @@ import NotifyTable from "./components/common/NotifyTable";
 import TaskTable from "./components/common/TaskTable";
 import SingleProductPage from "./components/common/SingleProductPage";
 import Settings from "./pages/employees/Settings"
+import BreakAndLeavePage from "./pages/BreakAndLeavePage";
 
 
 // auth pages
@@ -33,7 +34,6 @@ import AdminTaskTable from "./components/Admin/AdminTaskTable";
 import AdminProductTable from "./components/Admin/AdminProductTable";
 import ExchangeRatesTable from "./components/Admin/ExchangeRatesTable";
 import CBMCalculator from "./components/Admin/CBMCalculator";
-import BreakAndLeavePage from "./pages/admin/BreakAndLeavePage";
 
 // lahore pages
 import LahoreProductTable from "./components/Lahore/LahoreProductTable";
@@ -74,6 +74,7 @@ const router = createBrowserRouter(
 
         {/* Lahore Routes */}
         <Route path="lahoreproducttable" element={<LahoreProductTable />} />
+        <Route path="lahoreproducttable/selectItem/:selectItemValue" element={<LahoreProductTable />} />
         <Route path="lahoreproducttable/:id" element={<SingleProductPage />} />
         <Route path="trackproduct" element={<TrackProduct />} />
         <Route path="intrackingtable" element={<IntrackingproductTable />} />
@@ -88,6 +89,7 @@ const router = createBrowserRouter(
         <Route path="employees/:id" element={<UserInfo />} />
         <Route path="logs" element={<LogTable />} />
         <Route path="productTable" element={<AdminProductTable />} />
+        <Route path="productTable/selectItem/:selectItemValue" element={<AdminProductTable />} />
         <Route path="productTable/:id" element={<SingleProductPage />} />
         <Route path="adminTask" element={<AdminTaskTable />} />
         <Route path="adminTable" element={<AdminTable/>}/>

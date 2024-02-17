@@ -5,7 +5,6 @@ const path = require('path');
 const multer = require('multer');
 const authMiddleware = require('../middlewares/authMiddleware');
 const adminCheck = require('../middlewares/adminCheck');
-const chinaEmployeeCheck = require('../middlewares/chinaEmployeeCheck');
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -46,36 +45,23 @@ router.put(
       return next();
     }
 
-    if (
-      Object.keys(req.body).length > 1 &&
-      !(req.user.role === "admin" || req.user.role === "superadmin")
-    ) {
-      return res.status(403).json({ message: "Access denied. Only admin are allowed." });
+    if(req.user.dashboard === "china"){
+      return next();
     }
 
-    if (
-      Object.keys(req.body).length === 1 &&
-      Object.keys(req.body)[0] !== "status" &&
-      !(req.user.role === "admin" || req.user.role === "superadmin")
-    ) {
-      return res.status(403).json({ message: "Access denied. Only admin are allowed." });
-    }
-
-
-    
-    // china employee is only allowed to update status, not other fields
-    // above code will capture if china or some other user tries to update other fields
-
-    chinaEmployeeCheck(req, res, next);
+    res.status(401).json({ message: "You are not allowed to update this order" });
   },
   orderCtrl.updateOrder
 );
+
 router.put(
   '/:id/re-order',
   authMiddleware,
   adminCheck,
   orderCtrl.reOrder
 );
+
+
 router.delete(
   '/:id',
   authMiddleware,

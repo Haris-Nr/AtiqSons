@@ -1,7 +1,6 @@
-import { Table, Tag, Space, Button, Modal, message } from 'antd';
+import { Table, Space, Button, Modal, message } from 'antd';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import Highlighter from 'react-highlight-words';
 import {
     getExchangeRates,
     createExchangeRate,
@@ -18,7 +17,7 @@ const ExchangeRatesTable = () => {
     const [showCreateExchangeRateModal, setShowCreateExchangeRateModal] = useState(false);
     const [showEditExchangeRateModal, setShowEditExchangeRateModal] = useState(false);
     const [activeExchangeRate, setActiveExchangeRate] = useState({});
-    const [search, setSearch] = useState('');
+    const [search] = useState('');
     const [reload, setReload] = useState(false);
 
     const {
@@ -27,19 +26,6 @@ const ExchangeRatesTable = () => {
         errorMessage
     } = useSelector((state) => state.exchangeRate);
 
-    const user = useSelector((state) => state.fetch.user);
-
-    const renderColumnWithHighlight = (text) => (
-        <Highlighter
-            highlightStyle={{
-                backgroundColor: 'yellow',
-                padding: 0
-            }}
-            searchWords={[search]}
-            autoEscape
-            textToHighlight={text?.toString() || ''}
-        />
-    );
 
     useEffect(() => {
         dispatch(getExchangeRates({
@@ -70,13 +56,11 @@ const ExchangeRatesTable = () => {
             title: 'Currency 1',
             dataIndex: 'currency1',
             key: 'currency1',
-            ...renderColumnWithHighlight
         },
         {
             title: 'Currency 2',
             dataIndex: 'currency2',
             key: 'currency2',
-            ...renderColumnWithHighlight
         },
         {
             title: 'Rate',
@@ -126,9 +110,22 @@ const ExchangeRatesTable = () => {
             return message.error("One of the currencies must be the "+defaultCurrency);
         }
 
-        dispatch(createExchangeRate(values));
-        setReload(!reload);
-        setShowCreateExchangeRateModal(false);
+        const onSuccess = () => {
+            message.success('Exchange Rate Created Successfully');
+            setReload(!reload);
+            setShowCreateExchangeRateModal(false);
+        }
+
+        const onFail = () => { 
+            message.error('Failed to create Exchange Rate');
+            setShowCreateExchangeRateModal(false);
+        }
+        dispatch(createExchangeRate({
+            values: values,
+            onSuccess,
+            onFail
+        }));
+        
     }
 
 
@@ -164,6 +161,7 @@ const ExchangeRatesTable = () => {
                 columns={columns}
                 dataSource={exchangeRates.exchangeRates}
                 rowKey={(record) => record._id}
+                scroll={{ x: true }}
                 title={getHeadSection}
                 pagination={{
                     current: currentPage,
@@ -171,7 +169,6 @@ const ExchangeRatesTable = () => {
                     total: exchangeRates.totalCount,
                     showSizeChanger: true,
                     showQuickJumper: true,
-                    showTotal: (total) => `Total ${total} items and ${Math.ceil(total / pageSize)} Pages`,
                 }}
                 loading={isLoading}
                 onChange={handleTableChange}

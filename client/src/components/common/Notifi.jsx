@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState,useRef } from "react";
 import { IoNotificationsOutline } from "react-icons/io5";
 import { Dropdown, Badge, Avatar } from "antd";
 import { useDispatch, useSelector } from "react-redux";
@@ -20,6 +20,7 @@ const Notifi = ({ headerMobile }) => {
   const { user } = useSelector((state) => state.fetch);
   let userId = user?.employee?._id;
   const [unseenCount, setUnseenCount] = useState(0);
+  const notificationAudioRef = useRef(null);
 
   const fetchInitialData = useCallback(() => {
     socket.emit("fetchNotifications", userId);
@@ -33,6 +34,7 @@ const Notifi = ({ headerMobile }) => {
 
     const handleNewNotification = () => {
       fetchInitialData();
+      notificationAudioRef.current?.play();
     };
 
     socket.on("newNotification", handleNewNotification);
@@ -120,6 +122,12 @@ const Notifi = ({ headerMobile }) => {
 
   const flattenedNotificationItems = [].concat(...notificationItems);
   return (
+    <>
+     <audio
+        ref={notificationAudioRef}
+        src="/sounds/notification.mp3"
+        hidden={true}
+      />
     <Dropdown
       overlayStyle={{ minWidth: headerMobile ? 316 : 400 }}
       menu={{
@@ -139,8 +147,8 @@ const Notifi = ({ headerMobile }) => {
           {
             label: (
               <div
-                style={{ color: "#504BE4" }}
-                className="text-center hover:underline p-3"
+              style={{ color: "#504BE4" }}
+              className="text-center hover:underline p-3"
               >
                 <Link to="notification">See All Notification</Link>
               </div>
@@ -150,7 +158,7 @@ const Notifi = ({ headerMobile }) => {
       }}
       placement={`${headerMobile ? "bottom" : "bottomRight"}`}
       trigger={["click"]}
-    >
+      >
       <span onClick={(e) => e.preventDefault()}>
         <Badge
           count={unseenCount}
@@ -160,11 +168,12 @@ const Notifi = ({ headerMobile }) => {
             backgroundColor: "#6560F0",
             margin: "2px",
           }}
-        >
+          >
           <IoNotificationsOutline className="text-2xl cursor-pointer" />
         </Badge>
       </span>
     </Dropdown>
+</>
   );
 };
 

@@ -4,7 +4,7 @@ import { TfiControlForward } from "react-icons/tfi";
 import { Button, Menu } from "antd";
 import { useLocation, useNavigate } from "react-router-dom";
 import Sider from "antd/es/layout/Sider";
-import { FaProductHunt,FaShoppingCart, FaMoneyBillAlt } from "react-icons/fa";
+import { FaProductHunt,FaShoppingCart, FaMoneyBillAlt,FaLeaf, FaBoxOpen } from "react-icons/fa";
 import { FaTasks,FaCog } from "react-icons/fa";
 import { FaPersonShelter } from "react-icons/fa6";
 import { BsPersonFill } from "react-icons/bs";
@@ -24,11 +24,11 @@ const Sidenav = ({
 
   const [selectedKeys, setSelectedKeys] = useState();
 
-  useEffect(() => {
+   useEffect(() => {
     const pathName = location.pathname;
-    setSelectedKeys(pathName.split("/")[2]);
+    const updatedSelectedKeys = pathName.split("/").slice(2).join('/');
+    setSelectedKeys(updatedSelectedKeys);
   }, [location.pathname]);
-
   const employeeDashboard = user?.employee?.dashboard;
 
   const items = [
@@ -81,6 +81,12 @@ const Sidenav = ({
       key: "settings",
       icon: <FaCog />,
     },
+
+    user?.employee?.role === "employee" && {
+      label: "My Breaks/Leaves",
+      key: "break-leave",
+      icon: <MdFreeBreakfast />,
+    },
     
     //admin
     employeeDashboard === "admin" && {
@@ -97,6 +103,21 @@ const Sidenav = ({
       label: "Products",
       key: "productTable",
       icon: <FaProductHunt />,
+    },
+    employeeDashboard === 'admin' && {
+      label: "Prioty Products",
+      key: "productTable/selectItem/prioty",
+      icon: <FaShoppingCart />,
+    },
+    employeeDashboard === 'admin' && {
+      label: "Seasonal Products",
+      key: "productTable/selectItem/seasonal",
+      icon: <FaLeaf />,
+    },
+    employeeDashboard === 'admin' && {
+      label: "Holding Products",
+      key: "productTable/selectItem/holding",
+      icon: <FaBoxOpen />,
     },
     employeeDashboard === "admin" &&  {
       label: "Task",
@@ -128,6 +149,22 @@ const Sidenav = ({
       label: "Admin",
       key: "adminTable",
       icon: <BsPersonFill />,
+    },
+
+    employeeDashboard === 'lahore' && {
+      label: "Prioty Products",
+      key: "lahoreproducttable/selectItem/prioty",
+      icon: <FaShoppingCart />,
+    },
+    employeeDashboard === 'lahore' && {
+      label: "Seasonal Products",
+      key: "lahoreproducttable/selectItem/seasonal",
+      icon: <FaLeaf />,
+    },
+    employeeDashboard === 'lahore' && {
+      label: "Holding Products",
+      key: "lahoreproducttable/selectItem/holding",
+      icon: <FaBoxOpen />,
     },
 
   ].filter(Boolean);

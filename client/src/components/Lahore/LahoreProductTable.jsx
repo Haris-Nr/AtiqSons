@@ -1,10 +1,11 @@
-import React, { useEffect } from "react";
-import { Table, Image, Tag, message } from "antd";
+import React, { useEffect, useState } from "react";
+import { Table, Image, Tag } from "antd";
 import ProductButton from "./ProductButton";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Productsbyemployee,
+  fetchProductsBySelectItem,
   setPageSize,
   setCurrentPage,
 } from "../../redux/Features/Product/productSlice";
@@ -16,38 +17,56 @@ const baseURL = import.meta.env.VITE_API_BASE_URL;
 const LahoreProductTable = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.fetch);
-  const { employee } = user;
+
+  const { selectItemValue } = useParams();
+
+
+  const { user: { employee } } = useSelector((state) => state.fetch);
+  const [productsList, setProductsList] = useState([]);
+
   const {
     fetchProductData,
+    selectItemProducts,
     isLoading,
     totalItems,
     currentPage,
     pageSize,
-    totalPages,
     search,
-    error
   } = useSelector((state) => state.product);
 
 
 
   useEffect(() => {
-    if (employee?._id) {
-      dispatch(Productsbyemployee(employee?._id));
+    if (!selectItemValue) {
+      if (employee?._id) {
+        dispatch(Productsbyemployee(employee?._id));
+      }
+    } else {
+      dispatch(fetchProductsBySelectItem(selectItemValue));
     }
+  }, [
+    dispatch,
+    employee,
+    currentPage,
+    pageSize,
+    search,
+    selectItemValue
+  ]);
 
-    if(error.success === false) {
-      message.error(error.message)
+  useEffect(() => {
+    if (selectItemValue) {
+      setProductsList(selectItemProducts);
+    } else {
+      setProductsList(fetchProductData);
     }
+  }, [fetchProductData, selectItemProducts, selectItemValue]);
 
-  }, [dispatch, employee, currentPage, pageSize,search,error.message,error.success]);
+
 
   const handleTableChange = (pagination) => {
     dispatch(setCurrentPage(pagination.current));
     dispatch(setPageSize(pagination.pageSize));
   };
-
-
 
 
   const renderColumnWithHighlight = (text) => (
@@ -141,7 +160,7 @@ const LahoreProductTable = () => {
   const onRowClick = (record) => {
     return {
       onClick: () => {
-        navigate(record._id);
+        navigate(`/lahore/lahoreproducttable/${record._id}`);
       },
     };
   };
@@ -149,12 +168,12 @@ const LahoreProductTable = () => {
   const heading = (
     <div className="flex justify-between">
       <ProductSearch/>
-      <ProductButton />
+      {!selectItemValue && <ProductButton />}
     </div>
   );
 
-  const dataSourceWithKeys = fetchProductData
-    ? fetchProductData
+  const dataSourceWithKeys = productsList
+    ? productsList
         .filter((item) =>
           Object.values(item)
             .join(" ")
@@ -182,7 +201,6 @@ const LahoreProductTable = () => {
           current: currentPage,
           pageSize: pageSize,
           total: totalItems,
-          showTotal: (total) => `Total ${total} product ${totalPages} page`,
         }}
         onChange={handleTableChange}
         scroll={{

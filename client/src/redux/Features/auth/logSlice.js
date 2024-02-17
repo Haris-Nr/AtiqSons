@@ -3,12 +3,12 @@ import authApi from "../../api/authApi";
 
 const initialState = {
     allLogsData: [],
-  isLoading: false,
-  error:{},
-  currentPage: 1,
-  pageSize: 10,
-  totalPages: 0,
-  totalItems: 0,
+    isLoading: false,
+    error: {},
+    currentPage: 1,
+    pageSize: 10,
+    totalPages: 0,
+    totalItems: 0,
 };
 
 export const allLogs = createAsyncThunk(
@@ -16,7 +16,7 @@ export const allLogs = createAsyncThunk(
     async (_, { getState, rejectWithValue }) => {
         const { currentPage, pageSize } = getState().log;
         try {
-          const response = await authApi.getAllLogs(currentPage, pageSize);
+            const response = await authApi.getAllLogs(currentPage, pageSize);
             return response;
         } catch (error) {
             return rejectWithValue(error);
@@ -25,15 +25,15 @@ export const allLogs = createAsyncThunk(
 );
 
 export const deleteAllLogs = createAsyncThunk(
-  "logs/deleteAll",
-  async (_, { rejectWithValue }) => {
-      try {
-          const response = await authApi.deleteAllLogs();
-          return response;
-      } catch (error) {
-          return rejectWithValue(error);
-      }
-  }
+    "logs/deleteAll",
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await authApi.deleteAllLogs();
+            return response;
+        } catch (error) {
+            return rejectWithValue(error);
+        }
+    }
 );
 
 export const logSlice = createSlice({
@@ -41,16 +41,16 @@ export const logSlice = createSlice({
     initialState,
     reducers: {
         setCurrentPage(state, action) {
-          state.currentPage = action.payload;
+            state.currentPage = action.payload;
         },
         setPageSize(state, action) {
-          state.pageSize = action.payload;
+            state.pageSize = action.payload;
         },
-      },
-    
+    },
+
     extraReducers: (builder) => {
         builder
-        // show logs
+            // show logs
             .addCase(allLogs.pending, (state) => {
                 state.isLoading = true;
             })
@@ -67,15 +67,15 @@ export const logSlice = createSlice({
             })
             // delete all logs
             .addCase(deleteAllLogs.pending, (state) => {
-              state.isLoading = true;
-          })
-          .addCase(deleteAllLogs.fulfilled, (state) => {
-              state.isLoading = false;
-          })
-          .addCase(deleteAllLogs.rejected, (state, action) => {
-              state.isLoading = false;
-              state.error = action.payload;
-          });
+                state.isLoading = true;
+            })
+            .addCase(deleteAllLogs.fulfilled, (state) => {
+                state.isLoading = false;
+            })
+            .addCase(deleteAllLogs.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.payload;
+            });
     },
 });
 export const { setCurrentPage, setPageSize } = logSlice.actions;

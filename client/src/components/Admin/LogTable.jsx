@@ -112,7 +112,6 @@ const LogTable = () => {
           current: currentPage,
           pageSize: pageSize,
           total: totalItems,
-          showTotal: (total) => `Total ${total} items`,
         }}
         onChange={handleTableChange}
         scroll={{ x: true }}

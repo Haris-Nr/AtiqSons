@@ -26,8 +26,10 @@ const UserInfo = () => {
   const remoteVideo = useRef(null);
   const [showScreenShareModal, setShowScreenShareModal] = useState(false);
   const [screenShareLoading, setScreenShareLoading] = useState(false);
+
   const [showScreenShotModal, setShowScreenShotModal] = useState(false);
   const [screenShotLoading, setScreenShotLoading] = useState(false);
+  const screenShareTimeout = useRef(null);
   const [screenShotData, setScreenShotData] = useState(null);
 
   const { employeeDetails, deleteEmployeedata, changeStatusdata } = useSelector(
@@ -177,8 +179,7 @@ const UserInfo = () => {
         "Employee is not online. Please try again some other time."
       );
     }
-
-    setScreenShareLoading(Date.now());
+    setScreenShareLoading(true);
     setShowScreenShareModal(true);
     await initializeAdminPeer(id);
     socket.emit("request-screen-share", user.employee._id, id);
@@ -256,17 +257,18 @@ const UserInfo = () => {
 
   useEffect(() => {
     if (screenShareLoading) {
-      setTimeout(() => {
-        if (screenShareLoading) {
-          // if still loading after 5 seconds, show error message
+      screenShareTimeout.current= setTimeout(() => {
           message.error(
             "Screen Share request timed out. Most probable reason is that screen share is not allowed by Employee yet. Please try again."
           );
           setScreenShareLoading(false);
           setShowScreenShareModal(false);
-        }
+        
       }, parseFloat(import.meta.env.VITE_SCREEN_SHARE_TIMEOUT) * 1000);
+    }else{
+      clearTimeout(screenShareTimeout.current);
     }
+
   }, [screenShareLoading]);
 
   async function handleCaptureScreenShotClick() {
@@ -322,13 +324,13 @@ const UserInfo = () => {
         onCancel={hideScreenShareModal}
         footer={null}
       >
-        <Spin size="large" spinning={!!screenShareLoading} />
+        <Spin size="large" spinning={screenShareLoading} />
 
         <video
           ref={remoteVideo}
           autoPlay
           playsInline
-          hidden={!!screenShareLoading}
+          hidden={screenShareLoading}
         ></video>
       </Modal>
 

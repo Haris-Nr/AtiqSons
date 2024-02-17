@@ -122,7 +122,7 @@ const NotifyTable = () => {
   ? notify
       .map((item,index) => ({
         ...item,
-        key: index++,
+        key: index,
       }))
   : [];
 

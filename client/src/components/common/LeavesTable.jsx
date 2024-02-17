@@ -11,17 +11,24 @@ import { useDispatch, useSelector } from 'react-redux';
 const LeavesTable = () => {
     const dispatch = useDispatch();
     const { leaves, loading } = useSelector((state) => state.break);
+    const  user  = useSelector((state) => state.fetch.user);
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [search, setSearch] = useState('');
     const [reload, setReload] = useState(false);
+
+    function isAdmin() {
+        return user.employee?.role === 'admin' || user.employee?.role === 'superadmin';
+    }
+
     useEffect(() => {
         dispatch(getLeaves({
             page,
             pageSize,
-            search: search.trim()
+            search: search.trim(),
+            filter: isAdmin() ? 'all' : 'mine'
         }));
-    }, [reload, page, pageSize, reload, dispatch, search]);
+    }, [user, reload, page, pageSize, dispatch,search]);
 
 
     useEffect(() => {
@@ -103,7 +110,7 @@ const LeavesTable = () => {
             ),
         },
         {
-            title: 'Start Time',
+            title: 'Start Date',
             key: 'startTime',
             render: (text, record) => (
                 <Space size="middle">
@@ -112,7 +119,7 @@ const LeavesTable = () => {
             ),
         },
         {
-            title: 'End Time',
+            title: 'End Date',
             key: 'endTime',
             render: (text, record) => (
                 <Space size="middle">
@@ -130,7 +137,15 @@ const LeavesTable = () => {
                 </Tag>
             ),
         },
-        {
+        
+
+    ];
+
+
+    
+
+    if(isAdmin()){
+        columns.push({
             title: 'Action',
             key: 'action',
             render: (text, record) => (
@@ -154,14 +169,13 @@ const LeavesTable = () => {
                     }
                 </Space>
             ),
-        },
-
-    ];
+        })
+    }
 
 
     const searchMarkup = <div className="flex justify-between w-full">
         <Input
-            placeholder="Search order"
+            placeholder="Search in Leaves"
             className='mt-2'
             onChange={(e) => setSearch(e.target.value)}
             onBlur={() => setReload(!reload)}
@@ -195,13 +209,13 @@ const LeavesTable = () => {
         columns={columns}
         dataSource={leaves.breaks}
         rowKey={(record) => record._id}
+        scroll={{ x: true }}
         pagination={{
             total: leaves.totalBreaks,
             pageSize: pageSize,
             current: page,
             showSizeChanger: true,
             showQuickJumper: true,
-            showTotal: (total) => `Total ${total} items and ${Math.ceil(total / pageSize)} Pages`,
         }}
         onChange={handleTableChange}
         title={getHeadSection}

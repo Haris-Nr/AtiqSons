@@ -1,5 +1,5 @@
 import { Table, Tag, Image, message } from "antd";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Highlighter from "react-highlight-words";
 import ProductButton from "../Lahore/ProductButton";
@@ -7,8 +7,9 @@ import {
   AllProduct,
   setCurrentPage,
   setPageSize,
+  fetchProductsBySelectItem
 } from "../../redux/Features/Product/productSlice";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,useParams } from "react-router-dom";
 import socket from "../../redux/api/socket";
 import ProductSearch from "../common/ProductSearch";
 
@@ -17,13 +18,15 @@ const baseURL = import.meta.env.VITE_API_BASE_URL;
 const AdminProductTable = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { selectItemValue } = useParams();
+  const [productsList, setProductsList] = useState([]);
   const {
     AllProductData,
+    selectItemProducts,
     isLoading,
     currentPage,
     pageSize,
-    totalItems,
-    totalPages,
+    totalProduct,
     search,
     error,
   } = useSelector((state) => state.product);
@@ -41,12 +44,26 @@ const AdminProductTable = () => {
   );
 
   useEffect(() => {
-    dispatch(AllProduct());
+    if (!selectItemValue) {
+      dispatch(AllProduct());
+    } else {
+      dispatch(fetchProductsBySelectItem(selectItemValue));
+    }
     socket.connect();
     if (error.success === false) {
       message.error(error.message);
     }
-  }, [dispatch, currentPage, pageSize, search, error.success, error.message]);
+  }, [dispatch, currentPage, pageSize, search, error.success, error.message,selectItemValue]);
+
+
+  useEffect(() => {
+    if(selectItemValue){
+      setProductsList(selectItemProducts);
+    } else{
+      setProductsList(AllProductData);
+    }
+  }, [selectItemProducts, AllProductData, selectItemValue]);
+
 
   const handleTableChange = (pagination) => {
     dispatch(setCurrentPage(pagination.current));
@@ -142,13 +159,13 @@ const AdminProductTable = () => {
   const onRowClick = (record) => {
     return {
       onClick: () => {
-        navigate(record._id);
+        navigate('/admin/productTable/'+record._id);
       },
     };
   };
 
-  const dataSourceWithKeys = AllProductData
-    ? AllProductData.filter((item) =>
+  const dataSourceWithKeys = productsList
+    ? productsList.filter((item) =>
         Object.values(item)
           .join(" ")
           .toLowerCase()
@@ -183,8 +200,7 @@ const AdminProductTable = () => {
           showSizeChanger: true,
           current: currentPage,
           pageSize: pageSize,
-          total: totalItems,
-          showTotal: (total) => `Total ${total} items and ${totalPages} Pages`,
+          total: totalProduct,
         }}
         onChange={handleTableChange}
         onRow={onRowClick}

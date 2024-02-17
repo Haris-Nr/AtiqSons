@@ -13,6 +13,16 @@ const addProduct = async (productData) => {
     }
 };
 
+const fetchProductsBySelectItem = async (selectItem,page,limit,search) => {
+    try {
+        const queryParams = `?page=${page}&limit=${limit}&search=${search}`;
+        const response = await axiosInstance.get(`/api/product/fetchProductsBySelectItem${queryParams}&selectItem=${selectItem}`);
+        return response.data;
+    } catch (error) {
+        throw error.response.data
+    }
+}
+
 const fetchProductsbyemployee = async (productData,page,limit,search) => {
     try {
         const queryParams = `?page=${page}&limit=${limit}&search=${search}`;
@@ -104,6 +114,7 @@ const dubaiProduct = async (page,limit,search) => {
 const productApi = {
     addProduct,
     fetchProductsbyemployee,
+    fetchProductsBySelectItem,
     getSingleProduct,
     getAllProduct,
     deleteProduct,

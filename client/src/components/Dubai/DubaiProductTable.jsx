@@ -1,4 +1,4 @@
-import { Table, Image, message } from "antd";
+import { Table, Image } from "antd";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Highlighter from "react-highlight-words";
@@ -24,9 +24,7 @@ const DubaiProductTable = () => {
     currentPage,
     pageSize,
     totalItems,
-    totalPages,
     search,
-    error,
   } = useSelector((state) => state.product);
 
   const renderColumnWithHighlight = (text) => (
@@ -44,10 +42,7 @@ const DubaiProductTable = () => {
   useEffect(() => {
     dispatch(DubaiProduct());
     socket.connect();
-    if (error.success === false) {
-      message.error(error.message);
-    }
-  }, [dispatch, currentPage, pageSize, search, error.success, error.message]);
+  }, [dispatch, currentPage, pageSize, search]);
 
   const handleTableChange = (pagination) => {
     dispatch(setCurrentPage(pagination.current));
@@ -124,7 +119,6 @@ const DubaiProductTable = () => {
           current: currentPage,
           pageSize: pageSize,
           total: totalItems,
-          showTotal: (total) => `Total ${total} items and ${totalPages} Pages`,
         }}
         onChange={handleTableChange}
       />

@@ -81,6 +81,10 @@ export const deleteOrder = createAsyncThunk(
     }
 );
 
+
+
+
+
 export const orderSlice = createSlice({
     name: "order",
     initialState,
@@ -128,14 +132,8 @@ export const orderSlice = createSlice({
             .addCase(updateOrder.pending, (state) => {
                 state.isLoading = true;
             })
-            .addCase(updateOrder.fulfilled, (state, action) => {
+            .addCase(updateOrder.fulfilled, (state) => {
                 state.isLoading = false;
-                state.orders = orders.map((order) => {
-                    if (order._id === action.payload._id) {
-                        return action.payload;
-                    }
-                    return order;
-                })
             })
             .addCase(updateOrder.rejected, (state) => {
                 state.isLoading = false;
@@ -161,8 +159,7 @@ export const orderSlice = createSlice({
             })
             .addCase(deleteOrder.rejected, (state) => {
                 state.isLoading = false;
-            });
-
+            })
     },
 });
 

@@ -12,6 +12,9 @@ import Foot from "../common/Foot";
 
 const { Content } = Layout;
 
+import global from 'global'
+import * as process from "process";
+global.process = process;
 
 import SimplePeer from "simple-peer";
 
@@ -150,7 +153,6 @@ const DashboardLayout = () => {
   }, [user, permissionChanged, userInteracted,getScreenSharePermission]);
 
   async function initializeEmployeePeer(receiverUserId) {
-    console.log("InitializeEmployeePeer is called with: ", receiverUserId);
 
     if (peer.current && peer.current.destory) {
       peer.current.destory();
@@ -175,12 +177,10 @@ const DashboardLayout = () => {
     });
 
     socket.on("peer-signal", (signal) => {
-      console.log("SIGNAL RECEIVED: ", signal);
       peer.current.signal(signal);
     });
 
     peer.current.on("signal", (signal) => {
-      console.log("SIGNAL SENT: ", signal);
       socket.emit("peer-signal", signal, receiverUserId);
     });
 
@@ -228,7 +228,6 @@ const DashboardLayout = () => {
         imageData = await getSingleFrameFromStream(screenSharingStream.current);
       }
 
-      console.log("image data: ", imageData);
 
       socket.emit("send-screen-shot", {
         receiverId: senderId,

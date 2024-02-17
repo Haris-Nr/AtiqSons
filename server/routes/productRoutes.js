@@ -14,6 +14,7 @@ const {
   getIntrackingProduct,
   gettrackproduct,
   DubaiProduct,
+  fetchProductsBySelectItem,
 } = require("../controllers/productCtrl");
 const multer = require("multer");
 const path = require("path");
@@ -36,6 +37,8 @@ router.post(
   createProduct
 );
 router.post("/fetchProductsbyemployee", authMiddleware, fetchProducts);
+
+router.get("/fetchProductsBySelectItem", authMiddleware, fetchProductsBySelectItem);
 
 router.delete("/deleteproduct/:id", authMiddleware, deleteProduct);
 

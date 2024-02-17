@@ -41,7 +41,6 @@ const AdminTrackData = ({ id }) => {
         loading={isLoading}
         scroll={{ x: true }}
       />
-      ;
     </div>
   );
 };

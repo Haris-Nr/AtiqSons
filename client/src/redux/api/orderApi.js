@@ -8,7 +8,6 @@ const createOrder = async (values, onSuccess, onFail) => {
         formData.append('sku', values.sku);
         formData.append('productName', values.productName);
         formData.append('quantity', values.quantity);
-        formData.append('price', values.price);
         formData.append('status', values.status);
 
 
@@ -132,13 +131,15 @@ const reOrder = async (id, onSuccess, onFail) => {
     }
 }
 
+
+
 const orderApi = {
     createOrder,
     getOrders,
     getOrder,
     updateOrder,
     deleteOrder,
-    reOrder
+    reOrder,
 };
 
 export default orderApi;

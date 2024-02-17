@@ -11,8 +11,8 @@ const initialState = {
 
 export const getBreaks = createAsyncThunk(
     'breaks/getBreaks',
-    async ({ page, pageSize, search }) => {
-        const response = await breakApi.getBreaks(page, pageSize, search);
+    async ({ page, pageSize, search, filter }) => {
+        const response = await breakApi.getBreaks(page, pageSize, search, filter);
         return response.data;
     }
 );
@@ -20,8 +20,8 @@ export const getBreaks = createAsyncThunk(
 
 export const getLeaves = createAsyncThunk(
     'breaks/getLeaves',
-    async ({ page, pageSize, search }) => {
-        const response = await breakApi.getLeaves(page, pageSize, search);
+    async ({ page, pageSize, search, filter }) => {
+        const response = await breakApi.getLeaves(page, pageSize, search, filter);
         return response.data;
     }
 );

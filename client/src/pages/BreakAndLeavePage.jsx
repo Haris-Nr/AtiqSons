@@ -1,5 +1,5 @@
-import BreaksTable from "../../components/Admin/BreaksTable";
-import LeavesTable from "../../components/Admin/LeavesTable";
+import BreaksTable from "../components/common/BreaksTable";
+import LeavesTable from "../components/common/LeavesTable";
 
 const BreaksPage = () => {
     return (

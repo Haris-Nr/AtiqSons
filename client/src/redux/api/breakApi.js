@@ -1,9 +1,9 @@
 import axiosInstance from './axiosInstance';
 
 
-const getBreaks = async (page, pageSize, search) => {
+const getBreaks = async (page, pageSize, search, filter) => {
     try {
-        const response = await axiosInstance.get(`/api/break?page=${page}&limit=${pageSize}&search=${search}&filter=break`);
+        const response = await axiosInstance.get(`/api/break?page=${page}&limit=${pageSize}&search=${search}&filter=break,${filter}`);
         return response.data;
     } catch (error) {
         throw error.response.data
@@ -11,9 +11,9 @@ const getBreaks = async (page, pageSize, search) => {
 }
 
 
-const getLeaves = async (page, pageSize, search) => {
+const getLeaves = async (page, pageSize, search, filter) => {
     try {
-        const response = await axiosInstance.get(`/api/break?page=${page}&limit=${pageSize}&search=${search}&filter=leave`);
+        const response = await axiosInstance.get(`/api/break?page=${page}&limit=${pageSize}&search=${search}&filter=leave,${filter}`);
         return response.data;
     } catch (error) {
         throw error.response.data

@@ -72,10 +72,6 @@ const createOrder = async (req, res) => {
             return res.status(400).json({ message: "Quantity is required" });
         }
 
-        if (!req.body.price) {
-            return res.status(400).json({ message: "Price is required" });
-        }
-
         if (!req.file) {
             return res.status(400).json({ message: "Picture is required" });
         }
@@ -94,7 +90,7 @@ const createOrder = async (req, res) => {
         const savedOrder = await order.save();
         
         createRoomNotification({
-            io,
+            io: req.app.get("io"),
             room: "china-employees",
             actionUser: req.user._id,
             title: "New Order",
@@ -148,6 +144,32 @@ const updateOrder = async (req, res) => {
 
 
         if (order) {
+
+            if(req.body.status !== order.status) {
+                createRoomNotification({
+                    io: req.app.get("io"),
+                    room: "all-admins",
+                    actionUser: req.user._id,
+                    title: "Order Status Update",
+                    message: `Order status for product "${order.productName}" has been updated to "${req.body.status}"`,
+                    image: order.picture,
+                    onClick: "/admin/orders"
+                });
+            }
+
+
+            if(req.body.price !== order.price) {
+                createRoomNotification({
+                    io: req.app.get("io"),
+                    room: "all-admins",
+                    actionUser: req.user._id,
+                    title: "Order Price Update",
+                    message: `Order price for product "${order.productName}" has been updated to "${req.body.price}"`,
+                    image: order.picture,
+                    onClick: "/admin/orders"
+                });
+            }
+
             order.status = req.body.status || order.status;
             order.sku = req.body.sku || order.sku;
             order.productName = req.body.productName || order.productName;
@@ -227,11 +249,13 @@ const reOrder = async (req, res) => {
 
 
 
+
+
 module.exports = {
     getOrders,
     createOrder,
     updateOrder,
     deleteOrder,
     getOrder,
-    reOrder
+    reOrder,
 }

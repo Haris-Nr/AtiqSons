@@ -229,7 +229,6 @@ const deleteProduct = async (req, res) => {
       message: "Product has been deleted!",
     });
   } catch (error) {
-    console.log(error.message);
     res.status(500).json({
       success: false,
       message: error.message,
@@ -471,6 +470,54 @@ const DubaiProduct = async (req, res) => {
   }
 };
 
+const fetchProductsBySelectItem = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+    const { search, selectItem, createdBy } = req.query;
+
+    let query = { selectItem };
+
+    if (createdBy) {
+      query.createdBy = createdBy;
+    }
+
+    if (search) {
+      query.$or = [
+        { productName: { $regex: search, $options: "i" } },
+        { asin: { $regex: search, $options: "i" } },
+        { status: { $regex: search, $options: "i" } },
+        { tracking: { $regex: search, $options: "i" } },
+      ]
+    }
+    
+    const totalCount = await Product.countDocuments(query);
+
+    const products = await Product.find(query)
+      .skip(skip)
+      .limit(limit)
+      .select("image productName asin status tracking")
+      .sort({ createdAt: -1 })
+      .exec();
+
+    res.status(200).json({
+      data: products,
+      totalItems: totalCount,
+      currentPage: page,
+      itemsPerPage: limit,
+      totalPages: Math.ceil(totalCount / limit),
+      search: search,
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+}
+
 module.exports = {
   createProduct,
   fetchProducts,
@@ -483,4 +530,5 @@ module.exports = {
   getIntrackingProduct,
   gettrackproduct,
   DubaiProduct,
+  fetchProductsBySelectItem,
 };

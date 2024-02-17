@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Form, Input, Button, Select, Typography } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 
@@ -14,6 +14,7 @@ const CBMCalculator = () => {
   const [selectedUnit, setSelectedUnit] = useState("cm");
   const [selectedWeightUnit, setSelectedWeightUnit] = useState("Kg");
   const [result, setResult] = useState("");
+  const [isMobile, setIsMobile] = useState(false);
 
   const handleUnitChange = (value) => {
     setSelectedUnit(value);
@@ -103,9 +104,16 @@ const CBMCalculator = () => {
     );
   };
 
+
+  useEffect(() => {
+    if (window.innerWidth < 768) {
+      setIsMobile(true);
+    }
+  }, []);
+
   return (
     <div className="flex justify-center w-full">
-      <div className="w-1/2">
+      <div className={!isMobile ? "w-1/2": 'w-full'}>
         <h1 className="text-lg font-semibold mb-4">CBM Calculator</h1>
         <Form onFinish={handleCalculate}>
           <Form.Item label="# of units" name="quantity">

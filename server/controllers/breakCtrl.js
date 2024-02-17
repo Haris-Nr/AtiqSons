@@ -1,5 +1,6 @@
 const Break = require('../models/breakModel');
-const {createRoomNotification} = require('../util/notification');
+const User = require('../models/userModel');
+const {createRoomNotification, createNotification} = require('../util/notification');
 
 const createBreak = async (req, res) => {
     try {
@@ -35,14 +36,12 @@ const createBreak = async (req, res) => {
         _break.save();
 
 
-        const io = req.app.get('io');
-
         createRoomNotification({
-            io,
+            io: req.app.get('io'),
             room: "all-admins",
             actionUser: req.user._id,
             title: `New ${isLeave ? 'Leave' : 'Break'} Request`,
-            message: `${req.user.fullname} has requested for a ${isLeave ? 'leave': 'break'}.`,
+            message: isLeave ? `${req.user.fullname} has requested for a leave.`: `${req.user.fullname} is taking a break.`,
             onClick: '/admin/break-leave',
         });
         
@@ -83,6 +82,19 @@ const getAllBreaks = async (req, res) => {
         if (filter.includes('break')) {
             findFilter.isLeave = false;
         }
+
+        if(filter.includes('mine')) {   
+            findFilter['user._id'] = req.user._id;
+        }else {
+            // in case of all. only admin and superadmin can view all breaks
+            if(!(req.user.role === 'admin' || req.user.role === 'superadmin')) {
+                res.status(403).json({
+                    success: false,
+                    message: "You are not authorized to view this resource."
+                });    
+            }
+        }
+
 
         page = parseInt(page) || 1;
         limit = parseInt(limit) || 10;
@@ -168,6 +180,21 @@ const approveBreak = async (req, res) => {
         const _break = await Break.findById(id);
         _break.status = "APPROVED";
         _break.save();
+
+        const breakUser = await User.findById(_break.user);
+        // send notification to user, informing him that his break has been approved
+        createNotification(
+            req.app.get('io'),
+            null,    
+            _break.user,
+            `Your leave request has been approved.`,
+            `Leave Approved`,
+            req.user._id,
+            null,
+            '/'+breakUser.dashboard+'/break-leave'
+        );
+
+
         res.json({
             success: true,
             data: _break
@@ -188,6 +215,24 @@ const rejectBreak = async (req, res) => {
         const _break = await Break.findById(id);
         _break.status = "REJECTED";
         _break.save();
+
+        const breakUser = await User.findById(_break.user);
+
+        // send notification to user, informing him that his break has been rejected
+        createNotification(
+            req.app.get('io'),
+            null,    
+            _break.user,
+            `Your leave request has been rejected.`,
+            `Leave Rejected`,
+            req.user._id,
+            null,
+            '/'+breakUser.dashboard+'/break-leave'
+        );
+
+
+
+
         res.json({
             success: true,
             data: _break

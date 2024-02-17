@@ -7,6 +7,7 @@ import {
     Input,
     Select,
 } from 'antd';
+import { FaPencilAlt } from 'react-icons/fa';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Highlighter from 'react-highlight-words';
@@ -15,7 +16,7 @@ import {
     createOrder,
     reOrder,
     updateOrder,
-    deleteOrder,
+    deleteOrder
 } from '../../redux/Features/Order/orderSlice';
 
 import {
@@ -25,11 +26,12 @@ import {
 
 
 import OrderForm from '../Admin/OrderForm';
+import PriceForm from '../China/PriceForm';
 import { defaultCurrency } from '../../utils/currencyOptions';
 import ConfirmationModal from './ConfirmationModal';
 
 const OrdersTable = () => {
-    
+
     const dispatch = useDispatch();
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
@@ -40,7 +42,8 @@ const OrdersTable = () => {
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [reload, setReload] = useState(false);
     const [selectedCurrency, setSelectedCurrency] = useState(defaultCurrency);
-
+    const [showAddPriceModal, setShowAddPriceModal] = useState(false);
+    const [showEditPriceModal, setShowEditPriceModal] = useState(false);
 
     const {
         orders,
@@ -180,14 +183,34 @@ const OrdersTable = () => {
             title: <span>Price {currencySelect}</span>,
             dataIndex: 'price',
             key: 'price',
-            render: (price) => {
+            render: (price, record) => {
+
+                if (price === -1) {
+                    return <>
+                        {isAdmin() ?
+                            <span>N/A</span> :
+                            <Button
+                                onClick={() => handleAddPriceBtnClick(record)}
+                            >Add Price</Button>
+                        }
+                    </>
+                }
+
                 if (isLoadingExchangeRate) {
                     return <span>Loading...</span>;
                 }
 
                 return (
-                    <span>
-                        {selectedCurrency !== defaultCurrency ? (price * selectedCurrencyExchangeRate.rate).toFixed(2) : price.toFixed(2)}
+                    <span className='flex'>
+                        <span>
+                            {selectedCurrency !== defaultCurrency ? (price * selectedCurrencyExchangeRate.rate).toFixed(2) : price.toFixed(2)}
+                        </span>
+                        {!isAdmin() && (
+                            <FaPencilAlt
+                                className='ml-2 cursor-pointer'
+                                onClick={() => handleEditPriceBtnClick(record)}
+                            />
+                        )}
                     </span>
                 );
             }
@@ -202,8 +225,11 @@ const OrdersTable = () => {
                         <Select
                             defaultValue={status}
                             onChange={(value) => handleOrderStatusChangeBtnClick(value, record._id)}
+                            style={{ width: '100%' }}
                         >
-                            <Select.Option value="PENDING">Pending</Select.Option>
+                            <Select.Option
+                                value="PENDING"
+                            >Pending</Select.Option>
                             <Select.Option value="PROCESSING">Processing</Select.Option>
                             <Select.Option value="IN TRANSIT">In Transit</Select.Option>
                             <Select.Option value="DELIVERED">Delivered</Select.Option>
@@ -241,6 +267,77 @@ const OrdersTable = () => {
     }
 
 
+    function handleAddPriceBtnClick(order) {
+        setSelectedOrder(order);
+        setShowAddPriceModal(true);
+    }
+
+
+    function hideAddPriceModal() {
+        setShowAddPriceModal(false);
+        setSelectedOrder(null);
+    }
+
+    function handleAddPriceFormSubmit(values) {
+        const onSuccess = () => {
+            message.success("Price Added");
+            setReload(!reload);
+            setShowAddPriceModal(false);
+            setSelectedOrder(null);
+        }
+
+        const onFail = () => {
+            message.error("Price Add Failed");
+            setShowAddPriceModal(false);
+            setSelectedOrder(null);
+        }
+
+        dispatch(updateOrder({
+            id: selectedOrder._id,
+            orderData: {
+                price: values.price
+            },
+            onSuccess,
+            onFail
+        }));
+    }
+
+
+    function handleEditPriceBtnClick(order) {
+        setSelectedOrder(order);
+        setShowEditPriceModal(true);
+    }
+
+    function hideEditPriceModal() {
+        setShowEditPriceModal(false);
+        setSelectedOrder(null);
+    }
+
+    function handleEditPriceFormSubmit(values) {
+        const onSuccess = () => {
+            message.success("Price Updated");
+            setReload(!reload);
+            setShowEditPriceModal(false);
+            setSelectedOrder(null);
+        }
+
+        const onFail = () => {
+            message.error("Price Update Failed");
+            setShowEditPriceModal(false);
+            setSelectedOrder(null);
+        }
+
+        dispatch(updateOrder({
+            id: selectedOrder._id,
+            orderData: {
+                price: values.price
+            },
+            onSuccess,
+            onFail
+        }));
+    }
+
+
     function handleOrderStatusChangeBtnClick(value, id) {
         const onSuccess = () => {
             message.success("Order Status Updated");
@@ -273,6 +370,8 @@ const OrdersTable = () => {
         setSelectedOrder(null);
     }
 
+
+
     function handleEditOrderFormSubmit(values) {
         const onSuccess = () => {
             message.success("Order Updated");
@@ -289,7 +388,7 @@ const OrdersTable = () => {
             id: selectedOrder._id,
             orderData: values,
             onSuccess,
-            onFail   
+            onFail
         }));
     }
 
@@ -300,7 +399,7 @@ const OrdersTable = () => {
     }
 
 
-    function handleConfirmDeleteBtnClick(){
+    function handleConfirmDeleteBtnClick() {
         const onSuccess = () => {
             message.success("Order Deleted");
             setReload(!reload);
@@ -368,6 +467,7 @@ const OrdersTable = () => {
             >
                 Orders
             </h1>
+            {searchMarkup}
         </div>
     );
 
@@ -406,7 +506,7 @@ const OrdersTable = () => {
             onSuccess,
             onFail
         }));
-        
+
     }
 
 
@@ -415,6 +515,8 @@ const OrdersTable = () => {
 
         const onSuccess = () => {
             message.success("Re-Order Successful");
+            setReload(!reload);
+
         }
         const onFail = () => {
             message.error("Re-Order Failed");
@@ -424,7 +526,6 @@ const OrdersTable = () => {
             onSuccess,
             onFail
         }));
-        setReload(!reload);
     }
 
     return (
@@ -434,6 +535,7 @@ const OrdersTable = () => {
                 dataSource={orders.orders}
                 rowKey={(record) => record._id}
                 title={getHeadSection}
+                scroll={{ x: true }}
                 pagination={{
                     current: currentPage,
                     pageSize: pageSize,
@@ -464,6 +566,29 @@ const OrdersTable = () => {
                 <OrderForm
                     onSubmit={handleEditOrderFormSubmit}
                     order={selectedOrder}
+                />
+            </Modal>
+
+            <Modal
+                title="Add Price"
+                open={showAddPriceModal}
+                onCancel={hideAddPriceModal}
+                footer={null}
+            >
+                <PriceForm
+                    onSubmit={handleAddPriceFormSubmit}
+                />
+            </Modal>
+
+            <Modal
+                title="Edit Price"
+                open={showEditPriceModal}
+                onCancel={hideEditPriceModal}
+                footer={null}
+            >
+                <PriceForm
+                    onSubmit={handleEditPriceFormSubmit}
+                    price={selectedOrder?.price}
                 />
             </Modal>
 

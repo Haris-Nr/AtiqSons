@@ -35,6 +35,7 @@ module.exports = (server) => {
     } else if (role === "admin" || role === "superadmin") {
       onlineAdmins.push(newUser);
       socket.join("admins");
+      socket.join(role+"s");      // admins or superadmins
     }
   };
 
