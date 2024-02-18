@@ -34,6 +34,7 @@ import AdminTaskTable from "./components/Admin/AdminTaskTable";
 import AdminProductTable from "./components/Admin/AdminProductTable";
 import ExchangeRatesTable from "./components/Admin/ExchangeRatesTable";
 import CBMCalculator from "./components/Admin/CBMCalculator";
+import ScreenShotsTable from "./components/Admin/ScreenShotsTable";
 
 // lahore pages
 import LahoreProductTable from "./components/Lahore/LahoreProductTable";
@@ -100,6 +101,7 @@ const router = createBrowserRouter(
         <Route path="cbm-calculator" element={<CBMCalculator />} />
         <Route path="settings" element={<Settings />} />
         <Route path="break-leave" element={<BreakAndLeavePage />} />
+        <Route path="screenshots" element={<ScreenShotsTable />} />
         <Route path="stock" element = {<InventoryTable/>} />
 
       </Route>

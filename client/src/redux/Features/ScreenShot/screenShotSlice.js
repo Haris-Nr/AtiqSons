@@ -69,31 +69,31 @@ const screenShotSlice = createSlice({
             .addCase(createScreenShot.pending, (state) => {
                 state.loading = true;
             })
-            .addCase(createScreenShot.fulfilledpending, (state) => {
+            .addCase(createScreenShot.fulfilled, (state) => {
                 state.loading = false;
             })
-            .addCase(createScreenShot.rejectedpending, (state, action) => {
+            .addCase(createScreenShot.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             })
             .addCase(getAllScreenShots.pending, (state) => {
                 state.loading = true;
             })
-            .addCase(getAllScreenShots.fulfilledpending, (state, action) => {
+            .addCase(getAllScreenShots.fulfilled, (state, action) => {
                 state.loading = false;
                 state.screenShots = action.payload;
             })
-            .addCase(getAllScreenShots.rejectedpending, (state, action) => {
+            .addCase(getAllScreenShots.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             })
             .addCase(deleteScreenShot.pending, (state) => {
                 state.loading = true;
             })
-            .addCase(deleteScreenShot.fulfilledpending, (state) => {
+            .addCase(deleteScreenShot.fulfilled, (state) => {
                 state.loading = false;
             })
-            .addCase(deleteScreenShot.rejectedpending, (state, action) => {
+            .addCase(deleteScreenShot.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             });

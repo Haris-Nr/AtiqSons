@@ -13,7 +13,7 @@ import {
 } from "react-icons/fa";
 import { FaTasks, FaCog } from "react-icons/fa";
 import { FaPersonShelter } from "react-icons/fa6";
-import { BsPersonFill } from "react-icons/bs";
+import { BsCameraFill, BsPersonFill } from "react-icons/bs";
 import { BiCalculator } from "react-icons/bi";
 import { MdFreeBreakfast, MdOutlineProductionQuantityLimits } from "react-icons/md";
 import PropTypes from "prop-types";
@@ -161,6 +161,11 @@ const Sidenav = ({
       label: "Break/Leave",
       key: "break-leave",
       icon: <MdFreeBreakfast />,
+    },
+    employeeDashboard === "admin" && {
+      label: "Screen Shots",
+      key: "screenshots",
+      icon: <BsCameraFill />,
     },
     employeeDashboard === "admin" && {
       label: "Stock",
