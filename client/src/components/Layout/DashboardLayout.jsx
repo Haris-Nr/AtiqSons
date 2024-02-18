@@ -28,7 +28,7 @@ const DashboardLayout = () => {
   const [permissionChanged, setPermissionChanged] = useState(false);
   const [userInteracted, setUserInteracted] = useState(false);
   const screenSharingStream = useRef(null);
-  const { user, error } = useSelector((state) => state.fetch);
+  const { user } = useSelector((state) => state.fetch);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -74,11 +74,6 @@ const DashboardLayout = () => {
 
   }, [dispatch, navigate]);
 
-  useEffect(() => {
-    if (error.success) {
-      message.error(error.message);
-    }
-  }, [error]);
 
 
 

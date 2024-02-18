@@ -140,7 +140,6 @@ const OrdersTable = () => {
     const currencySelect = (
         <Select
             defaultValue={selectedCurrency}
-
             onChange={(value) => setSelectedCurrency(value)}
         >
             {currencyOptionWithDefault(currencyOptions).map((currency) => (
@@ -447,7 +446,7 @@ const OrdersTable = () => {
     </div>
 
     const adminUserHeadSection = () => (
-        <div>
+        <div className='space-y-3'>
             <div className="flex justify-between w-full">
                 <h1 className="text-2xl">Orders</h1>
                 <Button type="primary" onClick={handleCreateOrderBtnClick}>
@@ -530,6 +529,7 @@ const OrdersTable = () => {
     return (
         <>
             <Table
+            size='middle'
             bordered
                 columns={columns}
                 dataSource={orders.orders}

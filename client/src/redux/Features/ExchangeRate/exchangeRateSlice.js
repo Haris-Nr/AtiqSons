@@ -87,89 +87,83 @@ export const deleteExchangeRate = createAsyncThunk(
 export const exchangeRateSlice = createSlice({
     name: "exchangeRate",
     initialState,
-    reducers: {
-        resetExchangeRate: state => {
-            state.exchangeRate = {};
-        }
-    },
-    extraReducers: {
+    reducers: {},
+    extraReducers: (builder) => {
+        builder
         // getExchangeRate
-        [getExchangeRate.pending]: state => {
+        .addCase(getExchangeRate.pending, (state) => {
             state.isLoading = true;
-        },
-        [getExchangeRate.fulfilled]: (state, action) => {
+        })
+        .addCase(getExchangeRate.fulfilled, (state, action) => {
             state.selectedCurrencyExchangeRate = action.payload;
             state.isLoading = false;
-        },
-        [getExchangeRate.rejected]: (state, action) => {
+        })
+        .addCase(getExchangeRate.rejected, (state, action) => {
             state.errorMessage = action.payload.message;
             state.isLoading = false;
-        },
-
+        })
         // getExchangeRatesssssss
-        [getExchangeRates.pending]: state => {
+        .addCase(getExchangeRates.pending, (state) => {
             state.isLoading = true;
-        },
-        [getExchangeRates.fulfilled]: (state, action) => {
+        })
+        .addCase(getExchangeRates.fulfilled, (state, action) => {
             state.exchangeRates = action.payload;
             state.isLoading = false;
-        },
-        [getExchangeRates.rejected]: (state, action) => {
+        })
+        .addCase(getExchangeRates.rejected, (state, action) => {
             state.errorMessage = action.payload.message;
             state.isLoading = false;
-        },
+        })
 
         //  getCurrencyOptions
-        [getCurrencyOptions.pending]: state => {
+        .addCase(getCurrencyOptions.pending, (state) => {
             state.isLoading = true;
-        },
-        [getCurrencyOptions.fulfilled]: (state, action) => {
+        })
+        .addCase(getCurrencyOptions.fulfilled, (state, action) => {
             state.currencyOptions = action.payload;
             state.isLoading = false;
-        },
-        [getCurrencyOptions.rejected]: (state, action) => {
+        })
+        .addCase(getCurrencyOptions.rejected, (state, action) => {
             state.errorMessage = action.payload.message;
             state.isLoading = false;
-        },
+        })
 
         //  createExchangeRate
-        [createExchangeRate.pending]: state => {
+        .addCase(createExchangeRate.pending, (state) => {
             state.isLoading = true;
-        },
-        [createExchangeRate.fulfilled]: (state, action) => {
-            state.exchangeRate = action.payload;
+        })
+        .addCase(createExchangeRate.fulfilled, (state) => {
             state.isLoading = false;
-        },
-        [createExchangeRate.rejected]: (state, action) => {
+        })
+        .addCase(createExchangeRate.rejected, (state, action) => {
             state.errorMessage = action.payload.message;
             state.isLoading = false;
-        },
+        })
 
         // updateExchangeRate
-        [updateExchangeRate.pending]: state => {
+        .addCase(updateExchangeRate.pending, (state) => {
             state.isLoading = true;
-        },
-        [updateExchangeRate.fulfilled]: (state, action) => {
-            state.exchangeRate = action.payload;
+        })
+        .addCase(updateExchangeRate.fulfilled, (state) => {
             state.isLoading = false;
-        },
-        [updateExchangeRate.rejected]: (state, action) => {
+        })
+        .addCase(updateExchangeRate.rejected, (state, action) => {
             state.errorMessage = action.payload.message;
             state.isLoading = false;
-        },
+        })
 
         // deleteExchangeRate
-        [deleteExchangeRate.pending]: state => {
+        .addCase(deleteExchangeRate.pending, state => {
             state.isLoading = true;
-        },
-        [deleteExchangeRate.fulfilled]: (state, action) => {
+        })
+        .addCase(deleteExchangeRate.fulfilled, (state, action) => {
             state.exchangeRates = action.payload;
             state.isLoading = false;
-        },
-        [deleteExchangeRate.rejected]: (state, action) => {
+        })
+        .addCase(deleteExchangeRate.rejected, (state, action) => {
             state.errorMessage = action.payload.message;
             state.isLoading = false;
-        }
+        })
     }
 });
 

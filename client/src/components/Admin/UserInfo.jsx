@@ -8,6 +8,9 @@ import {
   resetDeleteState,
   resetStatusState,
 } from "../../redux/Features/Employees/employeeSlice";
+import {
+  createScreenShot,
+} from "../../redux/Features/ScreenShot/screenShotSlice";
 import { useParams } from "react-router-dom";
 import moment from "moment";
 import ChangeStatusButton from "../common/ChangeStatusButton";
@@ -300,6 +303,37 @@ const UserInfo = () => {
     setScreenShotData(null);
   }
 
+  function handleSaveScreenShot() {
+    // convert screenshot base64 data to blob
+    const byteCharacters = atob(screenShotData.split(",")[1]);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type: "image/png" });
+
+    const formData = new FormData();
+    formData.append("screenShot", blob);
+    formData.append("user", id);
+
+    const onSuccess = () => {
+      message.success("Screen shot saved successfully.");
+      hideScreenShotModal();
+    };
+
+    const onFail = () => {
+      message.error("Failed to save screen shot. Please try again later.");
+      hideScreenShotModal();
+    };
+
+    dispatch(createScreenShot({
+      data: formData,
+      onSuccess,
+      onFail,
+    }));
+  }
+
   return (
     <>
       <Descriptions
@@ -338,7 +372,14 @@ const UserInfo = () => {
         title="Screen Shot"
         open={showScreenShotModal}
         onCancel={hideScreenShotModal}
-        footer={null}
+        footer={[
+          <Button key="close" onClick={hideScreenShotModal}>
+            Close
+          </Button>,
+          <Button key="save" type="primary" onClick={handleSaveScreenShot}>
+            Save
+          </Button>,
+        ]}
       >
         <Spin size="large" spinning={screenShotLoading} />
         <img

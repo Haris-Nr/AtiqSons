@@ -8,31 +8,25 @@ const inventorySchema = new Schema(
             required: true,
         },
         quantity: {
-            type: Number,
+            type: String,
             required: true,
         },
         image: {
             type: String,
             },
         asin: {
-            type: Schema.Types.Mixed,
+            type: String,
             required: true,
             unique: true,
         },
         price: {
-            type: Number,
-            required: true,
-        },
-        currency: {
             type: String,
             required: true,
-            enum: ["$","AED","SAU"],
         },
-        createdBy: {
-            type: Schema.Types.ObjectId,
-            ref: "users",
-            required: true,
-        },
+        selectItem:{
+            type:String,
+            required:true
+        }
     },
     {
         timestamps: true,

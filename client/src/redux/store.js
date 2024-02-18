@@ -10,6 +10,8 @@ import dubaiReducer from './Features/Dubai/dubaiSlice'
 import orderReducer from './Features/Order/orderSlice'
 import exchangeRateReducer from './Features/ExchangeRate/exchangeRateSlice'
 import breakReducer from './Features/Break/breakSlice'
+import inventoryReducer from './Features/inventory/inventorySlice'
+import screenShotReducer from './Features/ScreenShot/screenShotSlice'
 
 export const store = configureStore({
   reducer: {
@@ -24,5 +26,7 @@ export const store = configureStore({
     order: orderReducer,
     exchangeRate: exchangeRateReducer,
     break: breakReducer,
+    screenShot: screenShotReducer,
+    inventory:inventoryReducer,
   },
 });

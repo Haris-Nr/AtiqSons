@@ -1,7 +1,7 @@
-const Order = require('../models/orderModel');
-const Notification = require('../models/notificationModel');
-const {createRoomNotification} = require('../util/notification');
-const fs = require('fs');
+const Order = require("../models/orderModel");
+const Notification = require("../models/notificationModel");
+const { createRoomNotification } = require("../util/notification");
+const fs = require("fs");
 
 const getOrders = async (req, res) => {
     try {
@@ -15,17 +15,15 @@ const getOrders = async (req, res) => {
         if (search) {
             filter.productName = {
                 $regex: search,
-                $options: "i"
-            }
+                $options: "i",
+            };
         }
-
 
         page = parseInt(page) || 1;
         limit = parseInt(limit) || 10;
         let skip = (page - 1) * limit;
 
-        const orders = await Order
-            .find(filter)
+        const orders = await Order.find(filter)
             .sort({ createdAt: -1 })
             .limit(limit)
             .skip(skip);
@@ -36,13 +34,12 @@ const getOrders = async (req, res) => {
             orders,
             page,
             limit,
-            totalOrders
+            totalOrders,
         });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
-}
-
+};
 
 const getOrder = async (req, res) => {
     try {
@@ -55,11 +52,10 @@ const getOrder = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
-}
+};
 
 const createOrder = async (req, res) => {
     try {
-
         if (!req.body.sku) {
             return res.status(400).json({ message: "SKU is required" });
         }
@@ -76,19 +72,20 @@ const createOrder = async (req, res) => {
             return res.status(400).json({ message: "Picture is required" });
         }
 
-
-        let picture = "/" + req.file.path
-            .replace(/\\/g, "/")
-            .split("/")
-            .filter((e) => e && e !== "public")
-            .join("/");
+        let picture =
+            "/" +
+            req.file.path
+                .replace(/\\/g, "/")
+                .split("/")
+                .filter((e) => e && e !== "public")
+                .join("/");
 
         const order = new Order({
             ...req.body,
-            picture
+            picture,
         });
         const savedOrder = await order.save();
-        
+
         createRoomNotification({
             io: req.app.get("io"),
             room: "china-employees",
@@ -96,14 +93,14 @@ const createOrder = async (req, res) => {
             title: "New Order",
             message: `New order for product "${req.body.productName}" has been placed`,
             image: picture,
-            onClick: "/china/orders"
+            onClick: "/china/orders",
         });
-    
+
         res.json(savedOrder);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
-}
+};
 
 const updateOrder = async (req, res) => {
     try {
@@ -112,33 +109,35 @@ const updateOrder = async (req, res) => {
         let newPicture = req.file;
 
         if (newPicture) {
-            newPicture = "/" + newPicture.path
-                .replace(/\\/g, "/")
-                .split("/")
-                .filter((e) => e && e !== "public")
-                .join("/");
+            newPicture =
+                "/" +
+                newPicture.path
+                    .replace(/\\/g, "/")
+                    .split("/")
+                    .filter((e) => e && e !== "public")
+                    .join("/");
 
             const ordersWithOldPicture = await Order.find({
-                picture: order.picture
+                picture: order.picture,
             });
 
             const notificationsWithOldPicture = await Notification.find({
-                image: order.picture
+                image: order.picture,
             });
 
             // incase of re-order, image could be used by another order
             if (
-                order.picture && 
-                ordersWithOldPicture.length === 1 && 
+                order.picture &&
+                ordersWithOldPicture.length === 1 &&
                 notificationsWithOldPicture.length === 0
             ) {
                 fs.unlinkSync(`./public${order.picture}`);
             }
             order.picture = newPicture;
         }
-        
+
         if (order) {
-            if(req.body.status !== order.status) {
+            if (req.body.status !== order.status) {
                 createRoomNotification({
                     io: req.app.get("io"),
                     room: "all-admins",
@@ -146,11 +145,11 @@ const updateOrder = async (req, res) => {
                     title: "Order Status Update",
                     message: `Order status for product "${order.productName}" has been updated to "${req.body.status}"`,
                     image: order.picture,
-                    onClick: "/admin/orders"
+                    onClick: "/admin/orders",
                 });
             }
 
-            if(req.body.price !== order.price) {
+            if (req.body.price !== order.price) {
                 createRoomNotification({
                     io: req.app.get("io"),
                     room: "all-admins",
@@ -158,7 +157,7 @@ const updateOrder = async (req, res) => {
                     title: "Order Price Update",
                     message: `Order price for product "${order.productName}" has been updated to "${req.body.price}"`,
                     image: order.picture,
-                    onClick: "/admin/orders"
+                    onClick: "/admin/orders",
                 });
             }
 
@@ -177,31 +176,33 @@ const updateOrder = async (req, res) => {
         console.log(error);
         res.status(500).json({ message: error.message });
     }
-}
+};
 
 const deleteOrder = async (req, res) => {
     try {
         const order = await Order.findById(req.params.id);
         if (order) {
-
             const ordersWithOldPicture = await Order.find({
-                picture: order.picture
+                picture: order.picture,
             });
 
             const notificationsWithOldPicture = await Notification.find({
-                image: order.picture
+                image: order.picture,
             });
 
             // incase of re-order, image could be used by another order
             if (
-                order.picture && 
+                order.picture &&
                 ordersWithOldPicture.length === 1 &&
                 notificationsWithOldPicture.length === 0
             ) {
                 try {
                     fs.unlinkSync(`./public${order.picture}`);
                 } catch (error) {
-                    console.log(error.message || 'Error: Deleting picture failed during order deletion');
+                    console.log(
+                        error.message ||
+                        "Error: Deleting picture failed during order deletion"
+                    );
                 }
             }
 
@@ -214,7 +215,7 @@ const deleteOrder = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
-}
+};
 
 const reOrder = async (req, res) => {
     try {
@@ -225,7 +226,7 @@ const reOrder = async (req, res) => {
                 productName: order.productName,
                 quantity: order.quantity,
                 price: order.price,
-                picture: order.picture
+                picture: order.picture,
             });
             const savedOrder = await newOrder.save();
             res.status(200).json(savedOrder);
@@ -235,11 +236,7 @@ const reOrder = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
-}
-
-
-
-
+};
 
 module.exports = {
     getOrders,
@@ -248,4 +245,4 @@ module.exports = {
     deleteOrder,
     getOrder,
     reOrder,
-}
+};

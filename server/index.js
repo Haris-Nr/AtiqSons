@@ -15,19 +15,16 @@ app.set("io", io);
 
 app.use(morgan("tiny"));
 
-app.use(cors( {
-  origin:  [
-    [process.env.CLIENT_URL],
-  ],
-  methods: "*",
-}));
-
-
-
+app.use(
+  cors({
+    origin: [[process.env.CLIENT_URL]],
+    methods: "*",
+  })
+);
 
 app.use(express.json());
 
-app.use(express.static(path.join(__dirname, 'dist')));
+app.use(express.static(path.join(__dirname, "dist")));
 app.use(express.static(path.join(__dirname, "public")));
 
 // Routes import
@@ -39,7 +36,9 @@ const logRoute = require("./routes/logRoute");
 const dubaiRoutes = require("./routes/dubaiRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const exchangeRateRoutes = require("./routes/exchangeRateRoutes");
-const breakRoutes = require("./routes/breakRoutes")
+const breakRoutes = require("./routes/breakRoutes");
+const screenShotRoutes = require("./routes/screenShotRoutes");
+const inventoryRoutes = require("./routes/inventoryRoutes");
 
 // Define your routes
 app.use("/api/user", userRoutes);
@@ -50,11 +49,12 @@ app.use("/api/log", logRoute);
 app.use("/api/dubai", dubaiRoutes);
 app.use("/api/order", orderRoutes);
 app.use("/api/exchange-rate", exchangeRateRoutes);
-app.use("/api/break", breakRoutes)
+app.use("/api/break", breakRoutes);
+app.use("/api/inventory", inventoryRoutes);
+app.use("/api/screenshot", screenShotRoutes);
 
-
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dist/index.html'));
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "dist/index.html"));
 });
 
 const PORT = process.env.PORT;

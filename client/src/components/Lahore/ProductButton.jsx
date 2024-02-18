@@ -9,7 +9,11 @@ import {
   Modal,
   Select,
 } from "antd";
-import { UploadOutlined, PlusCircleOutlined,EditOutlined } from "@ant-design/icons";
+import {
+  UploadOutlined,
+  PlusCircleOutlined,
+  EditOutlined,
+} from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Productsbyemployee,
@@ -21,8 +25,8 @@ import {
 
 const baseURL = import.meta.env.VITE_API_BASE_URL;
 
-const ProductButton = ({ productId,  productData: initialProductData }) => {
-
+const ProductButton = ({ productId, productData: initialProductData }) => {
+  
   const dispatch = useDispatch();
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState([]);
@@ -39,23 +43,23 @@ const ProductButton = ({ productId,  productData: initialProductData }) => {
   useEffect(() => {
     if (initialProductData && productId) {
       setIsEditMode(true);
-        form.setFieldsValue({
-          productName: initialProductData.productName,
-      quantity: initialProductData.quantity,
-      pastmonth: initialProductData.pastmonth,
-      price: initialProductData.price,
-      description: initialProductData.description,
-      asin: initialProductData.asin,
-      bestseller: initialProductData.bestseller,
-      selectItem: initialProductData.selectItem,
-      url: initialProductData.url,
-        });
-        if (initialProductData.image) {
-          const imageUrl = `${baseURL}${initialProductData.image}`;
-          setFileList([{ url: imageUrl, name: 'Product Image', status: 'done' }]);
-        }
+      form.setFieldsValue({
+        productName: initialProductData.productName,
+        quantity: initialProductData.quantity,
+        pastmonth: initialProductData.pastmonth,
+        price: initialProductData.price,
+        description: initialProductData.description,
+        asin: initialProductData.asin,
+        bestseller: initialProductData.bestseller,
+        selectItem: initialProductData.selectItem,
+        url: initialProductData.url,
+      });
+      if (initialProductData.image) {
+        const imageUrl = `${baseURL}${initialProductData.image}`;
+        setFileList([{ url: imageUrl, name: "Product Image", status: "done" }]);
+      }
     }
-  }, [initialProductData, productId,form]);
+  }, [initialProductData, productId, form]);
 
   const onFinish = (values) => {
     const formData = new FormData();
@@ -74,18 +78,19 @@ const ProductButton = ({ productId,  productData: initialProductData }) => {
     }
 
     if (isEditMode) {
-      dispatch(updateProductById({ id: productId, updatedProductData: formData })).then(() => {
-        message.success('Product updated successfully');
+      dispatch(
+        updateProductById({ id: productId, updatedProductData: formData })
+      ).then(() => {
+        message.success("Product updated successfully");
         resetFormAndCloseModal();
         dispatch(SingleProduct(productId));
       });
     } else {
-    dispatch(addProduct(formData)).then(() => {
-      dispatch(Productsbyemployee(employee?._id));
-    });
-  }
+      dispatch(addProduct(formData)).then(() => {
+        dispatch(Productsbyemployee(employee?._id));
+      });
+    }
   };
-
 
   useEffect(() => {
     if (productdata.success) {
@@ -174,18 +179,18 @@ const ProductButton = ({ productId,  productData: initialProductData }) => {
         shape="round"
         icon={isEditMode ? <EditOutlined /> : <PlusCircleOutlined />}
       >
-       {isEditMode ? 'Edit Product' : 'Add New Product'}
+        {isEditMode ? "Edit Product" : "Add New Product"}
       </Button>
 
       <Modal
-         title={isEditMode ? 'Edit Product' : 'Add Product'}
+        title={isEditMode ? "Edit Product" : "Add Product"}
         open={open}
         onOk={handleOk}
         confirmLoading={confirmLoading}
         onCancel={handleCancel}
       >
         <Form
-        form={form}
+          form={form}
           name="addProductForm"
           onFinish={onFinish}
           labelCol={{ span: 6 }}
@@ -297,7 +302,7 @@ const ProductButton = ({ productId,  productData: initialProductData }) => {
             message="Please select which item"
             hasFeedback
           >
-            <Select placeholder="Select a Item" size="middle" options={items}/>
+            <Select placeholder="Select a Item" size="middle" options={items} />
           </Form.Item>
 
           <Form.Item

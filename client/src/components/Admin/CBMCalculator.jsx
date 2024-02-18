@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, Button, Select, Typography } from "antd";
+import { Form, Input, Button, Select, Typography, Space } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
@@ -156,7 +156,7 @@ const CBMCalculator = () => {
             </Input.Group>
           </Form.Item>
           <Form.Item label="Weight (per unit)">
-            <Input.Group compact>
+            <Space.Compact>
               <Input
                 style={{ width: "60%" }}
                 placeholder="Weight"
@@ -171,7 +171,7 @@ const CBMCalculator = () => {
                 <Option value="Kg">KG</Option>
                 <Option value="Lbs">LBS</Option>
               </Select>
-            </Input.Group>
+            </Space.Compact>
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit" icon={<PlusOutlined />}>
