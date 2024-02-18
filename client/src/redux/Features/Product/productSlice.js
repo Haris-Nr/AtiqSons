@@ -16,13 +16,14 @@ const initialState = {
   productStatusData: {},
   trackStatusData: {},
   TrackProductData: {},
+  updateProduct:{},
 
   currentPage: 1,
   pageSize: 10,
   totalItems: 0,
   totalPages: 0,
   search: "",
-  totalProduct:0,
+  totalProduct: 0,
 
   isLoading: false,
   error: {},
@@ -192,6 +193,18 @@ export const DubaiProduct = createAsyncThunk(
       return response;
     } catch (error) {
       return rejectWithValue(error);
+    }
+  }
+);
+
+export const updateProductById = createAsyncThunk(
+  "product/updateProductById",
+  async ({ id, updatedProductData }, thunkAPI) => {
+    try {
+      const response = await productApi.updateProduct(id, updatedProductData);
+      return response;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error);
     }
   }
 );
@@ -388,6 +401,17 @@ export const productSlice = createSlice({
         state.search = action.payload?.search;
       })
       .addCase(DubaiProduct.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(updateProductById.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(updateProductById.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.updateProduct = action.payload;
+      })
+      .addCase(updateProductById.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       });

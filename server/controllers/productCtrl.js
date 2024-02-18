@@ -518,6 +518,66 @@ const fetchProductsBySelectItem = async (req, res) => {
   }
 }
 
+// Update product
+const updateProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const productUpdates = req.body; 
+
+    const product = await Product.findById(id);
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: 'Product not found',
+      });
+    }
+
+
+    // Handle image update
+    if (req.file) {
+      const imagePath = req.file.path;
+      // Create a relative path to store in DB (optional)
+      const relativeImagePath = "/" + imagePath.replace(/\\/g, "/").split("/").filter(e => e && e !== "public").join("/");
+
+      productUpdates.image = relativeImagePath;
+
+      // Delete the old image if it exists
+      if (product.image) {
+        const oldImagePath = path.join(__dirname, "../public", product.image);
+        try {
+          await fs.unlink(oldImagePath);
+        } catch (error) {
+          console.error(`Failed to delete old image: ${error.message}`);
+        }
+      }
+    }
+
+    const updatedProduct = await Product.findByIdAndUpdate(id, productUpdates, {
+      new: true,
+    });
+
+    if (!updatedProduct) {
+      return res.status(404).json({
+        success: false,
+        message: 'Product not found',
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Product updated successfully',
+      data: updatedProduct,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+
 module.exports = {
   createProduct,
   fetchProducts,
@@ -531,4 +591,5 @@ module.exports = {
   gettrackproduct,
   DubaiProduct,
   fetchProductsBySelectItem,
+  updateProduct,
 };

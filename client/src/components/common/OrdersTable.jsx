@@ -6,6 +6,7 @@ import {
     message,
     Input,
     Select,
+    Image,
 } from 'antd';
 import { FaPencilAlt } from 'react-icons/fa';
 import { useEffect, useState } from 'react';
@@ -122,8 +123,6 @@ const OrdersTable = () => {
         return user.employee?.role === "admin" || user.employee?.role === "superadmin";
     }
 
-
-
     function currencyOptionWithDefault(currencyOptions) {
         const hasDefaultCurrency = currencyOptions.find((currency) => currency.value === defaultCurrency);
 
@@ -162,10 +161,10 @@ const OrdersTable = () => {
             title: 'Picture',
             dataIndex: 'picture',
             key: 'picture',
-            render: (picture) => <img
+            width:'100px',
+            render: (picture) => <Image
                 src={import.meta.env.VITE_API_BASE_URL + picture}
                 alt="Product"
-                style={{ width: '50px', height: '50px' }}
             />
         },
         {
@@ -531,6 +530,7 @@ const OrdersTable = () => {
     return (
         <>
             <Table
+            bordered
                 columns={columns}
                 dataSource={orders.orders}
                 rowKey={(record) => record._id}
@@ -542,7 +542,6 @@ const OrdersTable = () => {
                     total: orders.totalOrders,
                     showSizeChanger: true,
                     showQuickJumper: true,
-                    showTotal: (total) => `Total ${total} items and ${Math.ceil(total / pageSize)} Pages`,
                 }}
                 loading={isLoading}
                 onChange={handleTableChange}

@@ -108,6 +108,19 @@ const dubaiProduct = async (page,limit,search) => {
     }
 };
 
+const updateProduct = async (id, productData) => {
+    try {
+        const response = await axiosInstance.put(`/api/product/update/${id}`, productData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+        return response.data;
+    } catch (error) {
+        throw error.response.data;
+    }
+};
+
 
 
 
@@ -122,7 +135,8 @@ const productApi = {
     getTrackProduct,
     changeTrackStatus,
     getIntrackingProduct,
-    dubaiProduct
+    dubaiProduct,
+    updateProduct
 };
 
 export default productApi;

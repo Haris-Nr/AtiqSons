@@ -15,6 +15,7 @@ const {
   gettrackproduct,
   DubaiProduct,
   fetchProductsBySelectItem,
+  updateProduct,
 } = require("../controllers/productCtrl");
 const multer = require("multer");
 const path = require("path");
@@ -37,6 +38,8 @@ router.post(
   createProduct
 );
 router.post("/fetchProductsbyemployee", authMiddleware, fetchProducts);
+
+router.put("/update/:id", authMiddleware, upload.single("image"),updateProduct);
 
 router.get("/fetchProductsBySelectItem", authMiddleware, fetchProductsBySelectItem);
 

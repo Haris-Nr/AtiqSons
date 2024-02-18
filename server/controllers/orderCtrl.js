@@ -105,8 +105,6 @@ const createOrder = async (req, res) => {
     }
 }
 
-
-
 const updateOrder = async (req, res) => {
     try {
         const order = await Order.findById(req.params.id);
@@ -136,15 +134,10 @@ const updateOrder = async (req, res) => {
             ) {
                 fs.unlinkSync(`./public${order.picture}`);
             }
-
-
             order.picture = newPicture;
-
         }
-
-
+        
         if (order) {
-
             if(req.body.status !== order.status) {
                 createRoomNotification({
                     io: req.app.get("io"),
@@ -156,7 +149,6 @@ const updateOrder = async (req, res) => {
                     onClick: "/admin/orders"
                 });
             }
-
 
             if(req.body.price !== order.price) {
                 createRoomNotification({
@@ -186,7 +178,6 @@ const updateOrder = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 }
-
 
 const deleteOrder = async (req, res) => {
     try {
@@ -224,7 +215,6 @@ const deleteOrder = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 }
-
 
 const reOrder = async (req, res) => {
     try {

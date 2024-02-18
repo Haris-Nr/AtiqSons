@@ -9,24 +9,53 @@ import {
   Modal,
   Select,
 } from "antd";
-import { UploadOutlined, PlusCircleOutlined } from "@ant-design/icons";
+import { UploadOutlined, PlusCircleOutlined,EditOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Productsbyemployee,
+  SingleProduct,
   addProduct,
   resetProductState,
+  updateProductById,
 } from "../../redux/Features/Product/productSlice";
 
-const ProductButton = () => {
+const baseURL = import.meta.env.VITE_API_BASE_URL;
+
+const ProductButton = ({ productId,  productData: initialProductData }) => {
+
   const dispatch = useDispatch();
+  const [form] = Form.useForm();
   const [fileList, setFileList] = useState([]);
   const [currency, setCurrency] = useState("$");
   const [open, setOpen] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+
   const { user } = useSelector((state) => state.fetch);
   const { productdata, isLoading } = useSelector((state) => state.product);
   const { employee } = user;
   const formRef = useRef(null);
+
+  useEffect(() => {
+    if (initialProductData && productId) {
+      setIsEditMode(true);
+        form.setFieldsValue({
+          productName: initialProductData.productName,
+      quantity: initialProductData.quantity,
+      pastmonth: initialProductData.pastmonth,
+      price: initialProductData.price,
+      description: initialProductData.description,
+      asin: initialProductData.asin,
+      bestseller: initialProductData.bestseller,
+      selectItem: initialProductData.selectItem,
+      url: initialProductData.url,
+        });
+        if (initialProductData.image) {
+          const imageUrl = `${baseURL}${initialProductData.image}`;
+          setFileList([{ url: imageUrl, name: 'Product Image', status: 'done' }]);
+        }
+    }
+  }, [initialProductData, productId,form]);
 
   const onFinish = (values) => {
     const formData = new FormData();
@@ -40,13 +69,21 @@ const ProductButton = () => {
       }
     }
 
-    if (fileList.length > 0) {
+    if (fileList.length > 0 && fileList[0].originFileObj) {
       formData.append("image", fileList[0].originFileObj);
     }
 
+    if (isEditMode) {
+      dispatch(updateProductById({ id: productId, updatedProductData: formData })).then(() => {
+        message.success('Product updated successfully');
+        resetFormAndCloseModal();
+        dispatch(SingleProduct(productId));
+      });
+    } else {
     dispatch(addProduct(formData)).then(() => {
       dispatch(Productsbyemployee(employee?._id));
     });
+  }
   };
 
 
@@ -71,6 +108,7 @@ const ProductButton = () => {
     formRef?.current?.resetFields();
     setFileList([]);
     setOpen(false);
+    setIsEditMode(false);
   };
 
   const handleOk = () => {
@@ -134,19 +172,20 @@ const ProductButton = () => {
         type="primary"
         onClick={showModal}
         shape="round"
-        icon={<PlusCircleOutlined />}
+        icon={isEditMode ? <EditOutlined /> : <PlusCircleOutlined />}
       >
-        Add New Product
+       {isEditMode ? 'Edit Product' : 'Add New Product'}
       </Button>
 
       <Modal
-        title="Add Product"
+         title={isEditMode ? 'Edit Product' : 'Add Product'}
         open={open}
         onOk={handleOk}
         confirmLoading={confirmLoading}
         onCancel={handleCancel}
       >
         <Form
+        form={form}
           name="addProductForm"
           onFinish={onFinish}
           labelCol={{ span: 6 }}

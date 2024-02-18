@@ -148,7 +148,7 @@ const Find = ({ id }) => {
                         />
                     </Form.Item>
 
-                    <Form.Item label="Image Upload" name="image" hasFeedback>
+                    <Form.Item label="Image Upload" name="image" hasFeedback rules={[{ required: true, message: "upload image" }]}>
                         <Upload
                             maxCount={1}
                             fileList={fileList}

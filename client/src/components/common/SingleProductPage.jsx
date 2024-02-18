@@ -21,6 +21,7 @@ import ChangeTrackStatusButton from "./ChangeTrackStatusButton";
 import AdminTrackData from "../Admin/AdminTrackData";
 import Find from "../Dubai/Find";
 import DubaiProductData from "../Admin/DubaiProductData";
+import ProductButton from "../Lahore/ProductButton";
 
 const baseURL = import.meta.env.VITE_API_BASE_URL;
 
@@ -214,7 +215,7 @@ const SingleProductPage = () => {
     {
       key: "14",
       label: "About This Item",
-      children: product?.description
+      children: product?.description,
     },
   ];
 
@@ -237,24 +238,24 @@ const SingleProductPage = () => {
         items={items}
         extra={
           <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
-            {user?.employee?.role === "admin" ||
-              (user?.employee?.role === "superadmin" && (
-                <ChangeStatusButton
-                  itemType="product"
-                  Id={id}
-                  currentStatus={status}
-                  onChangeStatus={handleStatus}
-                />
-              ))}
-            {user?.employee?.role === "admin" ||
-              (user?.employee?.role === "superadmin" && (
-                <ChangeTrackStatusButton
-                  Id={id}
-                  currentStatus={tracking}
-                  onChangeStatus={handleTrack}
-                />
-              ))}
-
+            {(user?.employee?.role === "admin" ||
+              user?.employee?.role === "superadmin") && (
+              <ChangeStatusButton
+                itemType="product"
+                Id={id}
+                currentStatus={status}
+                onChangeStatus={handleStatus}
+              />
+            )}
+            {(user?.employee?.role === "admin" ||
+              user?.employee?.role === "superadmin") && (
+              <ChangeTrackStatusButton
+                Id={id}
+                currentStatus={tracking}
+                onChangeStatus={handleTrack}
+              />
+            )}
+              <ProductButton productId={id} productData={SingleProductData?.data}/>
             {!(user?.employee?.dashboard === "dubai") ? (
               <DeleteButton onConfirmDelete={() => handleDelete(id)} />
             ) : (
@@ -264,18 +265,18 @@ const SingleProductPage = () => {
         }
       />
 
-      <div> 
+      <div>
         {(user?.employee?.dashboard === "dubai" ||
           user?.employee?.dashboard === "admin") && (
           <DubaiProductData id={id} />
         )}
-
-        {user?.employee?.role === "admin" ||
-          (user?.employee?.role === "superadmin" && (
-            <div className="space-y-2">
-              <AdminTrackData id={id} />
-            </div>
-          ))}
+        <h3 className="text-lg mb-4"> Tracking Details </h3>
+        {(user?.employee?.role === "admin" ||
+          user?.employee?.role === "superadmin") && (
+          <div className="space-y-2">
+            <AdminTrackData id={id} />
+          </div>
+        )}
       </div>
       {user?.employee?.dashboard === "lahore" && tracking === "tracking" && (
         <TrackProduct id={id} />

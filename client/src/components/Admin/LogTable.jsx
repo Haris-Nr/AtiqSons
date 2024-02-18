@@ -1,6 +1,6 @@
+import React, { useEffect } from 'react';
 import { Table, message } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect } from "react";
 import moment from "moment";
 import {
   allLogs,
@@ -43,6 +43,12 @@ const LogTable = () => {
   const handleTableChange = (pagination) => {
     dispatch(setCurrentPage(pagination.current));
     dispatch(setPageSize(pagination.pageSize));
+  };
+
+  const calculateDuration = (loginTime, logoutTime) => {
+    if (!logoutTime) return "0 hours";
+    const duration = moment(logoutTime).diff(moment(loginTime), 'hours', true);
+    return `${duration.toFixed(2)} hours`;
   };
 
   
@@ -92,6 +98,11 @@ const LogTable = () => {
       },
       key: "logoutTime",
     },
+    {
+      title: 'Duration',
+      key: 'duration',
+      render: (text, record) => calculateDuration(record.loginTime, record.logoutTime),
+    },
   ];
 
   
@@ -103,7 +114,7 @@ const LogTable = () => {
   return (
     <div>
       <Table
-      size="middle"
+        size="middle"
         bordered
         columns={columns}
         loading={isLoading}
