@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Layout, message, theme, notification } from "antd";
+import { Layout, theme, notification } from "antd";
 import { Outlet, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUser } from "../../redux/Features/auth/fetchSlice";
