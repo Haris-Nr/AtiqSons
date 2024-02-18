@@ -1,5 +1,5 @@
-import screenShotApi from "../../api/screenShotApi";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import screenShotApi from "../../api/screenShotApi";
 
 const initialState = {
     screenShots: [],
@@ -64,7 +64,7 @@ const screenShotSlice = createSlice({
             state.error = null;
         },
     },
-    extraReducers: (builder) => {
+    extraReducers:(builder) => {
         builder
             .addCase(createScreenShot.pending, (state) => {
                 state.loading = true;
