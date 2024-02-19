@@ -60,3 +60,12 @@
 .custom-select-CANCELLED .ant-select-selection-item {
   color: #FF4D4F; /* Change color for 'CANCELLED' */
 }
+
+.red-background{
+  color: white;
+  background-color: #E73939;
+}
+
+.ant-table-cell-row-hover{
+  color: black !important;
+}

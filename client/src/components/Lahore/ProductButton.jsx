@@ -42,17 +42,21 @@ const ProductButton = ({ productId, productData: initialProductData }) => {
 
   useEffect(() => {
     if (initialProductData && productId) {
+      console.log(initialProductData)
       setIsEditMode(true);
       form.setFieldsValue({
         productName: initialProductData.productName,
         quantity: initialProductData.quantity,
         pastmonth: initialProductData.pastmonth,
         price: initialProductData.price,
+        currency:initialProductData.currency,
         description: initialProductData.description,
         asin: initialProductData.asin,
         bestseller: initialProductData.bestseller,
         selectItem: initialProductData.selectItem,
         url: initialProductData.url,
+        seller:initialProductData.seller,
+        createdBy:initialProductData.createdBy
       });
       if (initialProductData.image) {
         const imageUrl = `${baseURL}${initialProductData.image}`;
@@ -176,7 +180,6 @@ const ProductButton = ({ productId, productData: initialProductData }) => {
       <Button
         type="primary"
         onClick={showModal}
-        shape="round"
         icon={isEditMode ? <EditOutlined /> : <PlusCircleOutlined />}
       >
         {isEditMode ? "Edit Product" : "Add New Product"}

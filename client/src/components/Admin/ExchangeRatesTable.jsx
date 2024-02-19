@@ -137,7 +137,11 @@ const ExchangeRatesTable = () => {
 
     function handleDeleteBtnClick(exchangeRate) {
         dispatch(deleteExchangeRate(exchangeRate._id));
-        setReload(!reload);
+        dispatch(getExchangeRates({
+            page: currentPage,
+            pageSize,
+            search
+        }));
     }
 
     function handleEditExchangeRateFormSubmit(updatedExchangeRate) {
@@ -158,6 +162,8 @@ const ExchangeRatesTable = () => {
     return (
         <>
             <Table
+            size='middle'
+            bordered
                 columns={columns}
                 dataSource={exchangeRates.exchangeRates}
                 rowKey={(record) => record._id}

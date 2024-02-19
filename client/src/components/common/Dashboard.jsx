@@ -92,7 +92,7 @@ const Dashboard = () => {
                     />
                   }
                   title={"Products"}
-                  value={totalProduct}
+                  value={`${totalProduct}`}
                 />
                     </>
                 )}

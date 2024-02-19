@@ -15,10 +15,12 @@ import Highlighter from "react-highlight-words";
 import InventoryForm from "./InventoryForm";
 import {
   addStock,
+  deleteStock,
   getStock,
   resetStockState,
   uploadStock,
 } from "../../redux/Features/inventory/inventorySlice";
+import DeleteButton from "../common/DeleteButton";
 
 const baseURL = import.meta.env.VITE_API_BASE_URL;
 
@@ -101,6 +103,7 @@ const InventoryTable = () => {
     form.resetFields();
     setFileList([]);
     setIsUploadModalOpen(false);
+    setReload(!reload)
     dispatch(
       getStock({
         search: search.trim(),
@@ -119,6 +122,18 @@ const InventoryTable = () => {
       dispatch(resetStockState());
     }
   }, [dispatch,uploadMessage]);
+
+  const handleDelete = (id) => {
+    dispatch(deleteStock(id)).then(() => {
+      dispatch(
+        getStock({
+          search: search.trim(),
+          page: currentPage,
+          limit: pageSize,
+        })
+      );
+    });
+  };
 
   const columns = [
     {
@@ -170,6 +185,9 @@ const InventoryTable = () => {
       title: "Action",
       dataIndex: "action",
       key: "action",
+      render: (_, record) => (
+        <DeleteButton onConfirmDelete={() => handleDelete(record._id)}/>
+      ),
     },
   ];
 
@@ -216,9 +234,10 @@ const InventoryTable = () => {
     </div>
   );
 
-  function handleCreateOrderFormSubmit(values) {
+  function handleCreateStockFormSubmit(values) {
     dispatch(addStock(values));
     setIsModalOpen(false);
+    setReload(!reload)
     dispatch(
       getStock({
         search: search.trim(),
@@ -254,7 +273,7 @@ const InventoryTable = () => {
         onCancel={handleCancel}
         footer={null}
       >
-        <InventoryForm onSubmit={handleCreateOrderFormSubmit} />
+        <InventoryForm onSubmit={handleCreateStockFormSubmit} />
       </Modal>
       <Modal
         title="Upload Stock File"

@@ -246,7 +246,6 @@ const OrdersTable = () => {
             render: (text, record) => (
                 <Space size="middle">
                     <Button onClick={() => handleReOrderBtnClick(record._id)}>Re-Order</Button>
-                    {/* edit and delete buttons */}
                     <Button
                         type="primary"
                         onClick={() => handleEitOrderBtnClick(record)}

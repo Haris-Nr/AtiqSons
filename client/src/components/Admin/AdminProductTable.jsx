@@ -2,7 +2,6 @@ import { Table, Tag, Image, message } from "antd";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Highlighter from "react-highlight-words";
-import ProductButton from "../Lahore/ProductButton";
 import {
   AllProduct,
   setCurrentPage,
@@ -180,7 +179,6 @@ const AdminProductTable = () => {
     <div className="flex justify-between ">
       <ProductSearch />
       <div className=" relative w-full px-4 max-w-full flex-grow flex-1 text-right ">
-        <ProductButton />
       </div>
     </div>
   );

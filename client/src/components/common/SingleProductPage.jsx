@@ -255,7 +255,9 @@ const SingleProductPage = () => {
                 onChangeStatus={handleTrack}
               />
             )}
-              <ProductButton productId={id} productData={SingleProductData?.data}/>
+
+            { !(user?.employee?.role === "admin" ||
+              user?.employee?.role === "superadmin") &&  <ProductButton productId={id} productData={SingleProductData?.data}/>}
             {!(user?.employee?.dashboard === "dubai") ? (
               <DeleteButton onConfirmDelete={() => handleDelete(id)} />
             ) : (

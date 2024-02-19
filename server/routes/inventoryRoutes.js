@@ -3,7 +3,7 @@ const router = express.Router();
 const authMiddleware = require("../middlewares/authMiddleware");
 const multer = require("multer");
 const path = require("path");
-const { addStock,getStock,uploadFile } = require("../controllers/inventoryCtrl");
+const { addStock,getStock,uploadFile,deleteStock, editStock } = require("../controllers/inventoryCtrl");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -31,6 +31,8 @@ const csvStorage = multer.diskStorage({
 const csvUpload = multer({ storage: csvStorage });
 
 router.post("/uploadstock", csvUpload.single("file"),uploadFile)
+
+router.delete("/stock/:id", authMiddleware, deleteStock);
 
 
 
