@@ -149,9 +149,10 @@ const DashboardLayout = () => {
 
   async function initializeEmployeePeer(receiverUserId) {
 
-    if (peer.current && peer.current.destory) {
-      peer.current.destory();
-      peer.current = null;
+    if (peer.current[receiverUserId] && 
+      peer.current.destory[receiverUserId]) {
+        peer.current[receiverUserId].destory();
+        peer.current[receiverUserId] = null;
       socket.off("peer-signal");
     }
 
@@ -172,27 +173,28 @@ const DashboardLayout = () => {
     });
 
     socket.on("peer-signal", (signal) => {
-      peer.current.signal(signal);
+      peer.current[receiverUserId].signal(signal);
     });
 
-    peer.current.on("signal", (signal) => {
+    peer.current[receiverUserId].on("signal", (signal) => {
       socket.emit("peer-signal", signal, receiverUserId);
     });
 
-    peer.current.on("error", (err) => {
+    peer.current[receiverUserId].on("error", (err) => {
       console.log(err);
-      peer.current.destroy();
-      peer.current = null;
+      peer.current[receiverUserId].destroy();
+      peer.current[receiverUserId] = null;
       socket.off("peer-signal");
     });
 
-    peer.current.on("close", () => {
-      peer.current?.destroy();
-      peer.current = null;
+
+    peer.current[receiverUserId].on("close", () => {
+      peer.current[receiverUserId]?.destroy();
+      peer.current[receiverUserId] = null;
       socket.off("peer-signal");
     });
 
-    peer.current.addStream(screenSharingStream.current);
+    peer.current[receiverUserId].addStream(screenSharingStream.current);
   }
 
   function getSingleFrameFromStream(stream) {
