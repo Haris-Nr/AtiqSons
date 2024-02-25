@@ -8,19 +8,21 @@ import {
   Input,
   Upload,
   Form,
+  Space,
 } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import Highlighter from "react-highlight-words";
-import InventoryForm from "./InventoryForm";
 import {
   addStock,
   deleteStock,
+  editStock,
   getStock,
   resetStockState,
   uploadStock,
 } from "../../redux/Features/inventory/inventorySlice";
 import DeleteButton from "../common/DeleteButton";
+import InventoryForm from "./InventoryForm";
 
 const baseURL = import.meta.env.VITE_API_BASE_URL;
 
@@ -28,6 +30,7 @@ const InventoryTable = () => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState([]);
+  const [editItem, setEditItem] = useState(null);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -135,6 +138,11 @@ const InventoryTable = () => {
     });
   };
 
+  const handleEditButton = (record) => {
+    setEditItem(record); 
+    setIsModalOpen(true);
+  };
+
   const columns = [
     {
       title: "SrNo",
@@ -186,7 +194,10 @@ const InventoryTable = () => {
       dataIndex: "action",
       key: "action",
       render: (_, record) => (
+        <Space size="middle">
         <DeleteButton onConfirmDelete={() => handleDelete(record._id)}/>
+        {/* <Button onClick={()=>handleEditButton(record)}>Edit</Button> */}
+        </Space>
       ),
     },
   ];
@@ -227,7 +238,7 @@ const InventoryTable = () => {
           <Button type="primary" onClick={showModal}>
             Add Stock
           </Button>
-          <Button onClick={showUploadModal}>Import</Button>
+          {/* <Button onClick={showUploadModal}>Import</Button> */}
         </div>
       </div>
       {searchMarkup}
@@ -235,7 +246,11 @@ const InventoryTable = () => {
   );
 
   function handleCreateStockFormSubmit(values) {
+    if (editItem) {
+      dispatch(editStock({ id: values._id, stockData:values }));
+    } else {
     dispatch(addStock(values));
+    }
     setIsModalOpen(false);
     setReload(!reload)
     dispatch(
@@ -245,7 +260,9 @@ const InventoryTable = () => {
         limit: pageSize,
       })
     );
+    setEditItem(null);
   }
+
 
   return (
     <div>
@@ -268,12 +285,15 @@ const InventoryTable = () => {
         onChange={handleTableChange}
       />
       <Modal
-        title="Add Stock"
+         title={editItem ? "Edit Stock" : "Add Stock"}
         open={isModalOpen}
-        onCancel={handleCancel}
+        onCancel={() => {
+          handleCancel();
+          setEditItem(null);
+        }}
         footer={null}
       >
-        <InventoryForm onSubmit={handleCreateStockFormSubmit} />
+        <InventoryForm onSubmit={handleCreateStockFormSubmit} order={editItem}/>
       </Modal>
       <Modal
         title="Upload Stock File"
@@ -282,7 +302,7 @@ const InventoryTable = () => {
         footer={null}
       >
         <Form form={form} onFinish={onFinish}>
-          <Form.Item name="file" label="Upload">
+          <Form.Item name="file" label="Upload" >
             <Upload
               maxCount={1}
               fileList={fileList}

@@ -1,10 +1,32 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Form, Input, Upload } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 
 const InventoryForm = ({ onSubmit, order }) => {
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState([]);
+
+  useEffect(() => {
+    if (order) {
+      form.setFieldsValue({
+        productName: order.productName,
+        quantity: order.quantity,
+        price: order.price,
+        asin: order.asin,
+        selectItem: order.selectItem,
+      });
+      if (order.image) {
+        setFileList([
+          {
+            uid: '-1',
+            name: 'image.png',
+            status: 'done',
+            url: order.image,
+          },
+        ]);
+      }
+    }
+  }, [order, form]);
 
   const onFinish = (values) => {
 
@@ -38,16 +60,6 @@ const InventoryForm = ({ onSubmit, order }) => {
           label="Product Name"
           name="productName"
           hasFeedback
-          rules={[
-            {
-              required: true,
-              message: "Please enter Product Name!",
-            },
-            {
-              type: "text",
-              message: "Enter a Valid Product Name",
-            },
-          ]}
         >
           <Input />
         </Form.Item>
@@ -55,7 +67,6 @@ const InventoryForm = ({ onSubmit, order }) => {
           label="Quantity"
           name="quantity"
           hasFeedback
-          rules={[{ required: true, message: "Please enter the quantity!" }]}
         >
           <Input />
         </Form.Item>
@@ -63,7 +74,6 @@ const InventoryForm = ({ onSubmit, order }) => {
           label="Price"
           name="price"
           hasFeedback
-          rules={[{ required: true, message: "Please enter the price!" }]}
         >
           <Input />
         </Form.Item>
@@ -72,19 +82,12 @@ const InventoryForm = ({ onSubmit, order }) => {
           label="ASIN"
           name="asin"
           hasFeedback
-          rules={[
-            {
-              required: true,
-              message: "Please enter ASIN number!",
-            },
-          ]}
         >
           <Input />
         </Form.Item>
         <Form.Item
           label="Select Item"
           name="selectItem"
-          required="true"
           message="Please select which item"
           hasFeedback
         >

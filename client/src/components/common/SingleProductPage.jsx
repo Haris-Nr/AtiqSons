@@ -52,6 +52,7 @@ const SingleProductPage = () => {
 
   const product = SingleProductData?.data;
 
+
   const status = product?.status;
   const tracking = product?.tracking;
   const imageUrl = product?.image ? `${baseURL}${product.image}` : "/no.png";
@@ -103,6 +104,7 @@ const SingleProductPage = () => {
       dispatch(resetTrackStatusState());
     }
   }, [trackStatusData, dispatch]);
+
 
   const items = [
     {
@@ -214,8 +216,20 @@ const SingleProductPage = () => {
     },
     {
       key: "14",
+      label: "Company",
+      children: product?.company,
+    },
+    {
+      key: "15",
+      label: "",
+      children:null,
+      span:2
+    },
+    {
+      key: "16",
       label: "About This Item",
       children: product?.description,
+
     },
   ];
 
@@ -256,8 +270,8 @@ const SingleProductPage = () => {
               />
             )}
 
-            { !(user?.employee?.role === "admin" ||
-              user?.employee?.role === "superadmin") &&  <ProductButton productId={id} productData={SingleProductData?.data}/>}
+            { (!(user?.employee?.role === "admin" ||
+              user?.employee?.role === "superadmin") &&  user?.employee?._id === product?.createdBy ) &&  <ProductButton productId={id} productData={SingleProductData?.data}/>}
             {!(user?.employee?.dashboard === "dubai") ? (
               <DeleteButton onConfirmDelete={() => handleDelete(id)} />
             ) : (

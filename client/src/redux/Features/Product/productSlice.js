@@ -9,6 +9,7 @@ const initialState = {
   IntrackingProductdata: [],
   gettrackproduct: [],
   dubaiProductData: [],
+  alltrackingProduct:{},
 
   productdata: {},
   SingleProductData: {},
@@ -21,7 +22,6 @@ const initialState = {
   currentPage: 1,
   pageSize: 10,
   totalItems: 0,
-  totalPages: 0,
   search: "",
   totalProduct: 0,
 
@@ -43,14 +43,15 @@ export const addProduct = createAsyncThunk(
 
 export const Productsbyemployee = createAsyncThunk(
   "product/Productsbyemployee",
-  async (productDataId, { getState, rejectWithValue }) => {
+  async ({ productDataId, company }, { getState, rejectWithValue }) => {
     try {
       const { currentPage, pageSize, search } = getState().product;
       const response = await productApi.fetchProductsbyemployee(
         productDataId,
+        company,
         currentPage,
         pageSize,
-        search
+        search,
       );
       return response;
     } catch (error) {
@@ -91,13 +92,14 @@ export const SingleProduct = createAsyncThunk(
 
 export const AllProduct = createAsyncThunk(
   "/product/fetchallProduct",
-  async (_, { getState, rejectWithValue }) => {
+  async (company, { getState, rejectWithValue }) => {
     try {
       const { currentPage, pageSize, search } = getState().product;
       const response = await productApi.getAllProduct(
         currentPage,
         pageSize,
-        search
+        search,
+        company
       );
       return response;
     } catch (error) {
@@ -180,6 +182,15 @@ export const getIntrackingProduct = createAsyncThunk(
   }
 );
 
+export const AllTrackingProduct = createAsyncThunk("product/allTrackingProduct", async ({ page, limit }, thunkAPI) => {
+  try {
+    const response = await productApi.allTrackingProduct(page, limit);
+    return response;
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error);
+  }
+})
+
 export const DubaiProduct = createAsyncThunk(
   "/product/dubairoduct",
   async (_, { getState, rejectWithValue }) => {
@@ -229,6 +240,7 @@ export const productSlice = createSlice({
     setCurrentPage: (state, action) => {
       state.currentPage = action.payload;
     },
+
     setPageSize: (state, action) => {
       state.pageSize = action.payload;
     },
@@ -260,7 +272,7 @@ export const productSlice = createSlice({
         state.isLoading = false;
         state.fetchProductData = action.payload.data;
         state.currentPage = action.payload?.currentPage;
-        state.totalPages = action.payload?.totalPages;
+        state.pageSize = action.payload?.itemsPerPage;
         state.totalItems = action.payload?.totalItems;
         state.search = action.payload?.search;
       })
@@ -308,7 +320,6 @@ export const productSlice = createSlice({
         state.currentPage = action.payload?.page;
         state.pageSize = action.payload?.limit;
         state.totalProduct = action.payload?.totalProduct;
-        state.totalPages = action.payload?.totalPages;
         state.search = action.payload?.search;
       })
       .addCase(AllProduct.rejected, (state, action) => {
@@ -414,7 +425,17 @@ export const productSlice = createSlice({
       .addCase(updateProductById.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
-      });
+      })
+      .addCase(AllTrackingProduct.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(AllTrackingProduct.fulfilled,(state,action)=>{
+        state.isLoading = false;
+        state.alltrackingProduct = action.payload;
+      })
+      .addCase(AllTrackingProduct.rejected,(state)=>{
+        state.isLoading = false;
+      });  
   },
 });
 

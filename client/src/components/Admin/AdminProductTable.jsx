@@ -15,9 +15,12 @@ import ProductSearch from "../common/ProductSearch";
 const baseURL = import.meta.env.VITE_API_BASE_URL;
 
 const AdminProductTable = () => {
+
+
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { selectItemValue } = useParams();
+  const { selectItemValue,company } = useParams();
   const [productsList, setProductsList] = useState([]);
   const {
     AllProductData,
@@ -29,6 +32,7 @@ const AdminProductTable = () => {
     search,
     error,
   } = useSelector((state) => state.product);
+
 
   const renderColumnWithHighlight = (text) => (
     <Highlighter
@@ -44,7 +48,7 @@ const AdminProductTable = () => {
 
   useEffect(() => {
     if (!selectItemValue) {
-      dispatch(AllProduct());
+      dispatch(AllProduct(company));
     } else {
       dispatch(fetchProductsBySelectItem(selectItemValue));
     }
@@ -52,7 +56,7 @@ const AdminProductTable = () => {
     if (error.success === false) {
       message.error(error.message);
     }
-  }, [dispatch, currentPage, pageSize, search, error.success, error.message,selectItemValue]);
+  }, [dispatch, currentPage, pageSize, search, error.success, error.message,selectItemValue,company]);
 
 
   useEffect(() => {
@@ -61,7 +65,7 @@ const AdminProductTable = () => {
     } else{
       setProductsList(AllProductData);
     }
-  }, [selectItemProducts, AllProductData, selectItemValue]);
+  }, [selectItemProducts, AllProductData, selectItemValue,company]);
 
 
   const handleTableChange = (pagination) => {
@@ -84,7 +88,7 @@ const AdminProductTable = () => {
       dataIndex: "url",
       render: (_, record) => {
         const imageUrl = record.image ? `${baseURL}${record.image}` : "/no.png";
-        return <Image width={100} src={imageUrl} />;
+        return <Image width={50} src={imageUrl} />;
       },
     },
     {
@@ -155,10 +159,21 @@ const AdminProductTable = () => {
     },
   ];
 
+  if (selectItemValue) {
+    columns.push(
+    {
+      title: "Company Name",
+      dataIndex: "company",
+      key: "company",
+      render: (text) => renderColumnWithHighlight(text),
+    },
+    );
+  }
+
   const onRowClick = (record) => {
     return {
       onClick: () => {
-        navigate('/admin/productTable/'+record._id);
+        navigate(`/admin/productTable/${company}/${record._id}`);
       },
     };
   };

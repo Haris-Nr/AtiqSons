@@ -137,11 +137,13 @@ const ExchangeRatesTable = () => {
 
     function handleDeleteBtnClick(exchangeRate) {
         dispatch(deleteExchangeRate(exchangeRate._id));
+        setReload(!reload);
         dispatch(getExchangeRates({
             page: currentPage,
             pageSize,
             search
         }));
+
     }
 
     function handleEditExchangeRateFormSubmit(updatedExchangeRate) {

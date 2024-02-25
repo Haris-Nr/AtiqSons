@@ -15,7 +15,7 @@ import { FaTasks, FaCog } from "react-icons/fa";
 import { FaPersonShelter } from "react-icons/fa6";
 import { BsCameraFill, BsPersonFill } from "react-icons/bs";
 import { BiCalculator } from "react-icons/bi";
-import { MdFreeBreakfast, MdOutlineProductionQuantityLimits } from "react-icons/md";
+import { MdFreeBreakfast, MdOutlineProductionQuantityLimits, MdTrackChanges } from "react-icons/md";
 import PropTypes from "prop-types";
 
 const Sidenav = ({
@@ -47,8 +47,13 @@ const Sidenav = ({
 
     // lahore
     employeeDashboard === "lahore" && {
-      label: "Product",
-      key: "lahoreproducttable",
+      label: "Amazon Product",
+      key: "lahoreproducttable/amazon",
+      icon: <FaProductHunt />,
+    },
+    employeeDashboard === "lahore" && {
+      label: "Noon Product",
+      key: "lahoreproducttable/noon",
       icon: <FaProductHunt />,
     },
     employeeDashboard === "lahore" && {
@@ -118,9 +123,19 @@ const Sidenav = ({
     },
   
     employeeDashboard === "admin" && {
-      label: "Products",
-      key: "productTable",
+      label: "Amazon Products",
+      key: "productTable/amazon",
       icon: <FaProductHunt />,
+    },
+    employeeDashboard === "admin" && {
+      label: "Noon Products",
+      key: "productTable/noon",
+      icon: <FaProductHunt />,
+    },
+    employeeDashboard === "admin" && {
+      label: "Tracking",
+      key: "trackingProduct",
+      icon:<MdTrackChanges />,
     },
     employeeDashboard === "admin" && {
       label: "Prioty Products",
@@ -189,7 +204,7 @@ const Sidenav = ({
 
   const siderStyle = {
     overflow: "auto",
-    height: "100vh",
+    height: "105vh",
     position: "fixed",
     left: 0,
     zIndex: 3,

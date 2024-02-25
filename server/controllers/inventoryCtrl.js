@@ -1,5 +1,6 @@
 const Inventory = require("../models/inventoryModel");
 const csvtojson = require("csvtojson");
+const fs = require('fs');
 
 const addStock = async (req, res) => {
   try {
@@ -77,35 +78,24 @@ const getStock = async (req, res) => {
 
 const uploadFile = async (req, res) => {
   try {
+    console.log(req.file)
     if (!req.file) {
-      return res.status(400).json({
-        success: false,
-        message: "No file uploaded.",
-      });
+      throw new Error("File not found")
     }
 
     let jsonArray = await csvtojson().fromFile(req.file.path);
     jsonArray = jsonArray.map(({ SRno, ...rest }) => rest);
 
-    for (const item of jsonArray) {
-      try {
-        await new Inventory(item).save();
-      } catch (error) {
-        if (error.code === 11000) {
-          console.log(`Skipping duplicate item: ${item.asin}`);
-          continue;
-        } else {
-          throw error;
-        }
-      }
-    }
+    await Inventory.insertMany(jsonArray);
+
+    fs.unlink(req.file.path);
 
     res.status(200).json({
       success: true,
       message: "File uploaded and processed successfully.",
     });
   } catch (error) {
-    console.log(error.message);
+    console.log(error);
     res.status(500).json({
       success: false,
       message: error.message,
@@ -140,9 +130,32 @@ const deleteStock = async (req, res) => {
 const editStock = async (req, res) => {
   try {
     const { id } = req.params;
+
+    const existingItem = await Inventory.findById(id);
+
+    if (!existingItem) {
+      return res.status(404).json({
+        success: false,
+        message: 'Stock item not found.',
+      });
+    }
+
     const updatedData = req.body;
 
-    const updatedItem = await Inventory.findByIdAndUpdate(id, updatedData, {
+    if (req.file) {
+      if (existingItem.image) {
+        const existingImagePath = existingItem.image;
+        fs.unlink(path.resolve(existingImagePath), (err) => {
+          if (err) {
+            throw new Error(err.message)
+            console.error("Failed to delete old image:", err);
+          }
+        });
+      }
+      updatedData.image = req.file.path;
+    }
+
+    await Inventory.findByIdAndUpdate(id, updatedData, {
       new: true,
     });
     res.status(200).json({

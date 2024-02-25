@@ -49,8 +49,10 @@ const uploadStock = async (file) => {
                 },
             }
         );
+        // console.log(response);
         return response.data;
     } catch (error) {
+        console.log(error.response.data);
         throw error.response.data;
     }
 };
@@ -64,9 +66,29 @@ const deleteStock = async (id) => {
     }
 };
 
+const editStock = async (id, stockData) => {
+    try {
+        console.log(id, stockData);
+
+        const response = await axiosInstance.put(
+            `/api/inventory/stock/${id}`,
+            stockData,
+            {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            }
+        );
+        return response.data;
+    } catch (error) {
+        throw error.response.data;
+    }
+};
+
 export default {
     addStock,
     getStock,
     uploadStock,
     deleteStock,
+    editStock
 };

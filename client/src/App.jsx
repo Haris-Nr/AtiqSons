@@ -50,6 +50,7 @@ import OrdersTable from "./components/common/OrdersTable";
 
 import AdminTable from "./components/Admin/AdminTable";
 import InventoryTable from "./components/Admin/InventoryTable";
+import AllTrackingproduct from "./components/Admin/AllTrackingproduct";
 
 
 const router = createBrowserRouter(
@@ -75,9 +76,9 @@ const router = createBrowserRouter(
 
 
         {/* Lahore Routes */}
-        <Route path="lahoreproducttable" element={<LahoreProductTable />} />
+        <Route path="lahoreproducttable/:company" element={<LahoreProductTable />} />
         <Route path="lahoreproducttable/selectItem/:selectItemValue" element={<LahoreProductTable />} />
-        <Route path="lahoreproducttable/:id" element={<SingleProductPage />} />
+        <Route path="lahoreproducttable/:company/:id" element={<SingleProductPage />} />
         <Route path="trackproduct" element={<TrackProduct />} />
         <Route path="intrackingtable" element={<IntrackingproductTable />} />
         <Route path="intrackingtable/:id" element={<SingleProductPage />} />
@@ -90,9 +91,9 @@ const router = createBrowserRouter(
         <Route path="employees" element={<EmpolyeeTable />} />
         <Route path="employees/:id" element={<UserInfo />} />
         <Route path="logs" element={<LogTable />} />
-        <Route path="productTable" element={<AdminProductTable />} />
+        <Route path="productTable/:company" element={<AdminProductTable />} />
         <Route path="productTable/selectItem/:selectItemValue" element={<AdminProductTable />} />
-        <Route path="productTable/:id" element={<SingleProductPage />} />
+        <Route path="productTable/:company/:id" element={<SingleProductPage />} />
         <Route path="adminTask" element={<AdminTaskTable />} />
         <Route path="adminTable" element={<AdminTable/>}/>
         <Route path="adminTable/:id" element={<UserInfo/>}/>
@@ -102,6 +103,7 @@ const router = createBrowserRouter(
         <Route path="settings" element={<Settings />} />
         <Route path="break-leave" element={<BreakAndLeavePage />} />
         <Route path="screenshots" element={<ScreenShotsTable />} />
+        <Route path="trackingProduct" element={<AllTrackingproduct/>} />
         <Route path="stock" element = {<InventoryTable/>} />
 
       </Route>

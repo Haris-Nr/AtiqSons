@@ -5,27 +5,21 @@ const inventorySchema = new Schema(
     {
         productName: {
             type: String,
-            required: true,
         },
         quantity: {
             type: String,
-            required: true,
         },
         image: {
             type: String,
             },
         asin: {
             type: String,
-            required: true,
-            unique: true,
         },
         price: {
             type: String,
-            required: true,
         },
         selectItem:{
             type:String,
-            required:true
         }
     },
     {

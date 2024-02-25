@@ -23,10 +23,15 @@ const fetchProductsBySelectItem = async (selectItem,page,limit,search) => {
     }
 }
 
-const fetchProductsbyemployee = async (productData,page,limit,search) => {
+const fetchProductsbyemployee = async ( productDataId, company ,page,limit,search) => {
     try {
+
         const queryParams = `?page=${page}&limit=${limit}&search=${search}`;
-        const response = await axiosInstance.post(`/api/product/fetchProductsbyemployee${queryParams}`, { createdBy: productData });
+
+        const response = await axiosInstance.post(`/api/product/fetchProductsbyemployee${queryParams}`, {
+            createdBy: productDataId,
+            company: company,
+        });
         return response.data;
     } catch (error) {
         throw error.response.data
@@ -43,9 +48,9 @@ const getSingleProduct = async (id) => {
 
 };
 
-const getAllProduct = async (page, limit, search) => {
+const getAllProduct = async (page, limit, search,company) => {
     try {
-        const response = await axiosInstance.get(`/api/product/fetchallProduct?page=${page}&limit=${limit}&search=${search}`);
+        const response = await axiosInstance.get(`/api/product/fetchallProduct?page=${page}&limit=${limit}&search=${search}&company=${company}`);
         return response.data;
     } catch (error) {
         throw error.response.data;
@@ -99,6 +104,15 @@ const getIntrackingProduct = async (productData) => {
     
 };
 
+const allTrackingProduct = async (page, limit) => {
+    try {
+        const {data} = await axiosInstance.get(`/api/product/getIntrackingProduct?page=${page}&limit=${limit}`);
+        return data;
+    } catch (error) {
+        throw error.response.data;
+    }
+}
+
 const dubaiProduct = async (page,limit,search) => {
     try {
         const response = await axiosInstance.get(`/api/product/dubaiproduct?page=${page}&limit=${limit}&search=${search}`);
@@ -136,7 +150,8 @@ const productApi = {
     changeTrackStatus,
     getIntrackingProduct,
     dubaiProduct,
-    updateProduct
+    updateProduct,
+    allTrackingProduct
 };
 
 export default productApi;

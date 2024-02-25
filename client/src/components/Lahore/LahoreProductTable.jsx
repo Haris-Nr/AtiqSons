@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Table, Image, Tag } from "antd";
 import ProductButton from "./ProductButton";
-import { useNavigate,useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Productsbyemployee,
@@ -13,15 +13,15 @@ import Highlighter from "react-highlight-words";
 import ProductSearch from "../common/ProductSearch";
 const baseURL = import.meta.env.VITE_API_BASE_URL;
 
-
 const LahoreProductTable = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { selectItemValue } = useParams();
+  const { selectItemValue,company } = useParams();
 
-
-  const { user: { employee } } = useSelector((state) => state.fetch);
+  const {
+    user: { employee },
+  } = useSelector((state) => state.fetch);
   const [productsList, setProductsList] = useState([]);
 
   const {
@@ -34,24 +34,15 @@ const LahoreProductTable = () => {
     search,
   } = useSelector((state) => state.product);
 
-
-
   useEffect(() => {
     if (!selectItemValue) {
-      if (employee?._id) {
-        dispatch(Productsbyemployee(employee?._id));
+      if (employee?._id && company) {
+        dispatch(Productsbyemployee({ productDataId: employee?._id, company }));
       }
     } else {
       dispatch(fetchProductsBySelectItem(selectItemValue));
     }
-  }, [
-    dispatch,
-    employee,
-    currentPage,
-    pageSize,
-    search,
-    selectItemValue
-  ]);
+  }, [dispatch, employee, currentPage, pageSize, search, selectItemValue,company]);
 
   useEffect(() => {
     if (selectItemValue) {
@@ -62,12 +53,10 @@ const LahoreProductTable = () => {
   }, [fetchProductData, selectItemProducts, selectItemValue]);
 
 
-
   const handleTableChange = (pagination) => {
     dispatch(setCurrentPage(pagination.current));
     dispatch(setPageSize(pagination.pageSize));
   };
-
 
   const renderColumnWithHighlight = (text) => (
     <Highlighter
@@ -88,7 +77,7 @@ const LahoreProductTable = () => {
       render: (text, record, index) => {
         return (currentPage - 1) * pageSize + index + 1;
       },
-      className:"text-center"
+      className: "text-center",
     },
     {
       key: "image",
@@ -96,7 +85,7 @@ const LahoreProductTable = () => {
       dataIndex: "url",
       render: (_, record) => {
         const imageUrl = record.image ? `${baseURL}${record.image}` : "/no.png";
-        return <Image width={100} src={imageUrl} />;
+        return <Image width={50} src={imageUrl} />;
       },
     },
     {
@@ -157,17 +146,34 @@ const LahoreProductTable = () => {
     },
   ];
 
+  if (selectItemValue) {
+    columns.push({
+      title: "Seller Name",
+      dataIndex: "seller",
+      key: "seller",
+      render: (text) => renderColumnWithHighlight(text),
+    },
+    {
+      title: "Company Name",
+      dataIndex: "company",
+      key: "company",
+      render: (text) => renderColumnWithHighlight(text),
+    },
+    
+    );
+  }
+
   const onRowClick = (record) => {
     return {
       onClick: () => {
-        navigate(`/lahore/lahoreproducttable/${record._id}`);
+        navigate(`/lahore/lahoreproducttable/${company}/${record._id}`);
       },
     };
   };
 
   const heading = (
     <div className="flex justify-between">
-      <ProductSearch/>
+      <ProductSearch />
       {!selectItemValue && <ProductButton />}
     </div>
   );
@@ -180,7 +186,7 @@ const LahoreProductTable = () => {
             .toLowerCase()
             .includes(search.toLowerCase())
         )
-        .map((item,index) => ({
+        .map((item, index) => ({
           ...item,
           key: index,
         }))
@@ -189,15 +195,15 @@ const LahoreProductTable = () => {
   return (
     <div>
       <Table
-      size="middle"
+        size="middle"
         bordered
         loading={isLoading}
         title={() => heading}
         columns={columns}
         dataSource={dataSourceWithKeys}
         pagination={{
-          showQuickJumper:true,
-          showSizeChanger:true,
+          showQuickJumper: true,
+          showSizeChanger: true,
           current: currentPage,
           pageSize: pageSize,
           total: totalItems,

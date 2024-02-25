@@ -22,11 +22,14 @@ import {
   resetProductState,
   updateProductById,
 } from "../../redux/Features/Product/productSlice";
+import { useParams } from "react-router-dom";
 
 const baseURL = import.meta.env.VITE_API_BASE_URL;
 
 const ProductButton = ({ productId, productData: initialProductData }) => {
-  
+
+  const { company } = useParams();
+
   const dispatch = useDispatch();
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState([]);
@@ -41,8 +44,7 @@ const ProductButton = ({ productId, productData: initialProductData }) => {
   const formRef = useRef(null);
 
   useEffect(() => {
-    if (initialProductData && productId) {
-      console.log(initialProductData)
+    if (initialProductData && productId) { 
       setIsEditMode(true);
       form.setFieldsValue({
         productName: initialProductData.productName,
@@ -54,22 +56,24 @@ const ProductButton = ({ productId, productData: initialProductData }) => {
         asin: initialProductData.asin,
         bestseller: initialProductData.bestseller,
         selectItem: initialProductData.selectItem,
+        company: initialProductData.company,
         url: initialProductData.url,
-        seller:initialProductData.seller,
-        createdBy:initialProductData.createdBy
       });
       if (initialProductData.image) {
         const imageUrl = `${baseURL}${initialProductData.image}`;
         setFileList([{ url: imageUrl, name: "Product Image", status: "done" }]);
       }
     }
-  }, [initialProductData, productId, form]);
+  }, [initialProductData, productId, form, isEditMode]);
 
   const onFinish = (values) => {
     const formData = new FormData();
-    formData.append("createdBy", employee?._id);
-    formData.append("seller", employee?.fullname);
     formData.append("currency", currency);
+
+    if (!isEditMode) {
+      formData.append("createdBy", employee?._id);
+      formData.append("seller", employee?.fullname);
+    }
 
     for (const [key, value] of Object.entries(values)) {
       if (key !== "image") {
@@ -91,7 +95,9 @@ const ProductButton = ({ productId, productData: initialProductData }) => {
       });
     } else {
       dispatch(addProduct(formData)).then(() => {
-        dispatch(Productsbyemployee(employee?._id));
+        resetFormAndCloseModal();
+        dispatch(Productsbyemployee({ productDataId: employee?._id, company }));
+        dispatch(resetProductState());
       });
     }
   };
@@ -101,13 +107,13 @@ const ProductButton = ({ productId, productData: initialProductData }) => {
       message.success(productdata.message);
       resetFormAndCloseModal();
       setConfirmLoading(false);
-      dispatch(Productsbyemployee(employee?._id));
+      dispatch(Productsbyemployee({ productDataId: employee?._id, company }));
       dispatch(resetProductState());
     } else if (productdata.success === false) {
       message.error(productdata.message);
       setConfirmLoading(false);
     }
-  }, [productdata, dispatch, employee]);
+  }, [productdata, dispatch, employee,company]);
 
   const showModal = () => {
     setOpen(true);
@@ -125,16 +131,15 @@ const ProductButton = ({ productId, productData: initialProductData }) => {
       .validateFields()
       .then(() => {
         formRef.current.submit();
-        setConfirmLoading(true);
         if (isLoading) {
           resetFormAndCloseModal();
-          setConfirmLoading(false);
         }
       })
+      
       .catch((errorInfo) => {
         message.error(errorInfo);
       });
-    dispatch(Productsbyemployee(employee?._id));
+    dispatch(Productsbyemployee({productDataId: employee?._id, company }));
   };
 
   const handleCancel = () => {
@@ -144,6 +149,7 @@ const ProductButton = ({ productId, productData: initialProductData }) => {
   const handleCurrencyChange = (value) => {
     setCurrency(value);
   };
+
 
   const items = [
     {
@@ -158,7 +164,28 @@ const ProductButton = ({ productId, productData: initialProductData }) => {
       value: "holding",
       label: "Holding Item",
     },
+    {
+      value: "tracking",
+      label: "For Tracking Item",
+    },
   ];
+
+  const companyOptions = company === "amazon"
+  ? [{ value: "amazon", label: "Amazon" }]
+  : company === "noon"
+  ? [{ value: "noon", label: "Noon" }]
+  : [];
+
+  // const companyName = [
+  //   {
+  //     value:"amazon",
+  //     label: "Amazon",
+  //   },
+  //   {
+  //     value:"noon",
+  //     label: "Noon",
+  //   }
+  // ]
 
   const selectAfter = (
     <Select
@@ -186,11 +213,13 @@ const ProductButton = ({ productId, productData: initialProductData }) => {
       </Button>
 
       <Modal
+      key={isEditMode ? 'edit' : 'add'}
         title={isEditMode ? "Edit Product" : "Add Product"}
         open={open}
         onOk={handleOk}
         confirmLoading={confirmLoading}
         onCancel={handleCancel}
+        afterClose={() => setIsEditMode(false)}
       >
         <Form
           form={form}
@@ -306,6 +335,16 @@ const ProductButton = ({ productId, productData: initialProductData }) => {
             hasFeedback
           >
             <Select placeholder="Select a Item" size="middle" options={items} />
+          </Form.Item>
+
+          <Form.Item
+            label="Company"
+            name="company"
+            required="true"
+            message="Please select Company Name"
+            hasFeedback
+          >
+            <Select placeholder="Select a Item" size="middle" options={companyOptions} />
           </Form.Item>
 
           <Form.Item

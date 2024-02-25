@@ -126,7 +126,6 @@ const reOrder = async (id, onSuccess, onFail) => {
         return response.data;
     } catch (error) {
         onFail();
-        console.log(error);
         throw error.response.data
     }
 }

@@ -125,7 +125,7 @@ const CBMCalculator = () => {
             />
           </Form.Item>
           <Form.Item label="Dimensions (L x W x H per unit)">
-            <Input.Group compact>
+            <Space.Compact>
               <Input
                 style={{ width: "25%" }}
                 placeholder="Length"
@@ -153,7 +153,7 @@ const CBMCalculator = () => {
                 <Option value="inch">IN</Option>
                 <Option value="meter">M</Option>
               </Select>
-            </Input.Group>
+            </Space.Compact>
           </Form.Item>
           <Form.Item label="Weight (per unit)">
             <Space.Compact>

@@ -58,6 +58,18 @@ export const deleteStock = createAsyncThunk(
     }
 );
 
+export const editStock = createAsyncThunk(
+    "inventory/editStock",
+    async ({ id, stockData }, thunkAPI) => {
+        try {
+            const response = await inventoryapi.editStock(id, stockData);
+            return response;
+        } catch (error) {
+            return thunkAPI.rejectWithValue(error);
+        }
+    }
+);
+
 export const inventorySlice = createSlice({
     name: "inventory",
     initialState,
@@ -109,7 +121,7 @@ export const inventorySlice = createSlice({
             })
             .addCase(uploadStock.rejected, (state, action) => {
                 state.isLoading = false;
-                state.error = action.payload;
+                state.uploadMessage = action.payload;
             })
             // delete stock
             .addCase(deleteStock.pending, (state) => {
@@ -122,6 +134,18 @@ export const inventorySlice = createSlice({
             .addCase(deleteStock.rejected, (state, action) => {
                 state.isLoading = false;
                 state.addstockmessage = action.payload;
+            })
+            // Edit stock
+            .addCase(editStock.pending, (state) => {
+                state.isLoading = true;
+            })
+            .addCase(editStock.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.addstockmessage = action.payload;
+            })
+            .addCase(editStock.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.payload;
             });
     },
 });

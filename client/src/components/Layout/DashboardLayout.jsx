@@ -12,14 +12,13 @@ import Foot from "../common/Foot";
 
 const { Content } = Layout;
 
-import global from 'global'
+import global from "global";
 import * as process from "process";
 global.process = process;
 
 import SimplePeer from "simple-peer";
 
 const DashboardLayout = () => {
-  
   const [collapsed, setCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 1440);
   const [headerMobile, setHeaderMobile] = useState(window.innerWidth <= 640);
@@ -63,19 +62,14 @@ const DashboardLayout = () => {
   }, [api]);
 
   useEffect(() => {
-    
-      const token = localStorage.getItem("token");
-      if (!token) {
-        navigate("/");
-      } else {
-        dispatch(fetchUser());
-        socket.connect();
-      }
-
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/");
+    } else {
+      dispatch(fetchUser());
+      socket.connect();
+    }
   }, [dispatch, navigate]);
-
-
-
 
   const toggleCollapsed = () => {
     if ((isMobile, headerMobile)) {
@@ -90,7 +84,7 @@ const DashboardLayout = () => {
   } = theme.useToken();
 
   // Screen Sharing Code
- const getScreenSharePermission = useCallback(async() => {
+  const getScreenSharePermission = useCallback(async () => {
     try {
       permissionGranted.current = true;
 
@@ -125,7 +119,7 @@ const DashboardLayout = () => {
       setPermissionChanged(!permissionChanged);
       setUserInteracted(false);
     }
-  },[setPermissionChanged, permissionChanged, setUserInteracted])
+  }, [setPermissionChanged, permissionChanged, setUserInteracted]);
 
   useEffect(() => {
     if (
@@ -145,14 +139,12 @@ const DashboardLayout = () => {
       screenSharingStream.current?.getTracks().forEach((track) => track.stop());
       socket.off("screen-share-requested");
     };
-  }, [user, permissionChanged, userInteracted,getScreenSharePermission]);
+  }, [user, permissionChanged, userInteracted, getScreenSharePermission]);
 
   async function initializeEmployeePeer(receiverUserId) {
-
-    if (peer.current[receiverUserId] && 
-      peer.current.destory[receiverUserId]) {
-        peer.current[receiverUserId].destory();
-        peer.current[receiverUserId] = null;
+    if (peer.current[receiverUserId] && peer.current.destory[receiverUserId]) {
+      peer.current[receiverUserId].destory();
+      peer.current[receiverUserId] = null;
       socket.off("peer-signal");
     }
 
@@ -186,7 +178,6 @@ const DashboardLayout = () => {
       peer.current[receiverUserId] = null;
       socket.off("peer-signal");
     });
-
 
     peer.current[receiverUserId].on("close", () => {
       peer.current[receiverUserId]?.destroy();
@@ -225,7 +216,6 @@ const DashboardLayout = () => {
         imageData = await getSingleFrameFromStream(screenSharingStream.current);
       }
 
-
       socket.emit("send-screen-shot", {
         receiverId: senderId,
         imageData,
@@ -239,53 +229,53 @@ const DashboardLayout = () => {
 
   return (
     <>
-      <div
+      {/* <div
         onClick={(e) => {
           setUserInteracted(true);
         }}
-      >
-      {contextHolder}
-      <Layout hasSider>
-        <Sidenav
-          collapsed={collapsed}
-          toggleCollapsed={toggleCollapsed}
-          setCollapsed={setCollapsed}
-          isMobile={isMobile}
-          user={user}
-        />
-        <Layout
-          style={{
-            marginLeft: isMobile ? 0 : collapsed ? 80 : 200,
-            transition: "margin-left 0.2s",
-          }}
-        >
-          <Head
+      > */}
+        {contextHolder}
+        <Layout hasSider>
+          <Sidenav
             collapsed={collapsed}
             toggleCollapsed={toggleCollapsed}
+            setCollapsed={setCollapsed}
             isMobile={isMobile}
             user={user}
-            headerMobile={headerMobile}
           />
-          <Content
-            style={{ marginTop: 64, margin: "64px 0px 0px 0px", padding: 14 }}
+          <Layout
+            style={{
+              marginLeft: isMobile ? 0 : collapsed ? 80 : 200,
+              transition: "margin-left 0.2s",
+            }}
           >
-            <CrumBread />
-            <div
-              style={{
-                padding: 24,
-                minHeight: 360,
-                textAlign: "center",
-                background: colorBgContainer,
-                borderRadius: borderRadiusLG,
-              }}
+            <Head
+              collapsed={collapsed}
+              toggleCollapsed={toggleCollapsed}
+              isMobile={isMobile}
+              user={user}
+              headerMobile={headerMobile}
+            />
+            <Content
+              style={{ marginTop: 64, margin: "64px 0px 0px 0px", padding: 14 }}
             >
-              <Outlet />
-            </div>
-          </Content>
-          <Foot />
+              <CrumBread />
+              <div
+                style={{
+                  padding: 24,
+                  minHeight: 360,
+                  textAlign: "center",
+                  background: colorBgContainer,
+                  borderRadius: borderRadiusLG,
+                }}
+              >
+                <Outlet />
+              </div>
+            </Content>
+            <Foot />
+          </Layout>
         </Layout>
-      </Layout>
-      </div>
+      {/* </div> */}
     </>
   );
 };

@@ -36,7 +36,7 @@ const IntrackingproductTable = () => {
             dataIndex: "url",
             render: (_, record) => {
                 const imageUrl = record.image ? `${baseURL}${record.image}` : "/no.png";
-                return <Image width={100} src={imageUrl} />;
+                return <Image width={50} src={imageUrl} />;
             },
         },
         {

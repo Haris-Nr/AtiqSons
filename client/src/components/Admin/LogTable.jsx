@@ -24,7 +24,7 @@ const LogTable = () => {
 
     const timer = setTimeout(() => {
       dispatch(deleteAllLogs());
-    }, 32 * 24 * 60 * 60 * 1000);
+    }, 5000);
 
 
     return () => {

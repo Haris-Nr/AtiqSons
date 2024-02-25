@@ -16,6 +16,7 @@ const {
   DubaiProduct,
   fetchProductsBySelectItem,
   updateProduct,
+  allTrackingProduct,
 } = require("../controllers/productCtrl");
 const multer = require("multer");
 const path = require("path");
@@ -68,6 +69,8 @@ router.patch(
 );
 
 router.post("/intrackingProduct", authMiddleware, getIntrackingProduct);
+
+router.get("/getIntrackingProduct", authMiddleware,adminCheck,allTrackingProduct)
 
 router.get("/dubaiproduct", authMiddleware, DubaiProduct);
 

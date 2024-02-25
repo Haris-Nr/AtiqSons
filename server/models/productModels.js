@@ -66,8 +66,13 @@ const productSchema = new Schema(
         },
         selectItem:{
             type:String,
-            enum:["prioty","seasonal","holding"],
+            enum:["prioty","seasonal","holding","tracking"],
             required:true
+        },
+        company:{
+            type:String,
+            enum:["amazon","noon"],
+            required:true,
         }
     },
     {

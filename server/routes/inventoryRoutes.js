@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const authMiddleware = require("../middlewares/authMiddleware");
+const adminCheck = require("../middlewares/adminCheck");
 const multer = require("multer");
 const path = require("path");
 const { addStock,getStock,uploadFile,deleteStock, editStock } = require("../controllers/inventoryCtrl");
@@ -15,9 +16,9 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-router.post("/addstock", authMiddleware, upload.single("image"), addStock);
+router.post("/addstock", authMiddleware,adminCheck, upload.single("image"), addStock);
 
-router.get("/stock", authMiddleware, getStock);
+router.get("/stock", authMiddleware,adminCheck, getStock);
 
 const csvStorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -30,10 +31,11 @@ const csvStorage = multer.diskStorage({
 
 const csvUpload = multer({ storage: csvStorage });
 
-router.post("/uploadstock", csvUpload.single("file"),uploadFile)
+router.post("/uploadstock",authMiddleware,adminCheck, csvUpload.single("file"),uploadFile)
 
-router.delete("/stock/:id", authMiddleware, deleteStock);
+router.delete("/stock/:id", authMiddleware,adminCheck, deleteStock);
 
+router.put("/stock/:id", authMiddleware,adminCheck,upload.single("image"),editStock )
 
 
 

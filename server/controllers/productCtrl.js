@@ -16,6 +16,11 @@ const createProduct = async (req, res) => {
         "Product already in product list added by " + findproduct.seller
       );
     }
+
+    if (req.body.selectItem === "tracking") {
+      req.body.tracking = "tracking";
+    }
+
     let image = "";
     if (req.file) {
       image = req.file.path;
@@ -96,18 +101,24 @@ const fetchProducts = async (req, res) => {
       throw new Error("Creator ID (createdBy) must be provided");
     }
 
-    let query = { createdBy: req.body.createdBy };
+    let query = { 
+      createdBy: req.body.createdBy,    
+    };
+
+    if (req.body.company) {
+      query.company = req.body.company;
+    }
 
     if (search) {
-      query = {
-        createdBy: req.body.createdBy,
-        $or: [
+      query.$or= [
           { productName: { $regex: search, $options: "i" } },
           { asin: { $regex: search, $options: "i" } },
           { status: { $regex: search, $options: "i" } },
           { tracking: { $regex: search, $options: "i" } },
-        ],
-      };
+        ];
+      if (req.body.company) {
+        query.company = req.body.company;
+      }
     }
 
     const totalCount = await Product.countDocuments(query);
@@ -124,10 +135,10 @@ const fetchProducts = async (req, res) => {
       totalItems: totalCount,
       currentPage: page,
       itemsPerPage: limit,
-      totalPages: Math.ceil(totalCount / limit),
       search: search,
     });
   } catch (error) {
+    console.log(error);
     res.status(500).json({
       success: false,
       message: error.message,
@@ -142,6 +153,7 @@ const allProduct = async (req, res) => {
     const limit = parseInt(req.query.limit);
     const skip = (page - 1) * limit;
     const search = req.query.search;
+    const company = req.query.company;
 
     let queryObj = {};
     if (search) {
@@ -155,6 +167,11 @@ const allProduct = async (req, res) => {
         ],
       };
     }
+
+    if (company) {
+      queryObj.company = company;
+    }
+
     const products = await Product.find(queryObj)
       .sort({ createdAt: -1 })
       .skip(skip)
@@ -163,14 +180,12 @@ const allProduct = async (req, res) => {
       .exec();
 
     const totalProduct = await Product.countDocuments(queryObj);
-    const totalPages = Math.ceil(totalProduct / limit);
 
     res.status(200).json({
       data: products,
       page: page,
       limit: limit,
       totalProduct: totalProduct,
-      totalPages: totalPages,
       search: search,
     });
   } catch (error) {
@@ -184,14 +199,13 @@ const allProduct = async (req, res) => {
 // delete product
 const deleteProduct = async (req, res) => {
   try {
-    
     const { id } = req.params;
 
     const product = await Product.findById(id);
 
-    const dubaiProduct = await Dubai.findOne({productId:id});
+    const dubaiProduct = await Dubai.findOne({ productId: id });
 
-    const trackProduct = await Track.findOne({productId:id});
+    const trackProduct = await Track.findOne({ productId: id });
 
     if (!product) {
       throw new Error("Product not found");
@@ -208,7 +222,7 @@ const deleteProduct = async (req, res) => {
 
     if (dubaiProduct && dubaiProduct.image) {
       const filePath = path.join(__dirname, "../public", dubaiProduct.image);
-     await fs.unlink(filePath, (err) => {
+      await fs.unlink(filePath, (err) => {
         if (err) {
           throw new Error(err);
         }
@@ -216,7 +230,7 @@ const deleteProduct = async (req, res) => {
     }
 
     await Product.findByIdAndDelete(id);
-    
+
     if (dubaiProduct) {
       await Dubai.findByIdAndDelete(dubaiProduct._id);
     }
@@ -235,7 +249,6 @@ const deleteProduct = async (req, res) => {
     });
   }
 };
-
 
 /* change product status */
 const changeStatus = async (req, res) => {
@@ -428,6 +441,36 @@ const getIntrackingProduct = async (req, res) => {
   }
 };
 
+const allTrackingProduct = async (req, res) => {
+  try {
+    let { page, limit } = req.query;
+
+    page = parseInt(page) || 1;
+    limit = parseInt(limit) || 10;
+    let skip = (page - 1) * limit;
+
+    const trackingProducts = await Product.find({ tracking: "tracking" })
+      .select("image productName seller asin tracking status company")
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .skip(skip);
+
+    const totaltracking = await Product.countDocuments({
+      tracking: "tracking",
+    });
+
+    res.status(200).json({
+      trackingProducts,
+      page,
+      limit,
+      totaltracking,
+  });
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // Dubai products
 const DubaiProduct = async (req, res) => {
   try {
@@ -450,7 +493,7 @@ const DubaiProduct = async (req, res) => {
       .limit(limit)
       .select("image productName")
       .sort({ createdAt: -1 });
-      
+
     const totalCount = await Product.countDocuments(query);
 
     res.status(200).json({
@@ -489,15 +532,17 @@ const fetchProductsBySelectItem = async (req, res) => {
         { asin: { $regex: search, $options: "i" } },
         { status: { $regex: search, $options: "i" } },
         { tracking: { $regex: search, $options: "i" } },
-      ]
+        { seller: { $regex: search, $options: "i" } },
+        { company: { $regex: search, $options: "i" } },
+      ];
     }
-    
+
     const totalCount = await Product.countDocuments(query);
 
     const products = await Product.find(query)
       .skip(skip)
       .limit(limit)
-      .select("image productName asin status tracking")
+      .select("image productName seller asin status tracking company")
       .sort({ createdAt: -1 })
       .exec();
 
@@ -509,36 +554,39 @@ const fetchProductsBySelectItem = async (req, res) => {
       totalPages: Math.ceil(totalCount / limit),
       search: search,
     });
-
   } catch (error) {
     res.status(500).json({
       success: false,
       message: error.message,
     });
   }
-}
+};
 
 // Update product
 const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const productUpdates = req.body; 
+    const productUpdates = req.body;
 
     const product = await Product.findById(id);
 
     if (!product) {
       return res.status(404).json({
         success: false,
-        message: 'Product not found',
+        message: "Product not found",
       });
     }
-
 
     // Handle image update
     if (req.file) {
       const imagePath = req.file.path;
-      // Create a relative path to store in DB (optional)
-      const relativeImagePath = "/" + imagePath.replace(/\\/g, "/").split("/").filter(e => e && e !== "public").join("/");
+      const relativeImagePath =
+        "/" +
+        imagePath
+          .replace(/\\/g, "/")
+          .split("/")
+          .filter((e) => e && e !== "public")
+          .join("/");
 
       productUpdates.image = relativeImagePath;
 
@@ -560,13 +608,13 @@ const updateProduct = async (req, res) => {
     if (!updatedProduct) {
       return res.status(404).json({
         success: false,
-        message: 'Product not found',
+        message: "Product not found",
       });
     }
 
     res.status(200).json({
       success: true,
-      message: 'Product updated successfully',
+      message: "Product updated successfully",
       data: updatedProduct,
     });
   } catch (error) {
@@ -576,7 +624,6 @@ const updateProduct = async (req, res) => {
     });
   }
 };
-
 
 module.exports = {
   createProduct,
@@ -592,4 +639,5 @@ module.exports = {
   DubaiProduct,
   fetchProductsBySelectItem,
   updateProduct,
+  allTrackingProduct,
 };
