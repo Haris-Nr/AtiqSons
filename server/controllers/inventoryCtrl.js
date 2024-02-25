@@ -53,6 +53,7 @@ const getStock = async (req, res) => {
       : {};
 
     const stockItems = await Inventory.find(searchQuery)
+      .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
 

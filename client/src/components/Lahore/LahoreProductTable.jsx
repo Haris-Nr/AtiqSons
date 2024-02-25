@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Table, Image, Tag } from "antd";
+import { Table, Tag } from "antd";
 import ProductButton from "./ProductButton";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -85,7 +85,7 @@ const LahoreProductTable = () => {
       dataIndex: "url",
       render: (_, record) => {
         const imageUrl = record.image ? `${baseURL}${record.image}` : "/no.png";
-        return <Image width={50} src={imageUrl} />;
+        return <img width={50} src={imageUrl} />;
       },
     },
     {

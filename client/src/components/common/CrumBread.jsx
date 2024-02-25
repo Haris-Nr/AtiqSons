@@ -1,5 +1,5 @@
 import React from "react";
-import { useLocation, Link } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { Breadcrumb } from "antd";
 import { useSelector } from "react-redux";
 
@@ -29,16 +29,21 @@ const CrumBread = () => {
     title: getTitle(item),
     key: index,
   }));
+
   const itemRender = (route, params, items) => {
-    const last = items.indexOf(route) === items.length - 1;
-    return last ? (
-      <span>{route.title}</span>
-    ) : (
-      <Link to=".." relative="path">
-        {route.title}
-      </Link>
-    );
+    return <span>{route.title}</span>;
   };
+  
+  // const itemRender = (route, params, items) => {
+  //   const last = items.indexOf(route) === items.length - 1;
+  //   return last ? (
+  //     <span>{route.title}</span>
+  //   ) : (
+  //     <Link to=".." relative="path">
+  //       route.title
+  //     </Link>
+  //   );
+  // };
   return (
     <>
       <Breadcrumb
