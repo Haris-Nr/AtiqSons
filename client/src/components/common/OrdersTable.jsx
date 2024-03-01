@@ -30,6 +30,7 @@ import OrderForm from '../Admin/OrderForm';
 import PriceForm from '../China/PriceForm';
 import { defaultCurrency } from '../../utils/currencyOptions';
 import ConfirmationModal from './ConfirmationModal';
+import moment from 'moment';
 
 const OrdersTable = () => {
 
@@ -236,6 +237,12 @@ const OrdersTable = () => {
                     </div>
                 );
             }
+        },
+        {
+            title:"Date",
+            dataIndex:"createdAt",
+            key:"createdAt",
+            render:(text)=>moment(text).format("DD/MM/YYYY")
         }
     ];
 

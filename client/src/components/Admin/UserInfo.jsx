@@ -117,7 +117,7 @@ const UserInfo = () => {
       label: "Status",
       children: (
         <Badge
-          status={employee?.status === "active" ? "purple" : "default"}
+          status={employee?.status === "active" ? "success" : "error"}
           text={employee?.status}
         />
       ),
@@ -142,7 +142,7 @@ const UserInfo = () => {
       label: "LogStatus At",
       children: (
         <Badge
-          status={log?.logStatus === "Active" ? "processing" : "error"}
+          status={log?.logStatus === "Online" ? "success" : "error"}
           text={log?.logStatus}
         />
       ),

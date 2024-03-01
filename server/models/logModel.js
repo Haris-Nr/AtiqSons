@@ -13,6 +13,7 @@ const logSchema = new Schema(
       type: String,
       required: true,
       enum: ["Login", "Logout"],
+      default:"not"
     },
     logstatus: {
       type: String,

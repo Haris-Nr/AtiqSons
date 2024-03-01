@@ -27,7 +27,6 @@ import { useParams } from "react-router-dom";
 const baseURL = import.meta.env.VITE_API_BASE_URL;
 
 const ProductButton = ({ productId, productData: initialProductData }) => {
-
   const { company } = useParams();
 
   const dispatch = useDispatch();
@@ -37,6 +36,7 @@ const ProductButton = ({ productId, productData: initialProductData }) => {
   const [open, setOpen] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [changeSelectItem, setChangeSelectItem] = useState(null);
 
   const { user } = useSelector((state) => state.fetch);
   const { productdata, isLoading } = useSelector((state) => state.product);
@@ -44,14 +44,14 @@ const ProductButton = ({ productId, productData: initialProductData }) => {
   const formRef = useRef(null);
 
   useEffect(() => {
-    if (initialProductData && productId) { 
+    if (initialProductData && productId) {
       setIsEditMode(true);
       form.setFieldsValue({
         productName: initialProductData.productName,
         quantity: initialProductData.quantity,
         pastmonth: initialProductData.pastmonth,
         price: initialProductData.price,
-        currency:initialProductData.currency,
+        currency: initialProductData.currency,
         description: initialProductData.description,
         asin: initialProductData.asin,
         bestseller: initialProductData.bestseller,
@@ -72,7 +72,7 @@ const ProductButton = ({ productId, productData: initialProductData }) => {
 
     if (!isEditMode) {
       formData.append("createdBy", employee?._id);
-      formData.append("seller", employee?.fullname);
+      formData.append("employeeName", employee?.fullname);
     }
 
     for (const [key, value] of Object.entries(values)) {
@@ -113,7 +113,7 @@ const ProductButton = ({ productId, productData: initialProductData }) => {
       message.error(productdata.message);
       setConfirmLoading(false);
     }
-  }, [productdata, dispatch, employee,company]);
+  }, [productdata, dispatch, employee, company]);
 
   const showModal = () => {
     setOpen(true);
@@ -135,11 +135,11 @@ const ProductButton = ({ productId, productData: initialProductData }) => {
           resetFormAndCloseModal();
         }
       })
-      
+
       .catch((errorInfo) => {
         message.error(errorInfo);
       });
-    dispatch(Productsbyemployee({productDataId: employee?._id, company }));
+    dispatch(Productsbyemployee({ productDataId: employee?._id, company }));
   };
 
   const handleCancel = () => {
@@ -150,11 +150,10 @@ const ProductButton = ({ productId, productData: initialProductData }) => {
     setCurrency(value);
   };
 
-
   const items = [
     {
-      value: "prioty",
-      label: "Prioty Item",
+      value: "priority",
+      label: "priority Item",
     },
     {
       value: "seasonal",
@@ -170,22 +169,43 @@ const ProductButton = ({ productId, productData: initialProductData }) => {
     },
   ];
 
-  const companyOptions = company === "amazon"
-  ? [{ value: "amazon", label: "Amazon" }]
-  : company === "noon"
-  ? [{ value: "noon", label: "Noon" }]
-  : [];
+  const companyOptions =
+    company === "amazon"
+      ? [{ value: "amazon", label: "Amazon" }]
+      : company === "noon"
+      ? [{ value: "noon", label: "Noon" }]
+      : [];
 
-  // const companyName = [
-  //   {
-  //     value:"amazon",
-  //     label: "Amazon",
-  //   },
-  //   {
-  //     value:"noon",
-  //     label: "Noon",
-  //   }
-  // ]
+  const seasonalCategory = [
+    {
+      value: "winter",
+      label: "Winter",
+    },
+    {
+      value: "summer",
+      label: "Summer",
+    },
+    {
+      value: "ramzan",
+      label: "Ramza",
+    },
+    {
+      value: "halloween",
+      label: "Halloween",
+    },
+    {
+      value: "christmas",
+      label: "Christmas",
+    },
+    {
+      value: "diwali",
+      label: "Diwali",
+    },
+    {
+      value: "holi",
+      label: "Holi",
+    },
+  ];
 
   const selectAfter = (
     <Select
@@ -202,6 +222,10 @@ const ProductButton = ({ productId, productData: initialProductData }) => {
     </Select>
   );
 
+  const changeHandle = (value) => {
+    setChangeSelectItem(value)
+  }
+
   return (
     <>
       <Button
@@ -213,7 +237,7 @@ const ProductButton = ({ productId, productData: initialProductData }) => {
       </Button>
 
       <Modal
-      key={isEditMode ? 'edit' : 'add'}
+        key={isEditMode ? "edit" : "add"}
         title={isEditMode ? "Edit Product" : "Add Product"}
         open={open}
         onOk={handleOk}
@@ -229,6 +253,13 @@ const ProductButton = ({ productId, productData: initialProductData }) => {
           wrapperCol={{ span: 14 }}
           ref={formRef}
         >
+          <Form.Item
+            label="Sku"
+            name="sku"
+            rules={[{ required: true, message: "Please input the sku!" }]}
+          >
+            <Input />
+          </Form.Item>
           <Form.Item
             label="Product Name"
             name="productName"
@@ -334,9 +365,23 @@ const ProductButton = ({ productId, productData: initialProductData }) => {
             message="Please select which item"
             hasFeedback
           >
-            <Select placeholder="Select a Item" size="middle" options={items} />
+            <Select size="middle" options={items} onChange={(value)=> changeHandle(value)} />
           </Form.Item>
-
+          {
+            changeSelectItem === "seasonal" &&
+            <Form.Item
+              label="Seasonal Category"
+              name="seasonalCategory"
+              required="true"
+              message="Please select which Category"
+              hasFeedback
+              labelCol={{span:8}}
+              wrapperCol={{ span: 12, }}
+              
+            >
+              <Select size="middle" options={seasonalCategory} />
+            </Form.Item>
+          }
           <Form.Item
             label="Company"
             name="company"
@@ -344,7 +389,7 @@ const ProductButton = ({ productId, productData: initialProductData }) => {
             message="Please select Company Name"
             hasFeedback
           >
-            <Select placeholder="Select a Item" size="middle" options={companyOptions} />
+            <Select size="middle" options={companyOptions} />
           </Form.Item>
 
           <Form.Item
@@ -357,6 +402,16 @@ const ProductButton = ({ productId, productData: initialProductData }) => {
             ]}
           >
             <Input />
+          </Form.Item>
+          <Form.Item
+          label= "Seller Name"
+          name="seller"
+          hasFeedback
+          rules={[
+            { required: true, message: "Enter Seller Name"},
+          ]}
+          >
+          <Input/>
           </Form.Item>
 
           <Form.Item label="Image Upload" name="image" hasFeedback>

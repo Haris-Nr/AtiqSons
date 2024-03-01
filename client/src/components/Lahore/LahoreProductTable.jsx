@@ -81,7 +81,7 @@ const LahoreProductTable = () => {
     },
     {
       key: "image",
-      title: "Thumbnail",
+      title: "Picture",
       dataIndex: "url",
       render: (_, record) => {
         const imageUrl = record.image ? `${baseURL}${record.image}` : "/no.png";
@@ -99,30 +99,6 @@ const LahoreProductTable = () => {
       dataIndex: "asin",
       key: "asin",
       render: (text) => renderColumnWithHighlight(text),
-    },
-    {
-      title: "Track Progress",
-      dataIndex: "tracking",
-      key: "tracking",
-      render: (text, { tracking }) => {
-        return (
-          renderColumnWithHighlight(text),
-          (
-            <Tag
-              color={`${
-                tracking === "pending"
-                  ? "yellow"
-                  : tracking === "tracked"
-                  ? "purple"
-                  : "green"
-              }`}
-              key={tracking}
-            >
-              {tracking.toUpperCase()}
-            </Tag>
-          )
-        );
-      },
     },
     {
       title: "Status",
@@ -148,7 +124,7 @@ const LahoreProductTable = () => {
 
   if (selectItemValue) {
     columns.push({
-      title: "Seller Name",
+      title: "Employee Name",
       dataIndex: "seller",
       key: "seller",
       render: (text) => renderColumnWithHighlight(text),

@@ -68,8 +68,8 @@ const Sidenav = ({
     },
 
     employeeDashboard === "lahore" && {
-      label: "Prioty Products",
-      key: "lahoreproducttable/selectItem/prioty",
+      label: "Priority Products",
+      key: "lahoreproducttable/selectItem/priority",
       icon: <FaShoppingCart />,
     },
     employeeDashboard === "lahore" && {
@@ -138,8 +138,8 @@ const Sidenav = ({
       icon:<MdTrackChanges />,
     },
     employeeDashboard === "admin" && {
-      label: "Prioty Products",
-      key: "productTable/selectItem/prioty",
+      label: "Priority Products",
+      key: "productTable/selectItem/priority",
       icon: <FaShoppingCart />,
     },
     employeeDashboard === "admin" && {
@@ -183,8 +183,8 @@ const Sidenav = ({
       icon: <BsCameraFill />,
     },
     employeeDashboard === "admin" && {
-      label: "Stock",
-      key: "stock",
+      label: "Warehouse Stock",
+      key: "WarehouseStock",
       icon: <MdOutlineProductionQuantityLimits />,
     },
     employeeDashboard === "admin" && {

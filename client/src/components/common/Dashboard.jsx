@@ -4,6 +4,7 @@ import DashboardCard from "./DashboardCard";
 import { useDispatch, useSelector } from "react-redux";
 import socket from "../../redux/api/socket";
 import { getEmployee } from "../../redux/Features/Employees/employeeSlice";
+import { Link } from "react-router-dom";
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -61,6 +62,7 @@ const Dashboard = () => {
               <div className="flex justify-center gap-3">
                 {employee?.dashboard === "admin" && (
                   <>
+                  <Link to={"employees"}>
                   <DashboardCard
                     icon={
                       <UserOutlined
@@ -75,6 +77,7 @@ const Dashboard = () => {
                     title={`Employees`}
                     value={`${totalItems}/${userCount}`}
                     />
+                    </Link>
                     </>
                 )}
               </div>

@@ -1,6 +1,6 @@
-import { Table, Tag } from "antd";
+import { Badge, Table, Tag } from "antd";
+import React,{ useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useState } from "react";
 import {
   getEmployee,
 } from "../../redux/Features/Employees/employeeSlice";
@@ -16,6 +16,9 @@ function EmpolyeeTable() {
 
   const { getEmployeedata, isLoading } =
     useSelector((state) => state.employee);
+
+    console.log(getEmployeedata)
+
 
     const [pagination, setPagination] = useState({
       current: 1,
@@ -47,6 +50,12 @@ function EmpolyeeTable() {
       title: "FullName",
       dataIndex: "fullname",
       key: "fullname",
+      render:(text, record) => (
+        <>
+          <Badge status={`${ (record.action && record.logstatus) && !(record?.action==="Logout" && record?.logstatus === "Offline") ?  'success' : 'error'}`} text={`${record.fullname}`}  />
+        </>
+      )
+
     },
     {
       title: "Email",

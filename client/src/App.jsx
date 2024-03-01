@@ -104,7 +104,7 @@ const router = createBrowserRouter(
         <Route path="break-leave" element={<BreakAndLeavePage />} />
         <Route path="screenshots" element={<ScreenShotsTable />} />
         <Route path="trackingProduct" element={<AllTrackingproduct/>} />
-        <Route path="stock" element = {<InventoryTable/>} />
+        <Route path="WarehouseStock" element = {<InventoryTable/>} />
 
       </Route>
     </Route>

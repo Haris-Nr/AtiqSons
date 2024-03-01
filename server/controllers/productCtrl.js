@@ -101,8 +101,8 @@ const fetchProducts = async (req, res) => {
       throw new Error("Creator ID (createdBy) must be provided");
     }
 
-    let query = { 
-      createdBy: req.body.createdBy,    
+    let query = {
+      createdBy: req.body.createdBy,
     };
 
     if (req.body.company) {
@@ -110,12 +110,11 @@ const fetchProducts = async (req, res) => {
     }
 
     if (search) {
-      query.$or= [
-          { productName: { $regex: search, $options: "i" } },
-          { asin: { $regex: search, $options: "i" } },
-          { status: { $regex: search, $options: "i" } },
-          { tracking: { $regex: search, $options: "i" } },
-        ];
+      query.$or = [
+        { productName: { $regex: search, $options: "i" } },
+        { asin: { $regex: search, $options: "i" } },
+        { status: { $regex: search, $options: "i" } },
+      ];
       if (req.body.company) {
         query.company = req.body.company;
       }
@@ -126,7 +125,7 @@ const fetchProducts = async (req, res) => {
     const products = await Product.find(query)
       .skip(skip)
       .limit(limit)
-      .select("image productName asin status tracking")
+      .select("image productName asin status")
       .sort({ createdAt: -1 })
       .exec();
 
@@ -160,10 +159,8 @@ const allProduct = async (req, res) => {
       queryObj = {
         $or: [
           { productName: { $regex: search, $options: "i" } },
-          { seller: { $regex: search, $options: "i" } },
+          { employeeName: { $regex: search, $options: "i" } },
           { asin: { $regex: search, $options: "i" } },
-          { status: { $regex: search, $options: "i" } },
-          { trackProgress: { $regex: search, $options: "i" } },
         ],
       };
     }
@@ -176,7 +173,7 @@ const allProduct = async (req, res) => {
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
-      .select("image productName seller asin status tracking")
+      .select("image productName asin status employeeName")
       .exec();
 
     const totalProduct = await Product.countDocuments(queryObj);
@@ -423,7 +420,7 @@ const getIntrackingProduct = async (req, res) => {
     };
 
     const trackingProducts = await Product.find(query)
-      .select("image productName asin tracking status")
+      .select("image productName asin status")
       .sort({ createdAt: -1 });
 
     if (!trackingProducts.length) {
@@ -464,8 +461,7 @@ const allTrackingProduct = async (req, res) => {
       page,
       limit,
       totaltracking,
-  });
-
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -531,7 +527,6 @@ const fetchProductsBySelectItem = async (req, res) => {
         { productName: { $regex: search, $options: "i" } },
         { asin: { $regex: search, $options: "i" } },
         { status: { $regex: search, $options: "i" } },
-        { tracking: { $regex: search, $options: "i" } },
         { seller: { $regex: search, $options: "i" } },
         { company: { $regex: search, $options: "i" } },
       ];
@@ -542,7 +537,8 @@ const fetchProductsBySelectItem = async (req, res) => {
     const products = await Product.find(query)
       .skip(skip)
       .limit(limit)
-      .select("image productName seller asin status tracking company")
+      .populate("createdBy", "fullname")
+      .select("image productName seller asin status company")
       .sort({ createdAt: -1 })
       .exec();
 
@@ -625,6 +621,21 @@ const updateProduct = async (req, res) => {
   }
 };
 
+const deleteTrack = async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log(id);
+    await Track.findByIdAndDelete(id);
+    res.status(200).json({
+      message: "Track deleted successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   createProduct,
   fetchProducts,
@@ -640,4 +651,5 @@ module.exports = {
   fetchProductsBySelectItem,
   updateProduct,
   allTrackingProduct,
+  deleteTrack,
 };

@@ -32,7 +32,7 @@ const IntrackingproductTable = () => {
         },
         {
             key: "image",
-            title: "Thumbnail",
+            title: "Picture",
             dataIndex: "url",
             render: (_, record) => {
                 const imageUrl = record.image ? `${baseURL}${record.image}` : "/no.png";
@@ -48,28 +48,6 @@ const IntrackingproductTable = () => {
             title: "Asin No",
             dataIndex: "asin",
             key: "asin",
-        },
-        {
-            title: "Track Progress",
-            dataIndex: "tracking",
-            key: "tracking",
-            render: (text, { tracking }) => {
-                return (
-                    (
-                        <Tag
-                            color={`${tracking === "pending"
-                                ? "yellow"
-                                : tracking === "tracked"
-                                    ? "purple"
-                                    : "green"
-                                }`}
-                            key={tracking}
-                        >
-                            {tracking}
-                        </Tag>
-                    )
-                );
-            },
         },
         {
             title: "Status",

@@ -188,8 +188,8 @@ const SingleProductPage = () => {
     },
     {
       key: "10",
-      label: "Seller",
-      children: product?.seller,
+      label: "Employee",
+      children: product?.employeeName,
     },
     {
       key: "11",
@@ -221,8 +221,8 @@ const SingleProductPage = () => {
     },
     {
       key: "15",
-      label: "",
-      children:null,
+      label: "Seller",
+      children:product?.seller,
       span:2
     },
     {

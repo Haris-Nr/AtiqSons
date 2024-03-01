@@ -153,7 +153,7 @@ const InventoryTable = () => {
     },
     {
       key: "image",
-      title: "Thumbnail",
+      title: "Picture",
       dataIndex: "image",
       render: (_, record) => {
         const imageUrl = record.image ? `${baseURL}${record.image}` : "/no.png";
@@ -233,7 +233,7 @@ const InventoryTable = () => {
   const HeadSection = () => (
     <div className="space-y-3">
       <div className="flex justify-between w-full">
-        <h1 className="text-2xl">Stock</h1>
+        <h1 className="text-2xl">Warehouse Stock</h1>
         <div className="space-x-4">
           <Button type="primary" onClick={showModal}>
             Add Stock

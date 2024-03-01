@@ -220,6 +220,18 @@ export const updateProductById = createAsyncThunk(
   }
 );
 
+export const deleteTrack = createAsyncThunk(
+  "product/deleteTrack",
+  async (trackId, thunkAPI)=>{
+    try {
+        const response = await productApi.deleteTrack(trackId)
+        return response;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+)
+
 export const productSlice = createSlice({
   name: "product",
   initialState,
@@ -435,7 +447,18 @@ export const productSlice = createSlice({
       })
       .addCase(AllTrackingProduct.rejected,(state)=>{
         state.isLoading = false;
-      });  
+      })
+      .addCase(deleteTrack.pending,(state)=>{
+        state.isLoading = true;
+      })
+      .addCase(deleteTrack.fulfilled,(state,action)=>{
+        state.isLoading = false;
+        state.deleteProductData = action.payload;
+      })
+      .addCase(deleteTrack.rejected,(state,action)=> {
+        state.isLoading=false;
+        state.deleteProductData = action.payload;
+      })
   },
 });
 

@@ -3,9 +3,12 @@ import { Button, Form, InputNumber, Table, message } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import {
   TrackingProduct,
+  deleteTrack,
   getTrackingProduct,
+  resetDeleteState,
 } from "../../redux/Features/Product/productSlice";
 import moment from "moment";
+import DeleteButton from "../common/DeleteButton";
 
 const EditableContext = React.createContext(null);
 
@@ -100,7 +103,9 @@ const TrackProduct = ({ id }) => {
   const [edit, setEdit] = useState(true);
 
 
-  const { gettrackproduct } = useSelector((state) => state.product);
+  const { gettrackproduct,deleteProductData } = useSelector((state) => state.product);
+
+  console.log(deleteProductData)
 
   useEffect(() => {
     dispatch(getTrackingProduct(id))
@@ -118,6 +123,13 @@ const TrackProduct = ({ id }) => {
   }, [gettrackproduct.data, gettrackproduct.success]);
 
 
+  const handleDelete = (trackid) => {
+    dispatch(deleteTrack(trackid)).then(() => {
+      message.success(deleteProductData.message);
+      dispatch(getTrackingProduct(id))
+      dispatch(resetDeleteState())
+    })
+  }
 
   const [count, setCount] = useState(dataSource.length - 1);
 
@@ -131,6 +143,15 @@ const TrackProduct = ({ id }) => {
       title: "Sale",
       dataIndex: "sale",
       editable: edit
+    },
+    {
+      title: 'operation',
+      dataIndex: 'operation',
+      render: (_, record) =>(
+        <DeleteButton 
+        onConfirmDelete={()=>handleDelete(record._id)}
+        />
+      )
     },
   ];
 

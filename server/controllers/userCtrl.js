@@ -87,7 +87,7 @@ const loginUser = async (req, res) => {
         `Mr. ${user.fullname} your account is blocked, please contact the Super Admin`
       );
     }
-    const token = jwt.sign({ userId: user._id }, secret, { expiresIn: "1d" });
+    const token = jwt.sign({ userId: user._id }, secret);
 
     const logEntry = new Log({
       user_id: user._id,
@@ -156,8 +156,24 @@ const getEmployee = async (req, res) => {
 
     const total = await User.countDocuments({ role: "employee" });
 
+     // Prepare to fetch the latest log for each employee
+     const employeesWithLogs = await Promise.all(
+      employees.map(async (employee) => {
+        // Find the latest log for the current employee
+        const latestLog = await Log.findOne({ user_id: employee._id }).sort({ createdAt: -1 });
+
+        // If a log exists, attach action and logstatus to the employee object
+        if (latestLog) {
+          employee = employee.toObject(); // Convert the Mongoose document to a plain JavaScript object
+          employee.action = latestLog.action;
+          employee.logstatus = latestLog.logstatus;
+        }
+        return employee;
+      })
+    );
+
     res.status(200).json({
-      data: employees,
+      data: employeesWithLogs,
       total,
     });
   } catch (error) {

@@ -59,7 +59,7 @@ const DubaiProductTable = () => {
     },
     {
       key: "image",
-      title: "Thumbnail",
+      title: "Picture",
       dataIndex: "url",
       render: (_, record) => {
         const imageUrl = record.image ? `${baseURL}${record.image}` : "/no.png";

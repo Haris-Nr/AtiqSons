@@ -135,6 +135,15 @@ const updateProduct = async (id, productData) => {
     }
 };
 
+const deleteTrack = async (id) => {
+    try {
+        const response = await axiosInstance.delete(`/api/product/trackdelete/${id}`)
+        return response.data;
+    } catch (error) {
+        throw error.response.data;
+    }
+}
+
 
 
 
@@ -151,7 +160,8 @@ const productApi = {
     getIntrackingProduct,
     dubaiProduct,
     updateProduct,
-    allTrackingProduct
+    allTrackingProduct,
+    deleteTrack
 };
 
 export default productApi;

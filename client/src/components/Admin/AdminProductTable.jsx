@@ -1,4 +1,4 @@
-import { Table, Tag, Image, message } from "antd";
+import { Table, Tag, message } from "antd";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Highlighter from "react-highlight-words";
@@ -78,13 +78,14 @@ const AdminProductTable = () => {
       title: "SrNo",
       key: "srNo",
       render: (text, record, index) => {
+        console.log(record)
         return (currentPage - 1) * pageSize + index + 1;
       },
       className: "text-center",
     },
     {
       key: "image",
-      title: "Thumbnail",
+      title: "Picture",
       dataIndex: "url",
       render: (_, record) => {
         const imageUrl = record.image ? `${baseURL}${record.image}` : "/no.png";
@@ -100,18 +101,16 @@ const AdminProductTable = () => {
       },
     },
     {
-      title: "Seller",
-      dataIndex: "seller",
-      key: "quantity",
+      title: "Employee Name",
+      dataIndex:'employeeName',
+      key: "Employee Name",
       render: (text) => renderColumnWithHighlight(text),
-      className: "text-center",
     },
     {
       title: "Asin No",
       dataIndex: "asin",
       key: "asin",
       render: (text) => renderColumnWithHighlight(text),
-      className: "text-center",
     },
     {
       title: "Status",
@@ -133,30 +132,7 @@ const AdminProductTable = () => {
           </Tag>
         );
       },
-      className: "text-center",
-    },
-    {
-      title: "Track Progress",
-      dataIndex: "tracking",
-      key: "tracking",
-      render: (text, { tracking }) => {
-        return (
-          <Tag
-            color={`${
-              tracking === "pending"
-                ? "yellow"
-                : tracking === "tracked"
-                ? "purple"
-                : "green"
-            }`}
-            key={tracking}
-          >
-            {renderColumnWithHighlight(tracking)}
-          </Tag>
-        );
-      },
-      className: "text-center",
-    },
+    }
   ];
 
   if (selectItemValue) {

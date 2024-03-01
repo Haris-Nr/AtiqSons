@@ -3,6 +3,12 @@ const { Schema } = mongoose;
 
 const productSchema = new Schema(
     {
+        sku:{
+            type:String,
+            required:true,
+            unique: true
+        
+        },
         productName: {
             type: String,
             required: true,
@@ -58,22 +64,31 @@ const productSchema = new Schema(
             type: String,
             required: true,
         },
+        employeeName:{
+            type:String,
+            required:true,
+        },
         tracking: {
             type: String,
             enum: ["tracking", "tracked", "pending"],
-            default: "pending",
-            required: true,
+            default: "tracking",
         },
         selectItem:{
             type:String,
-            enum:["prioty","seasonal","holding","tracking"],
+            enum:["priority","seasonal","holding","tracking"],
             required:true
         },
         company:{
             type:String,
             enum:["amazon","noon"],
             required:true,
+        },
+        seasonalCategory:{
+            type:String,
+            enum:["winter","summer","ramzan","halloween","christmas","diwali","holi"]
+            
         }
+
     },
     {
         timestamps: true,

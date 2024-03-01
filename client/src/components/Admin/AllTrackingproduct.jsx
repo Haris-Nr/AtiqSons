@@ -34,10 +34,11 @@ const AllTrackingproduct = () => {
             render: (text, record, index) => {
                 return (currentPage - 1) * pageSize + index + 1;
             },
+            
         },
         {
             key: "image",
-            title: "Thumbnail",
+            title: "Picture",
             dataIndex: "url",
             render: (_, record) => {
                 const imageUrl = record.image ? `${baseURL}${record.image}` : "/no.png";
@@ -50,7 +51,7 @@ const AllTrackingproduct = () => {
             key: "productName",
         },
         {
-            title: "Seller Name",
+            title: "Employee Name",
             dataIndex: "seller",
             key: "seller",
         },
@@ -63,26 +64,6 @@ const AllTrackingproduct = () => {
             title: "Company Name",
             dataIndex: "company",
             key: "company",
-        },
-        {
-            title: "Track Progress",
-            dataIndex: "tracking",
-            key: "tracking",
-            render: (text, { tracking }) => {
-                return (
-                    <Tag
-                        color={`${tracking === "pending"
-                                ? "yellow"
-                                : tracking === "tracked"
-                                    ? "purple"
-                                    : "green"
-                            }`}
-                        key={tracking}
-                    >
-                        {tracking}
-                    </Tag>
-                );
-            },
         },
         {
             title: "Status",
@@ -122,6 +103,7 @@ const AllTrackingproduct = () => {
                     showSizeChanger: true,
                     showQuickJumper: true,
                 }}
+                expandable={true}
                 onChange={handleTableChange}
                 scroll={{
                     x: true,

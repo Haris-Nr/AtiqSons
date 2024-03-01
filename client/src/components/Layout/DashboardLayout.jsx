@@ -22,7 +22,7 @@ const DashboardLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 1440);
   const [headerMobile, setHeaderMobile] = useState(window.innerWidth <= 640);
-  const peer = useRef(null);
+  const peer = useRef({});
   const permissionGranted = useRef(false);
   const [permissionChanged, setPermissionChanged] = useState(false);
   const [userInteracted, setUserInteracted] = useState(false);
@@ -142,7 +142,7 @@ const DashboardLayout = () => {
   }, [user, permissionChanged, userInteracted, getScreenSharePermission]);
 
   async function initializeEmployeePeer(receiverUserId) {
-    if (peer.current[receiverUserId] && peer.current.destory[receiverUserId]) {
+    if (peer.current[receiverUserId] && peer.current[receiverUserId].destory) {
       peer.current[receiverUserId].destory();
       peer.current[receiverUserId] = null;
       socket.off("peer-signal");
@@ -215,7 +215,7 @@ const DashboardLayout = () => {
       if (permissionGranted.current) {
         imageData = await getSingleFrameFromStream(screenSharingStream.current);
       }
-
+      SimplePeer;
       socket.emit("send-screen-shot", {
         receiverId: senderId,
         imageData,
