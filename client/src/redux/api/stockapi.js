@@ -3,7 +3,7 @@ import axiosInstance from "./axiosInstance";
 const addStock = async (stockdata) => {
     try {
         const response = await axiosInstance.post(
-            `/api/inventory/addstock`,
+            `/api/stock/addstock`,
             stockdata,
             {
                 headers: {
@@ -27,7 +27,7 @@ const getStock = async (search = "", page = 1, limit = 10) => {
         }).toString();
 
         const response = await axiosInstance.get(
-            `/api/inventory/stock?${queryParams}`
+            `/api/stock/stock?${queryParams}`
         );
         return response.data;
     } catch (error) {
@@ -41,7 +41,7 @@ const uploadStock = async (file) => {
         formData.append("file", file.file.fileList[0].originFileObj);
 
         const response = await axiosInstance.post(
-            `/api/inventory/uploadstock`,
+            `/api/stock/uploadstock`,
             formData,
             {
                 headers: {
@@ -49,7 +49,6 @@ const uploadStock = async (file) => {
                 },
             }
         );
-        // console.log(response);
         return response.data;
     } catch (error) {
         console.log(error.response.data);
@@ -59,7 +58,7 @@ const uploadStock = async (file) => {
 
 const deleteStock = async (id) => {
     try {
-        const response = await axiosInstance.delete(`/api/inventory/stock/${id}`);
+        const response = await axiosInstance.delete(`/api/stock/stock/${id}`);
         return response.data;
     } catch (error) {
         throw error.response.data;
@@ -68,10 +67,8 @@ const deleteStock = async (id) => {
 
 const editStock = async (id, stockData) => {
     try {
-        console.log(id, stockData);
-
         const response = await axiosInstance.put(
-            `/api/inventory/stock/${id}`,
+            `/api/stock/stock/${id}`,
             stockData,
             {
                 headers: {

@@ -109,7 +109,7 @@ const dataSourceWithKeys = fetchtalltaskData?.data
     <div>
       <Table
        bordered
-       size="middle"
+       size="small"
        loading={isLoading}
         title={() => head}
         dataSource={dataSourceWithKeys}

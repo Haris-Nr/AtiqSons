@@ -8,10 +8,6 @@ const trackSchema = new Schema(
             ref: "products",
             required: true,
         },
-        date:{
-            type:Date,
-            required:true,
-        },
         sale:{
             type:Number,
             required:true,

@@ -2,9 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AllTrackingProduct } from "../../redux/Features/Product/productSlice";
 import { Image, Table, Tag} from "antd";
+import { useNavigate } from "react-router-dom";
 const baseURL = import.meta.env.VITE_API_BASE_URL;
 
 const AllTrackingproduct = () => {
+    const navigate = useNavigate();
     const dispatch = useDispatch();
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
@@ -52,8 +54,8 @@ const AllTrackingproduct = () => {
         },
         {
             title: "Employee Name",
-            dataIndex: "seller",
-            key: "seller",
+            dataIndex: "employeeName",
+            key: "employeeName",
         },
         {
             title: "Asin No",
@@ -87,10 +89,18 @@ const AllTrackingproduct = () => {
         },
     ];
 
+    const onRowClick = (record) => {
+        return {
+          onClick: () => {
+            navigate(`/admin/trackingProduct/${record._id}`);
+          },
+        };
+      };
+
     return (
         <div>
             <Table
-                size="middle"
+                size="small"
                 bordered
                 loading={isLoading}
                 columns={columns}
@@ -108,6 +118,7 @@ const AllTrackingproduct = () => {
                 scroll={{
                     x: true,
                 }}
+                onRow={onRowClick}
             />
         </div>
     );

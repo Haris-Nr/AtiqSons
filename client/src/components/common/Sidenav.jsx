@@ -16,6 +16,7 @@ import { FaPersonShelter } from "react-icons/fa6";
 import { BsCameraFill, BsPersonFill } from "react-icons/bs";
 import { BiCalculator } from "react-icons/bi";
 import { MdFreeBreakfast, MdOutlineProductionQuantityLimits, MdTrackChanges } from "react-icons/md";
+import { FaAmazon } from "react-icons/fa6";
 import PropTypes from "prop-types";
 
 const Sidenav = ({
@@ -49,7 +50,7 @@ const Sidenav = ({
     employeeDashboard === "lahore" && {
       label: "Amazon Product",
       key: "lahoreproducttable/amazon",
-      icon: <FaProductHunt />,
+      icon: <FaAmazon />,
     },
     employeeDashboard === "lahore" && {
       label: "Noon Product",
@@ -125,7 +126,7 @@ const Sidenav = ({
     employeeDashboard === "admin" && {
       label: "Amazon Products",
       key: "productTable/amazon",
-      icon: <FaProductHunt />,
+      icon: <FaAmazon />,
     },
     employeeDashboard === "admin" && {
       label: "Noon Products",
@@ -158,15 +159,21 @@ const Sidenav = ({
       icon: <FaTasks />,
     },
     employeeDashboard === "admin" && {
+      label: "Flex",
+      key: "flex",
+      // icon: <FaTasks />,
+    },
+    employeeDashboard === "admin" && {
       label: "Orders",
       key: "orders",
       icon: <FaShoppingCart />,
     },
     employeeDashboard === "admin" && {
-      label: "Exchange Rates",
-      key: "exchange-rates",
+      label: "Fiance",
+      key: "fiance",
       icon: <FaMoneyBillAlt />,
     },
+
     employeeDashboard === "admin" && {
       label: "CBM Calculator",
       key: "cbm-calculator",

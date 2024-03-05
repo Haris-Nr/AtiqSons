@@ -88,7 +88,7 @@ const TaskTable = () => {
 
   return (
       <Table
-      size="middle"
+      size="small"
       bordered
         columns={columns}
         dataSource={dataSourceWithKeys}

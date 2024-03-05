@@ -47,6 +47,7 @@ const ProductButton = ({ productId, productData: initialProductData }) => {
     if (initialProductData && productId) {
       setIsEditMode(true);
       form.setFieldsValue({
+        sku: initialProductData.sku,
         productName: initialProductData.productName,
         quantity: initialProductData.quantity,
         pastmonth: initialProductData.pastmonth,
@@ -58,6 +59,7 @@ const ProductButton = ({ productId, productData: initialProductData }) => {
         selectItem: initialProductData.selectItem,
         company: initialProductData.company,
         url: initialProductData.url,
+        seller: initialProductData.seller,
       });
       if (initialProductData.image) {
         const imageUrl = `${baseURL}${initialProductData.image}`;
@@ -223,8 +225,8 @@ const ProductButton = ({ productId, productData: initialProductData }) => {
   );
 
   const changeHandle = (value) => {
-    setChangeSelectItem(value)
-  }
+    setChangeSelectItem(value);
+  };
 
   return (
     <>
@@ -365,23 +367,25 @@ const ProductButton = ({ productId, productData: initialProductData }) => {
             message="Please select which item"
             hasFeedback
           >
-            <Select size="middle" options={items} onChange={(value)=> changeHandle(value)} />
+            <Select
+              size="middle"
+              options={items}
+              onChange={(value) => changeHandle(value)}
+            />
           </Form.Item>
-          {
-            changeSelectItem === "seasonal" &&
+          {changeSelectItem === "seasonal" && (
             <Form.Item
               label="Seasonal Category"
               name="seasonalCategory"
               required="true"
               message="Please select which Category"
               hasFeedback
-              labelCol={{span:8}}
-              wrapperCol={{ span: 12, }}
-              
+              labelCol={{ span: 8 }}
+              wrapperCol={{ span: 12 }}
             >
               <Select size="middle" options={seasonalCategory} />
             </Form.Item>
-          }
+          )}
           <Form.Item
             label="Company"
             name="company"
@@ -404,18 +408,17 @@ const ProductButton = ({ productId, productData: initialProductData }) => {
             <Input />
           </Form.Item>
           <Form.Item
-          label= "Seller Name"
-          name="seller"
-          hasFeedback
-          rules={[
-            { required: true, message: "Enter Seller Name"},
-          ]}
+            label="Seller Name"
+            name="seller"
+            hasFeedback
+            rules={[{ required: true, message: "Enter Seller Name" }]}
           >
-          <Input/>
+            <Input />
           </Form.Item>
 
           <Form.Item label="Image Upload" name="image" hasFeedback>
             <Upload
+            listType="picture"
               maxCount={1}
               fileList={fileList}
               onChange={({ fileList: newFileList }) => setFileList(newFileList)}

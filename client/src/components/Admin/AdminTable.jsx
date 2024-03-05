@@ -111,7 +111,7 @@ const AdminTable = () => {
       <Table
        loading={isLoading}
        bordered
-       size="middle"
+       size="small"
         title={() => heading}
         columns={columns}
         dataSource={dataSourceWithKeys}

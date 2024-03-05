@@ -71,7 +71,7 @@ const productSchema = new Schema(
         tracking: {
             type: String,
             enum: ["tracking", "tracked", "pending"],
-            default: "tracking",
+            default: "pending",
         },
         selectItem:{
             type:String,

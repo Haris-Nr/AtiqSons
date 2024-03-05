@@ -4,7 +4,7 @@ const authMiddleware = require("../middlewares/authMiddleware");
 const adminCheck = require("../middlewares/adminCheck");
 const multer = require("multer");
 const path = require("path");
-const { addStock,getStock,uploadFile,deleteStock, editStock } = require("../controllers/inventoryCtrl");
+const { addStock,getStock,uploadFile,deleteStock, editStock } = require("../controllers/stockCtrl");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {

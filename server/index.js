@@ -38,7 +38,9 @@ const orderRoutes = require("./routes/orderRoutes");
 const exchangeRateRoutes = require("./routes/exchangeRateRoutes");
 const breakRoutes = require("./routes/breakRoutes");
 const screenShotRoutes = require("./routes/screenShotRoutes");
-const inventoryRoutes = require("./routes/inventoryRoutes");
+const stockRoutes = require("./routes/stockRoutes");
+const flexRoutes = require('./routes/flexRoutes');
+const fianceRoutes = require('./routes/fianceRoutes');
 
 // Define your routes
 app.use("/api/user", userRoutes);
@@ -50,8 +52,12 @@ app.use("/api/dubai", dubaiRoutes);
 app.use("/api/order", orderRoutes);
 app.use("/api/exchange-rate", exchangeRateRoutes);
 app.use("/api/break", breakRoutes);
-app.use("/api/inventory", inventoryRoutes);
+app.use("/api/stock", stockRoutes);
 app.use("/api/screenshot", screenShotRoutes);
+app.use('/api/sellerflex', flexRoutes);
+app.use('/api/fiance', fianceRoutes);
+
+
 
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "dist/index.html"));

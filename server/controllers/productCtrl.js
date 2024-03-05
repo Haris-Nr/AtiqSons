@@ -10,11 +10,20 @@ const Dubai = require("../models/dubaiModels");
 const createProduct = async (req, res) => {
   try {
     // find product by asin NO
-    const findproduct = await Product.findOne({ asin: req.body.asin });
-    if (findproduct) {
-      throw new Error(
-        "Product already in product list added by " + findproduct.seller
-      );
+    const findProductByAsin = await Product.findOne({ asin: req.body.asin });
+    if (findProductByAsin) {
+      return res.status(400).json({
+        success: false,
+        message: "Product with this ASIN already exists in the product list added by " + findProductByAsin.seller,
+      });
+    }
+
+    const findProductBySku = await Product.findOne({ sku: req.body.sku });
+    if (findProductBySku) {
+      return res.status(400).json({
+        success: false,
+        message: "Product with this SKU already exists in the product list added by " + findProductBySku.seller,
+      });
     }
 
     if (req.body.selectItem === "tracking") {
@@ -96,6 +105,8 @@ const fetchProducts = async (req, res) => {
     const limit = parseInt(req.query.limit);
     const skip = (page - 1) * limit;
     const search = req.query.search;
+    const priceLow = parseFloat(req.query.priceLow);
+    const priceHigh = parseFloat(req.query.priceHigh); 
 
     if (!req.body.createdBy) {
       throw new Error("Creator ID (createdBy) must be provided");
@@ -109,11 +120,18 @@ const fetchProducts = async (req, res) => {
       query.company = req.body.company;
     }
 
+    if (!isNaN(priceLow) && !isNaN(priceHigh)) {
+      query.price = {
+        $gte: priceLow,
+        $lte: priceHigh,
+      };
+    }
+
     if (search) {
       query.$or = [
         { productName: { $regex: search, $options: "i" } },
         { asin: { $regex: search, $options: "i" } },
-        { status: { $regex: search, $options: "i" } },
+        {sku: { $regex: search, $options: "i" } },
       ];
       if (req.body.company) {
         query.company = req.body.company;
@@ -125,7 +143,7 @@ const fetchProducts = async (req, res) => {
     const products = await Product.find(query)
       .skip(skip)
       .limit(limit)
-      .select("image productName asin status")
+      .select("image productName asin status price currency sku")
       .sort({ createdAt: -1 })
       .exec();
 
@@ -135,6 +153,8 @@ const fetchProducts = async (req, res) => {
       currentPage: page,
       itemsPerPage: limit,
       search: search,
+      priceLow:priceLow,
+      priceHigh:priceHigh,
     });
   } catch (error) {
     console.log(error);
@@ -153,8 +173,13 @@ const allProduct = async (req, res) => {
     const skip = (page - 1) * limit;
     const search = req.query.search;
     const company = req.query.company;
+    const priceLow = parseFloat(req.query.priceLow);
+    const priceHigh = parseFloat(req.query.priceHigh); 
 
     let queryObj = {};
+
+    
+
     if (search) {
       queryObj = {
         $or: [
@@ -162,18 +187,25 @@ const allProduct = async (req, res) => {
           { employeeName: { $regex: search, $options: "i" } },
           { asin: { $regex: search, $options: "i" } },
         ],
-      };
+      };y
     }
 
     if (company) {
       queryObj.company = company;
     }
 
+    if (!isNaN(priceLow) && !isNaN(priceHigh)) {
+      queryObj.price = {
+        $gte: priceLow,
+        $lte: priceHigh,
+      };
+    }
+
     const products = await Product.find(queryObj)
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
-      .select("image productName asin status employeeName")
+      .select("image productName asin status employeeName price currency sku")
       .exec();
 
     const totalProduct = await Product.countDocuments(queryObj);
@@ -184,6 +216,8 @@ const allProduct = async (req, res) => {
       limit: limit,
       totalProduct: totalProduct,
       search: search,
+      priceLow:priceLow,
+      priceHigh:priceHigh,
     });
   } catch (error) {
     res.status(400).json({
@@ -393,11 +427,10 @@ const trackProduct = async (req, res) => {
 const gettrackproduct = async (req, res) => {
   try {
     const id = req.params.id;
-
+    
     const trackProduct = await Track.find({ productId: id });
 
     res.json({
-      success: true,
       data: trackProduct,
     });
   } catch (error) {
@@ -447,7 +480,7 @@ const allTrackingProduct = async (req, res) => {
     let skip = (page - 1) * limit;
 
     const trackingProducts = await Product.find({ tracking: "tracking" })
-      .select("image productName seller asin tracking status company")
+      .select("image productName employeeName asin tracking status company")
       .sort({ createdAt: -1 })
       .limit(limit)
       .skip(skip);
@@ -514,6 +547,8 @@ const fetchProductsBySelectItem = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
+    const priceLow = parseFloat(req.query.priceLow);
+    const priceHigh = parseFloat(req.query.priceHigh); 
     const { search, selectItem, createdBy } = req.query;
 
     let query = { selectItem };
@@ -522,13 +557,20 @@ const fetchProductsBySelectItem = async (req, res) => {
       query.createdBy = createdBy;
     }
 
+    if (!isNaN(priceLow) && !isNaN(priceHigh)) {
+      query.price = {
+        $gte: priceLow,
+        $lte: priceHigh,
+      };
+    }
+
     if (search) {
       query.$or = [
         { productName: { $regex: search, $options: "i" } },
         { asin: { $regex: search, $options: "i" } },
-        { status: { $regex: search, $options: "i" } },
-        { seller: { $regex: search, $options: "i" } },
+        { employeeName: { $regex: search, $options: "i" } },
         { company: { $regex: search, $options: "i" } },
+        {sku: { $regex: search, $options:"i" } },
       ];
     }
 
@@ -538,7 +580,7 @@ const fetchProductsBySelectItem = async (req, res) => {
       .skip(skip)
       .limit(limit)
       .populate("createdBy", "fullname")
-      .select("image productName seller asin status company")
+      .select("image productName employeeName asin status company price currency sku")
       .sort({ createdAt: -1 })
       .exec();
 
@@ -549,6 +591,8 @@ const fetchProductsBySelectItem = async (req, res) => {
       itemsPerPage: limit,
       totalPages: Math.ceil(totalCount / limit),
       search: search,
+      priceLow:priceLow,
+      priceHigh:priceHigh,
     });
   } catch (error) {
     res.status(500).json({
@@ -624,11 +668,8 @@ const updateProduct = async (req, res) => {
 const deleteTrack = async (req, res) => {
   try {
     const { id } = req.params;
-    console.log(id);
     await Track.findByIdAndDelete(id);
-    res.status(200).json({
-      message: "Track deleted successfully",
-    });
+    res.status(200);
   } catch (error) {
     res.status(500).json({
       message: error.message,

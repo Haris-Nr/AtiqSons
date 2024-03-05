@@ -1,4 +1,4 @@
-import { Table, Tag, message } from "antd";
+import { Table, Tag, message,InputNumber,Button } from "antd";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Highlighter from "react-highlight-words";
@@ -6,7 +6,9 @@ import {
   AllProduct,
   setCurrentPage,
   setPageSize,
-  fetchProductsBySelectItem
+  fetchProductsBySelectItem,
+  setPriceLow,
+  setPriceHigh,
 } from "../../redux/Features/Product/productSlice";
 import { useNavigate,useParams } from "react-router-dom";
 import socket from "../../redux/api/socket";
@@ -31,8 +33,35 @@ const AdminProductTable = () => {
     totalProduct,
     search,
     error,
+    priceLow,
+    priceHigh,
   } = useSelector((state) => state.product);
 
+  const [localPriceLow, setLocalPriceLow] = useState(priceLow);
+  const [localPriceHigh, setLocalPriceHigh] = useState(priceHigh);
+
+  const handlePriceLowChange = (value) => {
+    setLocalPriceLow(value);
+  };
+
+  const handlePriceHighChange = (value) => {
+    setLocalPriceHigh(value);
+  };
+
+  const applyPriceFilter = () => {
+    dispatch(setPriceLow(localPriceLow));
+    dispatch(setPriceHigh(localPriceHigh));
+  };
+
+  const clearPriceFilter = () => {
+    // Reset local state
+    setLocalPriceLow(null);
+    setLocalPriceHigh(null);
+
+    // Dispatch actions to reset global state
+    dispatch(setPriceLow(null));
+    dispatch(setPriceHigh(null));
+  };
 
   const renderColumnWithHighlight = (text) => (
     <Highlighter
@@ -56,7 +85,8 @@ const AdminProductTable = () => {
     if (error.success === false) {
       message.error(error.message);
     }
-  }, [dispatch, currentPage, pageSize, search, error.success, error.message,selectItemValue,company]);
+  }, [dispatch, currentPage, pageSize, search, error.success, error.message,selectItemValue,company, priceLow,
+    priceHigh,]);
 
 
   useEffect(() => {
@@ -65,7 +95,8 @@ const AdminProductTable = () => {
     } else{
       setProductsList(AllProductData);
     }
-  }, [selectItemProducts, AllProductData, selectItemValue,company]);
+  }, [selectItemProducts, AllProductData, selectItemValue,company,priceLow,
+    priceHigh,]);
 
 
   const handleTableChange = (pagination) => {
@@ -78,7 +109,6 @@ const AdminProductTable = () => {
       title: "SrNo",
       key: "srNo",
       render: (text, record, index) => {
-        console.log(record)
         return (currentPage - 1) * pageSize + index + 1;
       },
       className: "text-center",
@@ -91,6 +121,12 @@ const AdminProductTable = () => {
         const imageUrl = record.image ? `${baseURL}${record.image}` : "/no.png";
         return <img width={50} src={imageUrl} />;
       },
+    },
+    {
+      title: "SKU",
+      dataIndex: "sku",
+      key: "sku",
+      render: (text) => renderColumnWithHighlight(text),
     },
     {
       title: "Product Name",
@@ -111,6 +147,19 @@ const AdminProductTable = () => {
       dataIndex: "asin",
       key: "asin",
       render: (text) => renderColumnWithHighlight(text),
+    },
+    {
+      title: "Price",
+      dataIndex: "price",
+      key: "price",
+      render: (text, record) => (
+        <>
+          <span>
+            {record.price}
+            <sup> {record.currency}</sup>
+          </span>
+        </>
+      ),
     },
     {
       title: "Status",
@@ -149,7 +198,11 @@ const AdminProductTable = () => {
   const onRowClick = (record) => {
     return {
       onClick: () => {
-        navigate(`/admin/productTable/${company}/${record._id}`);
+        if(company){
+          navigate(`/admin/productTable/${company}/${record._id}`);
+        }else if(selectItemValue){
+          navigate(`/admin/productTable/selectItem/${selectItemValue}/${record._id}`);
+        }
       },
     };
   };
@@ -167,9 +220,25 @@ const AdminProductTable = () => {
     : [];
 
   const head = (
-    <div className="flex justify-between ">
+    <div className="flex flex-col space-y-2">
       <ProductSearch />
-      <div className=" relative w-full px-4 max-w-full flex-grow flex-1 text-right ">
+      <div className=" flex space-x-2">
+        <InputNumber
+          min={0}
+          placeholder="Min Price"
+          value={localPriceLow || ""}
+          onChange={handlePriceLowChange}
+        />
+        <InputNumber
+          min={0}
+          placeholder="Max Price"
+          value={localPriceHigh || ""}
+          onChange={handlePriceHighChange}
+        />
+        <Button onClick={applyPriceFilter}>Apply</Button>
+        <Button onClick={clearPriceFilter} style={{ marginLeft: "10px" }}>
+          Clear
+        </Button>
       </div>
     </div>
   );
@@ -178,7 +247,7 @@ const AdminProductTable = () => {
     <div>
       <Table
         bordered
-        size="middle"
+        size="small"
         loading={isLoading}
         title={() => head}
         columns={columns}

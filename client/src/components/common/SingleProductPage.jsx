@@ -11,16 +11,13 @@ import {
 } from "../../redux/Features/Product/productSlice";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Image, Tag, Descriptions, message } from "antd";
-import TrackProduct from "../Lahore/TrackProduct";
 import socket from "../../redux/api/socket";
 import moment from "moment";
 
 import DeleteButton from "./DeleteButton";
 import ChangeStatusButton from "./ChangeStatusButton";
 import ChangeTrackStatusButton from "./ChangeTrackStatusButton";
-import AdminTrackData from "../Admin/AdminTrackData";
 import Find from "../Dubai/Find";
-import DubaiProductData from "../Admin/DubaiProductData";
 import ProductButton from "../Lahore/ProductButton";
 
 const baseURL = import.meta.env.VITE_API_BASE_URL;
@@ -108,10 +105,14 @@ const SingleProductPage = () => {
 
   const items = [
     {
+      key:'0',
+      label:"SKU",
+      children:product?.sku,
+    },
+    {
       key: "1",
       label: "Product Name",
       children: product?.productName,
-      span: 3,
     },
     {
       key: "2",
@@ -223,20 +224,18 @@ const SingleProductPage = () => {
       key: "15",
       label: "Seller",
       children:product?.seller,
-      span:2
     },
     {
       key: "16",
       label: "About This Item",
       children: product?.description,
-
     },
   ];
 
   return (
     <div className="space-y-5">
       <Descriptions
-        size="middle"
+        size="default"
         layout="horizontal"
         title="Details"
         labelStyle={{ width: "150px", fontWeight: "bold" }}
@@ -280,23 +279,6 @@ const SingleProductPage = () => {
           </div>
         }
       />
-
-      <div>
-        {(user?.employee?.dashboard === "dubai" ||
-          user?.employee?.dashboard === "admin") && (
-          <DubaiProductData id={id} />
-        )}
-        <h3 className="text-lg mb-4"> Tracking Details </h3>
-        {(user?.employee?.role === "admin" ||
-          user?.employee?.role === "superadmin") && (
-          <div className="space-y-2">
-            <AdminTrackData id={id} />
-          </div>
-        )}
-      </div>
-      {user?.employee?.dashboard === "lahore" && tracking === "tracking" && (
-        <TrackProduct id={id} />
-      )}
     </div>
   );
 };

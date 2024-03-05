@@ -24,6 +24,8 @@ const initialState = {
   totalItems: 0,
   search: "",
   totalProduct: 0,
+  priceLow:null,
+  priceHigh:null,
 
   isLoading: false,
   error: {},
@@ -45,13 +47,15 @@ export const Productsbyemployee = createAsyncThunk(
   "product/Productsbyemployee",
   async ({ productDataId, company }, { getState, rejectWithValue }) => {
     try {
-      const { currentPage, pageSize, search } = getState().product;
+      const { currentPage, pageSize, search,priceLow,priceHigh } = getState().product;
       const response = await productApi.fetchProductsbyemployee(
         productDataId,
         company,
         currentPage,
         pageSize,
         search,
+        priceLow,
+        priceHigh
       );
       return response;
     } catch (error) {
@@ -64,12 +68,14 @@ export const fetchProductsBySelectItem = createAsyncThunk(
   "product/fetchProductsBySelectItem",
   async (selectItem, { getState, rejectWithValue }) => {
     try {
-      const { currentPage, pageSize, search } = getState().product;
+      const { currentPage, pageSize, search,priceLow,priceHigh } = getState().product;
       const response = await productApi.fetchProductsBySelectItem(
         selectItem,
         currentPage,
         pageSize,
-        search
+        search,
+        priceLow,
+        priceHigh
       );
       return response;
     } catch (error) {
@@ -94,12 +100,14 @@ export const AllProduct = createAsyncThunk(
   "/product/fetchallProduct",
   async (company, { getState, rejectWithValue }) => {
     try {
-      const { currentPage, pageSize, search } = getState().product;
+      const { currentPage, pageSize, search,priceLow,priceHigh } = getState().product;
       const response = await productApi.getAllProduct(
         currentPage,
         pageSize,
         search,
-        company
+        company,
+        priceLow,
+        priceHigh,
       );
       return response;
     } catch (error) {
@@ -135,8 +143,9 @@ export const ProductStatus = createAsyncThunk(
 export const TrackingProduct = createAsyncThunk(
   "/product/trackProduct",
   async (data, thunkAPI) => {
+    console.log(data);
     try {
-      const response = await productApi.getTrackProduct(data);
+      const response = await productApi.AddTrackProduct(data);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error);
@@ -260,6 +269,12 @@ export const productSlice = createSlice({
     setSearch: (state, action) => {
       state.search = action.payload;
     },
+    setPriceLow: (state, action) => {
+      state.priceLow = action.payload
+    },
+    setPriceHigh: (state, action) => {
+      state.priceHigh = action.payload
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -287,6 +302,8 @@ export const productSlice = createSlice({
         state.pageSize = action.payload?.itemsPerPage;
         state.totalItems = action.payload?.totalItems;
         state.search = action.payload?.search;
+        state.priceHigh = action.payload?.priceHigh
+        state.priceLow = action.payload?.priceLow
       })
       .addCase(Productsbyemployee.rejected, (state, action) => {
         state.isLoading = false;
@@ -333,6 +350,8 @@ export const productSlice = createSlice({
         state.pageSize = action.payload?.limit;
         state.totalProduct = action.payload?.totalProduct;
         state.search = action.payload?.search;
+        state.priceLow = action.payload?.priceLow;
+        state.priceHigh = action.payload?.priceHigh;
       })
       .addCase(AllProduct.rejected, (state, action) => {
         state.isLoading = false;
@@ -371,6 +390,7 @@ export const productSlice = createSlice({
         state.TrackProductData = action.payload;
       })
       .addCase(TrackingProduct.rejected, (state, action) => {
+        console.log(action.payload)
         state.isLoading = false;
         state.TrackProductData = action.payload;
       })
@@ -408,7 +428,7 @@ export const productSlice = createSlice({
       })
       .addCase(getTrackingProduct.rejected, (state, action) => {
         state.isLoading = false;
-        state.gettrackproduct = action.error;
+        state.error = action.payload;
       })
       // approved Dubai products
       .addCase(DubaiProduct.pending, (state) => {
@@ -451,13 +471,12 @@ export const productSlice = createSlice({
       .addCase(deleteTrack.pending,(state)=>{
         state.isLoading = true;
       })
-      .addCase(deleteTrack.fulfilled,(state,action)=>{
+      .addCase(deleteTrack.fulfilled,(state)=>{
         state.isLoading = false;
-        state.deleteProductData = action.payload;
       })
       .addCase(deleteTrack.rejected,(state,action)=> {
         state.isLoading=false;
-        state.deleteProductData = action.payload;
+        state.error = action.payload;
       })
   },
 });
@@ -470,5 +489,7 @@ export const {
   setCurrentPage,
   setPageSize,
   setSearch,
+  setPriceHigh,
+  setPriceLow,
 } = productSlice.actions;
 export default productSlice.reducer;

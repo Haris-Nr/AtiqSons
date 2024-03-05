@@ -118,7 +118,7 @@ function EmpolyeeTable() {
   return (
     <div>
       <Table
-      size="middle"
+      size="small"
         title={() => heading}
         bordered
         loading={isLoading}

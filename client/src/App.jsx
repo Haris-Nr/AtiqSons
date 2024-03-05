@@ -49,8 +49,11 @@ import OrdersTable from "./components/common/OrdersTable";
 
 
 import AdminTable from "./components/Admin/AdminTable";
-import InventoryTable from "./components/Admin/InventoryTable";
 import AllTrackingproduct from "./components/Admin/AllTrackingproduct";
+import AdminTrackData from "./components/Admin/AdminTrackData";
+import StockTable from "./components/Admin/StockTable";
+import Flex from "./components/Admin/Flex";
+import Fiance from "./components/Admin/Fiance";
 
 
 const router = createBrowserRouter(
@@ -78,10 +81,10 @@ const router = createBrowserRouter(
         {/* Lahore Routes */}
         <Route path="lahoreproducttable/:company" element={<LahoreProductTable />} />
         <Route path="lahoreproducttable/selectItem/:selectItemValue" element={<LahoreProductTable />} />
+        <Route path="lahoreproducttable/selectItem/:selectItemValue/:id" element={<SingleProductPage />} />
         <Route path="lahoreproducttable/:company/:id" element={<SingleProductPage />} />
-        <Route path="trackproduct" element={<TrackProduct />} />
         <Route path="intrackingtable" element={<IntrackingproductTable />} />
-        <Route path="intrackingtable/:id" element={<SingleProductPage />} />
+        <Route path="intrackingtable/:id" element={<TrackProduct />} />
 
         {/* Dubai Routes */}
         <Route path="dubaiproducttable" element={<DubaiProductTable />} />
@@ -93,6 +96,7 @@ const router = createBrowserRouter(
         <Route path="logs" element={<LogTable />} />
         <Route path="productTable/:company" element={<AdminProductTable />} />
         <Route path="productTable/selectItem/:selectItemValue" element={<AdminProductTable />} />
+        <Route path="productTable/selectItem/:selectItemValue/:id" element={<SingleProductPage/>} />
         <Route path="productTable/:company/:id" element={<SingleProductPage />} />
         <Route path="adminTask" element={<AdminTaskTable />} />
         <Route path="adminTable" element={<AdminTable/>}/>
@@ -104,7 +108,10 @@ const router = createBrowserRouter(
         <Route path="break-leave" element={<BreakAndLeavePage />} />
         <Route path="screenshots" element={<ScreenShotsTable />} />
         <Route path="trackingProduct" element={<AllTrackingproduct/>} />
-        <Route path="WarehouseStock" element = {<InventoryTable/>} />
+        <Route path="trackingProduct/:id" element={<AdminTrackData/>} />
+        <Route path="WarehouseStock" element = {<StockTable/>} />
+        <Route path="flex" element={<Flex/>} />
+        <Route path="fiance" element={<Fiance/>}/>
 
       </Route>
     </Route>

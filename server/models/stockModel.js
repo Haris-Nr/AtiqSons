@@ -1,8 +1,11 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
-const inventorySchema = new Schema(
+const stockSchema = new Schema(
     {
+        sku: {
+            type: String,
+        },
         productName: {
             type: String,
         },
@@ -11,21 +14,21 @@ const inventorySchema = new Schema(
         },
         image: {
             type: String,
-            },
+        },
         asin: {
             type: String,
         },
         price: {
             type: String,
         },
-        selectItem:{
-            type:String,
-        }
+        selectItem: {
+            type: String,
+        },
     },
     {
         timestamps: true,
     }
 );
 
-const Inventory = mongoose.model("inventory", inventorySchema);
-module.exports = Inventory;
+const Stock = mongoose.model("stock", stockSchema);
+module.exports = Stock;

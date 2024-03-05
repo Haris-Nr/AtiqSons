@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { Table, Image, Tag } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { getIntrackingProduct} from "../../redux/Features/Product/productSlice";
+import { getIntrackingProduct } from "../../redux/Features/Product/productSlice";
 const baseURL = import.meta.env.VITE_API_BASE_URL;
 
 const IntrackingproductTable = () => {
@@ -10,17 +10,15 @@ const IntrackingproductTable = () => {
     const dispatch = useDispatch();
     const { user } = useSelector((state) => state.fetch);
     const { employee } = user;
-    const {
-        IntrackingProductdata,
-        isLoading } = useSelector((state) => state.product);
-
+    const { IntrackingProductdata, isLoading } = useSelector(
+        (state) => state.product
+    );
 
     useEffect(() => {
         if (employee?._id) {
             dispatch(getIntrackingProduct(employee?._id));
         }
     }, [dispatch, employee]);
-
 
     const columns = [
         {
@@ -72,26 +70,25 @@ const IntrackingproductTable = () => {
     ];
 
     const onRowClick = (record) => {
+        console.log(record);
         return {
-          onClick: () => {
-            navigate(record._id);
-          },
+            onClick: () => {
+                navigate(`/lahore/intrackingtable/${record._id}`);
+            },
         };
-      };
-
+    };
 
     const dataSourceWithKeys = IntrackingProductdata?.data
-        ? IntrackingProductdata?.data
-            .map((item,index) => ({
-                ...item,
-                key: index,
-            }))
+        ? IntrackingProductdata?.data.map((item, index) => ({
+            ...item,
+            key: index,
+        }))
         : [];
 
     return (
         <div>
             <Table
-            size="middle"
+                size="small"
                 bordered
                 loading={isLoading}
                 columns={columns}

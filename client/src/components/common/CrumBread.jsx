@@ -24,6 +24,7 @@ const CrumBread = () => {
     return item.charAt(0).toUpperCase() + item.slice(1);
   };
 
+  
   const items = pathnames.map((item, index) => ({
     path: `/${item}`,
     title: getTitle(item),

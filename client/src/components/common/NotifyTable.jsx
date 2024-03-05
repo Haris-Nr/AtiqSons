@@ -129,7 +129,7 @@ const NotifyTable = () => {
   return (
     <div>
       <Table
-      size="middle"
+      size="small"
       bordered
        title={() => heading}
         columns={columns}

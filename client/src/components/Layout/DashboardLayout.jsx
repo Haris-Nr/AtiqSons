@@ -229,11 +229,11 @@ const DashboardLayout = () => {
 
   return (
     <>
-      <div
+      {/* <div
         onClick={(e) => {
           setUserInteracted(true);
         }}
-      >
+      > */}
         {contextHolder}
         <Layout hasSider>
           <Sidenav
@@ -275,7 +275,7 @@ const DashboardLayout = () => {
             <Foot />
           </Layout>
         </Layout>
-      </div>
+      {/* </div> */}
     </>
   );
 };

@@ -20,13 +20,13 @@ import {
   getStock,
   resetStockState,
   uploadStock,
-} from "../../redux/Features/inventory/inventorySlice";
+} from "../../redux/Features/stock/stockSlice";
 import DeleteButton from "../common/DeleteButton";
-import InventoryForm from "./InventoryForm";
+import StockForm from "./StockForm";
 
 const baseURL = import.meta.env.VITE_API_BASE_URL;
 
-const InventoryTable = () => {
+const StockTable = () => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState([]);
@@ -40,8 +40,14 @@ const InventoryTable = () => {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [reload, setReload] = useState(false);
 
-  const { addstockmessage, stockItems, isLoading, error, pagination,uploadMessage } =
-    useSelector((state) => state.inventory);
+  const {
+    addstockmessage,
+    stockItems,
+    isLoading,
+    error,
+    pagination,
+    uploadMessage,
+  } = useSelector((state) => state.stock);
 
   const renderColumnWithHighlight = (text) => (
     <Highlighter
@@ -99,14 +105,18 @@ const InventoryTable = () => {
   };
 
   const showUploadModal = () => setIsUploadModalOpen(true);
-  const handleUploadModalCancel = () => setIsUploadModalOpen(false);
+  const handleUploadModalCancel = () => {
+    setIsUploadModalOpen(false);
+    form.resetFields();
+    setFileList([]);
+  };
 
   const onFinish = (values) => {
     dispatch(uploadStock(values));
     form.resetFields();
     setFileList([]);
     setIsUploadModalOpen(false);
-    setReload(!reload)
+    setReload(!reload);
     dispatch(
       getStock({
         search: search.trim(),
@@ -124,7 +134,7 @@ const InventoryTable = () => {
       message.error(uploadMessage.message);
       dispatch(resetStockState());
     }
-  }, [dispatch,uploadMessage]);
+  }, [dispatch, uploadMessage]);
 
   const handleDelete = (id) => {
     dispatch(deleteStock(id)).then(() => {
@@ -139,7 +149,7 @@ const InventoryTable = () => {
   };
 
   const handleEditButton = (record) => {
-    setEditItem(record); 
+    setEditItem(record);
     setIsModalOpen(true);
   };
 
@@ -149,6 +159,14 @@ const InventoryTable = () => {
       key: "srNo",
       render: (text, record, index) => {
         return (currentPage - 1) * pageSize + index + 1;
+      },
+    },
+    {
+      key: "sku",
+      title: "SKU",
+      dataIndex: "sku",
+      render: (text) => {
+        return renderColumnWithHighlight(text);
       },
     },
     {
@@ -195,8 +213,8 @@ const InventoryTable = () => {
       key: "action",
       render: (_, record) => (
         <Space size="middle">
-        <DeleteButton onConfirmDelete={() => handleDelete(record._id)}/>
-        {/* <Button onClick={()=>handleEditButton(record)}>Edit</Button> */}
+          <DeleteButton onConfirmDelete={() => handleDelete(record._id)} />
+          <Button onClick={() => handleEditButton(record)}>Edit</Button>
         </Space>
       ),
     },
@@ -238,21 +256,20 @@ const InventoryTable = () => {
           <Button type="primary" onClick={showModal}>
             Add Stock
           </Button>
-          {/* <Button onClick={showUploadModal}>Import</Button> */}
+          <Button onClick={showUploadModal}>Import</Button>
         </div>
       </div>
       {searchMarkup}
     </div>
   );
-
   function handleCreateStockFormSubmit(values) {
     if (editItem) {
-      dispatch(editStock({ id: values._id, stockData:values }));
+      dispatch(editStock({ id: editItem._id, stockData: values }));
     } else {
-    dispatch(addStock(values));
+      dispatch(addStock(values));
     }
     setIsModalOpen(false);
-    setReload(!reload)
+    setReload(!reload);
     dispatch(
       getStock({
         search: search.trim(),
@@ -262,7 +279,6 @@ const InventoryTable = () => {
     );
     setEditItem(null);
   }
-
 
   return (
     <div>
@@ -285,7 +301,7 @@ const InventoryTable = () => {
         onChange={handleTableChange}
       />
       <Modal
-         title={editItem ? "Edit Stock" : "Add Stock"}
+        title={editItem ? "Edit Stock" : "Add Stock"}
         open={isModalOpen}
         onCancel={() => {
           handleCancel();
@@ -293,7 +309,7 @@ const InventoryTable = () => {
         }}
         footer={null}
       >
-        <InventoryForm onSubmit={handleCreateStockFormSubmit} order={editItem}/>
+        <StockForm onSubmit={handleCreateStockFormSubmit} order={editItem} />
       </Modal>
       <Modal
         title="Upload Stock File"
@@ -302,7 +318,11 @@ const InventoryTable = () => {
         footer={null}
       >
         <Form form={form} onFinish={onFinish}>
-          <Form.Item name="file" label="Upload" >
+          <Form.Item
+            name="file"
+            label="Upload"
+            rules={[{ required: true, message: "upload file" }]}
+          >
             <Upload
               maxCount={1}
               fileList={fileList}
@@ -323,4 +343,4 @@ const InventoryTable = () => {
   );
 };
 
-export default InventoryTable;
+export default StockTable;

@@ -18,6 +18,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
             footerBg:"white",
             headerBg:"white",
           },
+          Menu:{
+            itemColor:"light grey"
+          },
           Button: {},
         },
   }} 

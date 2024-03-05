@@ -1,10 +1,12 @@
-const Inventory = require("../models/inventoryModel");
+const Stock = require("../models/stockModel");
 const csvtojson = require("csvtojson");
-const fs = require('fs');
+const fs = require("fs");
+const xlsx = require('xlsx');
+const path = require("path");
 
 const addStock = async (req, res) => {
   try {
-    const findproduct = await Inventory.findOne({ asin: req.body.asin });
+    const findproduct = await Stock.findOne({ asin: req.body.asin });
     if (findproduct) {
       throw new Error("Already in stock");
     }
@@ -21,7 +23,7 @@ const addStock = async (req, res) => {
           .join("/");
     }
 
-    const newStock = new Inventory({
+    const newStock = new Stock({
       ...req.body,
       image: image,
     });
@@ -48,16 +50,20 @@ const getStock = async (req, res) => {
 
     const searchQuery = req.query.search
       ? {
-          productName: { $regex: req.query.search, $options: "i" },
+          $or: [
+            { productName: { $regex: req.query.search, $options: "i" } },
+            { sku: { $regex: req.query.search, $options: "i" } },
+            { asin: { $regex: req.query.search, $options: "i" } },
+          ],
         }
       : {};
 
-    const stockItems = await Inventory.find(searchQuery)
+    const stockItems = await Stock.find(searchQuery)
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
 
-    const total = await Inventory.countDocuments(searchQuery);
+    const total = await Stock.countDocuments(searchQuery);
 
     const totalPages = Math.ceil(total / limit);
 
@@ -79,24 +85,40 @@ const getStock = async (req, res) => {
 
 const uploadFile = async (req, res) => {
   try {
-    console.log(req.file)
     if (!req.file) {
-      throw new Error("File not found")
+      throw new Error("File not found");
     }
 
-    let jsonArray = await csvtojson().fromFile(req.file.path);
-    jsonArray = jsonArray.map(({ SRno, ...rest }) => rest);
+    let jsonArray = [];
+    if (req.file.originalname.endsWith('.csv')) {
+      jsonArray = await csvtojson().fromFile(req.file.path);
+    } else if (req.file.originalname.endsWith('.xlsx')) {
+      const workbook = xlsx.readFile(req.file.path);
+      workbook.SheetNames.forEach((sheetName) => {
+        const sheet = workbook.Sheets[sheetName];
+        const data = xlsx.utils.sheet_to_json(sheet);
+        jsonArray.push(...data);
+      });
+    } else {
+      throw new Error("Unsupported file format");
+    }
 
-    await Inventory.insertMany(jsonArray);
+    await Stock.insertMany(jsonArray);
 
-    fs.unlink(req.file.path);
+    const filePath = path.join(__dirname, "..", req.file.path);
+
+    await fs.unlink(filePath, (err) => {
+      if (err) {
+        throw err;
+      }
+      console.log("File deleted successfully");
+    });
 
     res.status(200).json({
       success: true,
       message: "File uploaded and processed successfully.",
     });
   } catch (error) {
-    console.log(error);
     res.status(500).json({
       success: false,
       message: error.message,
@@ -107,7 +129,7 @@ const uploadFile = async (req, res) => {
 const deleteStock = async (req, res) => {
   try {
     const { id } = req.params;
-    const deletedItem = await Inventory.findByIdAndDelete(id);
+    const deletedItem = await Stock.findByIdAndDelete(id);
 
     if (!deletedItem) {
       return res.status(404).json({
@@ -131,32 +153,45 @@ const deleteStock = async (req, res) => {
 const editStock = async (req, res) => {
   try {
     const { id } = req.params;
+    const updatedData = req.body;
 
-    const existingItem = await Inventory.findById(id);
+    const existingItem = await Stock.findById(id);
 
     if (!existingItem) {
       return res.status(404).json({
         success: false,
-        message: 'Stock item not found.',
+        message: "Stock item not found.",
       });
     }
 
-    const updatedData = req.body;
-
     if (req.file) {
+      const imagePath = req.file.path;
+      const relativeImagePath =
+        "/" +
+        imagePath
+          .replace(/\\/g, "/")
+          .split("/")
+          .filter((e) => e && e !== "public")
+          .join("/");
+
+      updatedData.image = relativeImagePath;
+
+      // Delete the old image if it exists
       if (existingItem.image) {
-        const existingImagePath = existingItem.image;
-        fs.unlink(path.resolve(existingImagePath), (err) => {
-          if (err) {
-            throw new Error(err.message)
-            console.error("Failed to delete old image:", err);
-          }
-        });
+        const oldImagePath = path.join(
+          __dirname,
+          "../public",
+          existingItem.image
+        );
+        try {
+          await fs.unlink(oldImagePath);
+        } catch (error) {
+          console.error(`Failed to delete old image: ${error.message}`);
+        }
       }
-      updatedData.image = req.file.path;
     }
 
-    await Inventory.findByIdAndUpdate(id, updatedData, {
+    await Stock.findByIdAndUpdate(id, updatedData, {
       new: true,
     });
     res.status(200).json({

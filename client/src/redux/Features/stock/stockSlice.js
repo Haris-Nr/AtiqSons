@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import inventoryapi from "../../api/inventoryapi";
+import inventoryapi from "../../api/stockapi";
 
 const initialState = {
     addstockmessage: {},
@@ -71,7 +71,7 @@ export const editStock = createAsyncThunk(
 );
 
 export const inventorySlice = createSlice({
-    name: "inventory",
+    name: "stock",
     initialState,
     reducers: {
         resetStockState: (state) => {
