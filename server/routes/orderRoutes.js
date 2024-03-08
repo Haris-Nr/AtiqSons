@@ -47,7 +47,7 @@ router.put(
 );
 
 router.put("/:id/re-order", authMiddleware, adminCheck, orderCtrl.reOrder);
-
+router.put("/:id/copy-to-inventory", authMiddleware, adminCheck, orderCtrl.copyToInventory);
 router.delete("/:id", authMiddleware, adminCheck, orderCtrl.deleteOrder);
 
 module.exports = router;

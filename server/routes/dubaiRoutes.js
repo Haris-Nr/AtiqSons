@@ -1,5 +1,5 @@
 const express = require("express");
-const { createProduct, allProduct } = require("../controllers/dubaiCtrl");
+const { createProduct, allProduct, deleteDubaiProduct } = require("../controllers/dubaiCtrl");
 const authMiddleware = require("../middlewares/authMiddleware");
 const router = express.Router();
 const multer = require("multer");
@@ -23,5 +23,6 @@ router.post(
     createProduct
 );
 router.get("/allproduct/:id", authMiddleware, allProduct);
+router.delete("/deleteproduct/:id", authMiddleware, deleteDubaiProduct);
 
 module.exports = router;

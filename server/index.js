@@ -39,8 +39,10 @@ const exchangeRateRoutes = require("./routes/exchangeRateRoutes");
 const breakRoutes = require("./routes/breakRoutes");
 const screenShotRoutes = require("./routes/screenShotRoutes");
 const stockRoutes = require("./routes/stockRoutes");
+const activityLogRoutes = require("./routes/activityLogRoutes");
 const flexRoutes = require('./routes/flexRoutes');
 const fianceRoutes = require('./routes/fianceRoutes');
+const fullfilmentRoutes = require('./routes/fullfilmentRoutes');
 
 // Define your routes
 app.use("/api/user", userRoutes);
@@ -54,8 +56,10 @@ app.use("/api/exchange-rate", exchangeRateRoutes);
 app.use("/api/break", breakRoutes);
 app.use("/api/stock", stockRoutes);
 app.use("/api/screenshot", screenShotRoutes);
+app.use("/api/activity-log", activityLogRoutes);
 app.use('/api/sellerflex', flexRoutes);
 app.use('/api/fiance', fianceRoutes);
+app.use('/api/fullfilment', fullfilmentRoutes);
 
 
 

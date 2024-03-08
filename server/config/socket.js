@@ -39,8 +39,6 @@ module.exports = (server) => {
     }
   };
 
-  
-
   const removeUser = (socketId) => {
     onlineEmployees = onlineEmployees.filter(
       (user) => user.socketId !== socketId

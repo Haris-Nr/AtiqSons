@@ -3,140 +3,73 @@ import {
     Space,
     Button,
     Modal,
-    message,
     Input,
     Select,
     Image,
+    Tooltip
 } from 'antd';
-import { FaPencilAlt } from 'react-icons/fa';
-import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { FaPencilAlt, FaEdit, FaTrashAlt, FaCopy, FaRedo } from 'react-icons/fa';
+import { useContext } from 'react';
 import Highlighter from 'react-highlight-words';
-import {
-    getOrders,
-    createOrder,
-    reOrder,
-    updateOrder,
-    deleteOrder
-} from '../../redux/Features/Order/orderSlice';
-
-import {
-    getExchangeRate,
-    getCurrencyOptions,
-} from '../../redux/Features/ExchangeRate/exchangeRateSlice';
-
-
 import OrderForm from '../Admin/OrderForm';
 import PriceForm from '../China/PriceForm';
-import { defaultCurrency } from '../../utils/currencyOptions';
 import ConfirmationModal from './ConfirmationModal';
-import moment from 'moment';
+import { OrdersContext } from '../../contexts/OrdersContext';
+import { defaultCurrency } from '../../utils/currencyOptions';
+
 
 const OrdersTable = () => {
-
-    const dispatch = useDispatch();
-    const [currentPage, setCurrentPage] = useState(1);
-    const [pageSize, setPageSize] = useState(10);
-    const [search, setSearch] = useState('');
-    const [showCreateOrderModal, setShowCreateOrderModal] = useState(false);
-    const [showEditOrderModal, setShowEditOrderModal] = useState(false);
-    const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
-    const [selectedOrder, setSelectedOrder] = useState(null);
-    const [reload, setReload] = useState(false);
-    const [selectedCurrency, setSelectedCurrency] = useState(defaultCurrency);
-    const [showAddPriceModal, setShowAddPriceModal] = useState(false);
-    const [showEditPriceModal, setShowEditPriceModal] = useState(false);
-
     const {
+        currentPage,
+        pageSize,
+        search,
+        setSearch,
+        showCreateOrderModal,
+        showEditOrderModal,
+        showDeleteConfirmModal,
+        selectedOrder,
+        reload,
+        setReload,
+        selectedCurrency,
+        setSelectedCurrency,
+        showAddPriceModal,
+        showEditPriceModal,
+        showAddExwPriceModal,
+        showEditExwPriceModal,
         orders,
         isLoading,
-        errorMessage
-    } = useSelector((state) => state.order);
-
-    const {
         selectedCurrencyExchangeRate,
-        isLoading: isLoadingExchangeRate,
+        isLoadingExchangeRate,
         currencyOptions,
-        errorMessage: exchangeRateErrorMessage
-    } = useSelector((state) => state.exchangeRate);
+        handleTableChange,
+        isAdmin,
+        currencyOptionWithDefault,
+        handleAddPriceBtnClick,
+        hideAddPriceModal,
+        handleAddPriceFormSubmit,
+        handleEditPriceBtnClick,
+        hideEditPriceModal,
+        handleEditPriceFormSubmit,
+        handleAddExwPriceBtnClick,
+        hideAddExwPriceModal,
+        handleAddExwPriceFormSubmit,
+        handleEditExwPriceBtnClick,
+        hideEditExwPriceModal,
+        handleEditExwPriceFormSubmit,
+        handleOrderStatusChangeBtnClick,
+        handleEitOrderBtnClick,
+        hideEditOrderModal,
+        handleEditOrderFormSubmit,
+        handleDeleteOrderBtnClick,
+        handleConfirmDeleteBtnClick,
+        hideDeleteConfirmModal,
+        handleCreateOrderBtnClick,
+        hideCreateOrderModal,
+        handleCreateOrderFormSubmit,
+        handleReOrderBtnClick,
+        handleCopyToInventoryBtnClick
+    } = useContext(OrdersContext);
 
-    const user = useSelector((state) => state.fetch.user);
-
-    const renderColumnWithHighlight = (text) => (
-        <Highlighter
-            highlightStyle={{
-                backgroundColor: 'yellow',
-                padding: 0
-            }}
-            searchWords={[search]}
-            autoEscape
-            textToHighlight={text?.toString() || ''}
-        />
-    );
-
-
-    useEffect(() => {
-        dispatch(getCurrencyOptions());
-    }, [dispatch]);
-
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [pageSize, search])
-
-    useEffect(() => {
-        dispatch(getOrders({
-            page: currentPage,
-            pageSize,
-            search: search.trim()
-        }));
-    }, [dispatch, currentPage, pageSize, reload,search]);
-
-
-    useEffect(() => {
-        if (errorMessage) {
-            message.error(errorMessage);
-        }
-
-        if (exchangeRateErrorMessage) {
-            message.error(exchangeRateErrorMessage);
-        }
-    }, [errorMessage, exchangeRateErrorMessage])
-
-    useEffect(() => {
-        if (selectedCurrency !== defaultCurrency) {
-            dispatch(getExchangeRate({
-                currency1: defaultCurrency,
-                currency2: selectedCurrency
-            }));
-        }
-    }, [dispatch, selectedCurrency]);
-
-
-
-
-    const handleTableChange = (pagination) => {
-        setCurrentPage(pagination.current);
-        setPageSize(pagination.pageSize);
-    };
-
-
-    function isAdmin() {
-        return user.employee?.role === "admin" || user.employee?.role === "superadmin";
-    }
-
-    function currencyOptionWithDefault(currencyOptions) {
-        const hasDefaultCurrency = currencyOptions.find((currency) => currency.value === defaultCurrency);
-
-        if (!hasDefaultCurrency) {
-            return [
-                {
-                    label: defaultCurrency,
-                    value: defaultCurrency
-                },
-                ...currencyOptions
-            ];
-        } else return currencyOptions;
-    }
 
     const currencySelect = (
         <Select
@@ -151,6 +84,18 @@ const OrdersTable = () => {
         </Select>
     );
 
+    const renderColumnWithHighlight = (text) => (
+        <Highlighter
+            highlightStyle={{
+                backgroundColor: 'yellow',
+                padding: 0
+            }}
+            searchWords={[search]}
+            autoEscape
+            textToHighlight={text?.toString() || ''}
+        />
+    );
+
     const columns = [
         {
             title: 'SKU',
@@ -158,10 +103,15 @@ const OrdersTable = () => {
             key: 'sku',
         },
         {
+            title: 'ASIN',
+            dataIndex: 'asin',
+            key: 'asin',
+        },
+        {
             title: 'Picture',
             dataIndex: 'picture',
             key: 'picture',
-            width:'100px',
+            width: '100px',
             render: (picture) => <Image
                 src={import.meta.env.VITE_API_BASE_URL + picture}
                 alt="Product"
@@ -186,8 +136,7 @@ const OrdersTable = () => {
 
                 if (price === -1) {
                     return <>
-                        {isAdmin() ?
-                            <span>N/A</span> :
+                        {
                             <Button
                                 onClick={() => handleAddPriceBtnClick(record)}
                             >Add Price</Button>
@@ -204,12 +153,60 @@ const OrdersTable = () => {
                         <span>
                             {selectedCurrency !== defaultCurrency ? (price * selectedCurrencyExchangeRate.rate).toFixed(2) : price.toFixed(2)}
                         </span>
-                        {!isAdmin() && (
-                            <FaPencilAlt
-                                className='ml-2 cursor-pointer'
-                                onClick={() => handleEditPriceBtnClick(record)}
-                            />
-                        )}
+                        <FaPencilAlt
+                            className='ml-2 cursor-pointer'
+                            onClick={() => handleEditPriceBtnClick(record)}
+                        />
+                    </span>
+                );
+            }
+        },
+        {
+            title: <span>EXW Price {currencySelect}</span>,
+            dataIndex: 'exwPrice',
+            key: 'exwPrice',
+            render: (exwPrice, record) => {
+
+                if (exwPrice === -1) {
+                    return <>
+                        {
+                            <Button
+                                onClick={() => handleAddExwPriceBtnClick(record)}
+                            >Add Price</Button>
+                        }
+                    </>
+                }
+
+                if (isLoadingExchangeRate) {
+                    return <span>Loading...</span>;
+                }
+
+                return (
+                    <span className='flex'>
+                        <span>
+                            {selectedCurrency !== defaultCurrency ? (exwPrice * selectedCurrencyExchangeRate.rate).toFixed(2) : exwPrice.toFixed(2)}
+                        </span>
+                        <FaPencilAlt
+                            className='ml-2 cursor-pointer'
+                            onClick={() => handleEditExwPriceBtnClick(record)}
+                        />
+                    </span>
+                );
+            }
+        },
+        {
+            title: <span>Total Price</span>,
+            key: 'totalPrice',
+            render: (text, record) => {
+                
+                const totalPrice = (record.price===-1 ? 0 : record.price) + 
+                                   (record.exwPrice === -1 ? 0 : record.exwPrice);
+                if (isLoadingExchangeRate) {
+                    return <span>Loading...</span>;
+                }
+                return (
+                    <span>
+                        {selectedCurrency !== defaultCurrency ? (totalPrice * selectedCurrencyExchangeRate.rate).toFixed(2) : totalPrice.toFixed(2)}
                     </span>
                 );
             }
@@ -223,7 +220,7 @@ const OrdersTable = () => {
                     <div className={`custom-select-${status.replace(' ', '_')}`}>
                         <Select
                             defaultValue={status}
-                            onChange={(value) => handleOrderStatusChangeBtnClick(value, record._id)}
+                            onChange={(value) => handleOrderStatusChangeBtnClick(value, record)}
                             style={{ width: '100%' }}
                         >
                             <Select.Option
@@ -237,12 +234,6 @@ const OrdersTable = () => {
                     </div>
                 );
             }
-        },
-        {
-            title:"Date",
-            dataIndex:"createdAt",
-            key:"createdAt",
-            render:(text)=>moment(text).format("DD/MM/YYYY")
         }
     ];
 
@@ -251,181 +242,42 @@ const OrdersTable = () => {
             title: 'Action',
             key: 'reorder',
             render: (text, record) => (
-                <Space size="middle">
-                    <Button onClick={() => handleReOrderBtnClick(record._id)}>Re-Order</Button>
-                    <Button
-                        type="primary"
-                        onClick={() => handleEitOrderBtnClick(record)}
-                    >
-                        Edit
-                    </Button>
-                    <Button
-                        type="danger"
-                        onClick={() => handleDeleteOrderBtnClick(record)}
-                    >
-                        Delete
-                    </Button>
-                </Space>
+                <>
+                    <Space size="middle">
+                        <Tooltip title="Edit">
+                            <FaEdit
+                                onClick={() => handleEitOrderBtnClick(record)}
+                                className="cursor-pointer"
+                                style={{ fontSize: '1.2rem' }}
+                            />
+                        </Tooltip>
+                        <Tooltip title="Delete">
+                            <FaTrashAlt
+                                onClick={() => handleDeleteOrderBtnClick(record)}
+                                className="cursor-pointer"
+                                style={{ fontSize: '1.2rem' }}
+                            />
+                        </Tooltip>
+                        <Tooltip title="Copy to stock">
+                            <FaCopy
+                                onClick={() => handleCopyToInventoryBtnClick(record._id)}
+                                className="cursor-pointer"
+                                style={{ fontSize: '1.2rem' }}
+                            />
+                        </Tooltip>
+                        <Tooltip title="Reorder">
+                            <FaRedo
+                                onClick={() => handleReOrderBtnClick(record._id)}
+                                className="cursor-pointer"
+                                style={{ fontSize: '1.2rem' }}
+                            />
+                        </Tooltip>
+                    </Space>
+                </>
             )
         })
     }
 
-
-    function handleAddPriceBtnClick(order) {
-        setSelectedOrder(order);
-        setShowAddPriceModal(true);
-    }
-
-
-    function hideAddPriceModal() {
-        setShowAddPriceModal(false);
-        setSelectedOrder(null);
-    }
-
-    function handleAddPriceFormSubmit(values) {
-        const onSuccess = () => {
-            message.success("Price Added");
-            setReload(!reload);
-            setShowAddPriceModal(false);
-            setSelectedOrder(null);
-        }
-
-        const onFail = () => {
-            message.error("Price Add Failed");
-            setShowAddPriceModal(false);
-            setSelectedOrder(null);
-        }
-
-        dispatch(updateOrder({
-            id: selectedOrder._id,
-            orderData: {
-                price: values.price
-            },
-            onSuccess,
-            onFail
-        }));
-    }
-
-
-    function handleEditPriceBtnClick(order) {
-        setSelectedOrder(order);
-        setShowEditPriceModal(true);
-    }
-
-    function hideEditPriceModal() {
-        setShowEditPriceModal(false);
-        setSelectedOrder(null);
-    }
-
-    function handleEditPriceFormSubmit(values) {
-        const onSuccess = () => {
-            message.success("Price Updated");
-            setReload(!reload);
-            setShowEditPriceModal(false);
-            setSelectedOrder(null);
-        }
-
-        const onFail = () => {
-            message.error("Price Update Failed");
-            setShowEditPriceModal(false);
-            setSelectedOrder(null);
-        }
-
-        dispatch(updateOrder({
-            id: selectedOrder._id,
-            orderData: {
-                price: values.price
-            },
-            onSuccess,
-            onFail
-        }));
-    }
-
-
-    function handleOrderStatusChangeBtnClick(value, id) {
-        const onSuccess = () => {
-            message.success("Order Status Updated");
-        }
-        const onFail = () => {
-            message.error("Order Status Update Failed");
-        }
-
-        dispatch(updateOrder({
-            id,
-            orderData: {
-                status: value,
-            },
-            onSuccess,
-            onFail
-        }))
-
-        setReload(!reload);
-    }
-
-
-    function handleEitOrderBtnClick(record) {
-        setSelectedOrder(record);
-        setShowEditOrderModal(true);
-    }
-
-
-    function hideEditOrderModal() {
-        setShowEditOrderModal(false);
-        setSelectedOrder(null);
-    }
-
-
-
-    function handleEditOrderFormSubmit(values) {
-        const onSuccess = () => {
-            message.success("Order Updated");
-            setReload(!reload);
-            setShowEditOrderModal(false);
-        }
-
-        const onFail = () => {
-            message.error("Order Update Failed");
-            setShowEditOrderModal(false);
-        }
-
-        dispatch(updateOrder({
-            id: selectedOrder._id,
-            orderData: values,
-            onSuccess,
-            onFail
-        }));
-    }
-
-
-    function handleDeleteOrderBtnClick(order) {
-        setSelectedOrder(order);
-        setShowDeleteConfirmModal(true);
-    }
-
-
-    function handleConfirmDeleteBtnClick() {
-        const onSuccess = () => {
-            message.success("Order Deleted");
-            setReload(!reload);
-            setShowDeleteConfirmModal(false);
-        }
-
-        const onFail = () => {
-            message.error("Order Delete Failed");
-            setShowDeleteConfirmModal(false);
-        }
-
-        dispatch(deleteOrder({
-            id: selectedOrder._id,
-            onSuccess,
-            onFail
-        }));
-    }
-
-    function hideDeleteConfirmModal() {
-        setShowDeleteConfirmModal(false);
-        setSelectedOrder(null);
-    }
 
     const searchMarkup = <div className="flex justify-between w-full">
         <Input
@@ -463,7 +315,6 @@ const OrdersTable = () => {
         </div>
     );
 
-
     const employeeUserHeadSection = () => (
         <div>
             <h1
@@ -475,7 +326,6 @@ const OrdersTable = () => {
         </div>
     );
 
-
     function getHeadSection() {
         if (isAdmin()) {
             return adminUserHeadSection();
@@ -484,59 +334,11 @@ const OrdersTable = () => {
         }
     }
 
-
-    function handleCreateOrderBtnClick() {
-        setShowCreateOrderModal(true);
-    }
-
-    function hideCreateOrderModal() {
-        setShowCreateOrderModal(false);
-    }
-
-
-    function handleCreateOrderFormSubmit(values) {
-        const onSuccess = () => {
-            message.success("Order Created");
-            setReload(!reload);
-            setShowCreateOrderModal(false);
-        }
-
-        const onFail = () => {
-            message.error("Order Creation Failed");
-            setShowCreateOrderModal(false);
-        }
-        dispatch(createOrder({
-            values: values,
-            onSuccess,
-            onFail
-        }));
-
-    }
-
-
-
-    function handleReOrderBtnClick(id) {
-
-        const onSuccess = () => {
-            message.success("Re-Order Successful");
-            setReload(!reload);
-
-        }
-        const onFail = () => {
-            message.error("Re-Order Failed");
-        }
-        dispatch(reOrder({
-            id,
-            onSuccess,
-            onFail
-        }));
-    }
-
     return (
         <>
             <Table
-            size='middle'
-            bordered
+                size='middle'
+                bordered
                 columns={columns}
                 dataSource={orders.orders}
                 rowKey={(record) => record._id}
@@ -597,6 +399,28 @@ const OrdersTable = () => {
                 />
             </Modal>
 
+            <Modal
+                title="Add EXW Price"
+                open={showAddExwPriceModal}
+                onCancel={hideAddExwPriceModal}
+                footer={null}
+            >
+                <PriceForm
+                    onSubmit={handleAddExwPriceFormSubmit}
+                />
+            </Modal>
+
+            <Modal
+                title="Edit EXW Price"
+                open={showEditExwPriceModal}
+                onCancel={hideEditExwPriceModal}
+                footer={null}
+            >
+                <PriceForm
+                    onSubmit={handleEditExwPriceFormSubmit}
+                    price={selectedOrder?.exwPrice}
+                />
+            </Modal>
             <ConfirmationModal
                 visible={showDeleteConfirmModal}
                 onConfirm={handleConfirmDeleteBtnClick}
@@ -604,7 +428,6 @@ const OrdersTable = () => {
                 title="Delete Order"
                 message="Are you sure you want to delete this order?"
             ></ConfirmationModal>
-
         </>
     );
 }

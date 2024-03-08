@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { LockOutlined, MailOutlined } from "@ant-design/icons";
 import { Button, Form, Input, message } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { loginUser, resetLoginState } from "../redux/Features/auth/authSlice";
 import { fetchUser } from "../redux/Features/auth/fetchSlice";
+import { TimerContext } from "../contexts/TimerContext";
+
+
 const Login = () => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
@@ -13,6 +16,11 @@ const Login = () => {
   const { user } = useSelector((state) => state.fetch);
 
   const [clientReady, setClientReady] = useState(false);
+
+  const {
+    handleClockIn,
+    handleClockOut
+  } = useContext(TimerContext);
 
   useEffect(() => {
     setClientReady(true);
@@ -24,8 +32,10 @@ const Login = () => {
 
   useEffect(() => {
     if (user?.employee?.dashboard) {
+      handleClockIn();
       navigate(`/${user?.employee?.dashboard}`);
     } else {
+      handleClockOut();
       navigate("/");
     }
   }, [user, navigate]);

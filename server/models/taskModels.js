@@ -16,6 +16,16 @@ const taskSchema = new Schema(
       enum: ["incomplete", "complete"],
       default: "incomplete",
     },
+    priority: {
+      type: String,
+      enum: ["low", "medium", "high"],
+      required:true
+    },
+    tasktype:{
+      type: String,
+      enum:["daily","onetime"],
+      required: true,
+    },
     dueDate: {
       type: Date, 
       required:true,

@@ -1,71 +1,77 @@
 .PhoneInput {
-	height: 40px !important;
+  height: 40px !important;
   border: 1px solid #d9d9d9 !important;
   border-radius: 6px !important;
 }
 
-.ant-layout-header{
+.ant-layout-header {
   background: #fff !important;
 }
 
 .ant-menu-item-active {
-	color: white !important;
+  color: white !important;
   transform: scale(1.05);
-  }
+}
 
-  .ant-menu-item-active{
-	background-color: #2B2A3F !important;
-  }
-  .ant-menu-item-selected{
-	background-color: #6560F0 !important;
-	color: aliceblue !important;
-  }
+.ant-menu-item-active {
+  background-color: #2b2a3f !important;
+}
 
-  .ant-menu{
-	background-color: #2B2A3F !important;
-  }
+.ant-menu-item-selected {
+  background-color: #6560f0 !important;
+  color: aliceblue !important;
+}
 
-  .ant-btn-primary{
-    background-color: #6560F0 !important;
-  }
+.ant-menu {
+  background-color: #2b2a3f !important;
+}
 
-  .ant-btn-primary:hover{
-    background-color: #150ef2 !important;
-    
-  }
+.ant-btn-primary {
+  background-color: #6560f0 !important;
+}
 
-  .ant-btn-icon-only:hover{
-    background-color: transparent !important;
-  }
-.ant-btn-danger{
+.ant-btn-primary:hover {
+  background-color: #150ef2 !important;
+}
+
+.ant-btn-icon-only:hover {
+  background-color: transparent !important;
+}
+
+.ant-btn-danger {
   background-color: red !important;
 }
-  
+
 .custom-select-PENDING .ant-select-selection-item {
-  color: #FA541C; /* Change color for 'PENDING' */
+  color: #fa541c;
+  /* Change color for 'PENDING' */
 }
 
 .custom-select-PROCESSING .ant-select-selection-item {
-  color: #2F54EB; /* Change color for 'PROCESSING' */
+  color: #2f54eb;
+  /* Change color for 'PROCESSING' */
 }
 
 .custom-select-IN_TRANSIT .ant-select-selection-item {
-  color: #52C41A; /* Change color for 'IN TRANSIT' */
+  color: #52c41a;
+  /* Change color for 'IN TRANSIT' */
 }
 
 .custom-select-DELIVERED .ant-select-selection-item {
-  color: #13C2C2; /* Change color for 'DELIVERED' */
+  color: #13c2c2;
+  /* Change color for 'DELIVERED' */
 }
 
 .custom-select-CANCELLED .ant-select-selection-item {
-  color: #FF4D4F; /* Change color for 'CANCELLED' */
+  color: #ff4d4f;
+  /* Change color for 'CANCELLED' */
 }
 
-.red-background{
+.red-background {
   color: white;
-  background-color: #E73939;
+  background-color: #e73939;
 }
 
-.ant-table-cell-row-hover{
+.ant-table-cell-row-hover {
   color: black !important;
 }

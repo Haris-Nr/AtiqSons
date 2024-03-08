@@ -116,7 +116,7 @@ const Flex = () => {
                 bordered
                 dataSource={flexes}
                 columns={columns}
-                rowKey={(record) => record._id}
+                rowKey={(record) => {return record._id}}
                 loading={isLoading}
                 scroll={{ x: true }}
                 pagination={{

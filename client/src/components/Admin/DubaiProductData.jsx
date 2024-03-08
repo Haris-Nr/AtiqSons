@@ -2,7 +2,8 @@ import { Image, Table } from "antd";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
-import { AllProduct } from "../../redux/Features/Dubai/dubaiSlice";
+import { AllProduct, deleteDubaiProduct } from "../../redux/Features/Dubai/dubaiSlice";
+import DeleteButton from "../common/DeleteButton";
 
 const baseURL = import.meta.env.VITE_API_BASE_URL;
 
@@ -16,6 +17,11 @@ const DubaiProductData = ({ id }) => {
     useEffect(() => {
         dispatch(AllProduct(id));
     }, [dispatch, id]);
+
+    const handleDelete = (record) => {
+        dispatch(deleteDubaiProduct(record));
+        dispatch(AllProduct(id))
+    }; 
 
     const columns = [
         {
@@ -52,6 +58,15 @@ const DubaiProductData = ({ id }) => {
             dataIndex: "createdAt",
             key: "createdAt",
             render:(record) => moment(record?.createdAt).format("DD/MM/YYYY")
+        },
+        {
+            title:"Delete",
+            key: "delete",
+            render:(record) =>(
+
+            <DeleteButton onConfirmDelete = {() => handleDelete(record._id)} />
+
+            )
         }
     ];
 

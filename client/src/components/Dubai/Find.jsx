@@ -150,6 +150,7 @@ const Find = ({ id }) => {
 
                     <Form.Item label="Image Upload" name="image" hasFeedback rules={[{ required: true, message: "upload image" }]}>
                         <Upload
+                        listType="picture"
                             maxCount={1}
                             fileList={fileList}
                             onChange={({ fileList: newFileList }) => setFileList(newFileList)}

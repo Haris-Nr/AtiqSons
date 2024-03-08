@@ -14,6 +14,8 @@ import stockReducer from "./Features/stock/stockSlice";
 import screenShotReducer from "./Features/ScreenShot/screenShotSlice";
 import flexReducer from "./Features/flex/flexSlice";
 import fianceReducer from "./Features/fiance/fianceSlice";
+import fullfilmentsReducer from './Features/fulfilment/fullfilmentSlice';
+import activityLogReducer from './Features/ActivityLog/activityLogSlice'
 
 export const store = configureStore({
   reducer: {
@@ -32,5 +34,7 @@ export const store = configureStore({
     stock: stockReducer,
     flex: flexReducer,
     fiance:fianceReducer,
+    fullfilments: fullfilmentsReducer,
+    activityLog: activityLogReducer
   },
 });

@@ -17,9 +17,6 @@ function EmpolyeeTable() {
   const { getEmployeedata, isLoading } =
     useSelector((state) => state.employee);
 
-    console.log(getEmployeedata)
-
-
     const [pagination, setPagination] = useState({
       current: 1,
       pageSize: 10,

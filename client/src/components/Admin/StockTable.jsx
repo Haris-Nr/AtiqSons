@@ -324,6 +324,7 @@ const StockTable = () => {
             rules={[{ required: true, message: "upload file" }]}
           >
             <Upload
+            listType="text"
               maxCount={1}
               fileList={fileList}
               onChange={({ fileList: newFileList }) => setFileList(newFileList)}

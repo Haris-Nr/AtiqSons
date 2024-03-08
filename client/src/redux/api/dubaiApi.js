@@ -18,9 +18,19 @@ const allProduct = async (id) => {
     }
 };
 
+const deleteDubaiProduct = async (id) => {
+    try {
+        const response = await axiosInstance.delete(`/api/dubai/deleteproduct/${id}`);
+        return response.data;
+    } catch (error) {
+        throw error.response.data;
+    }
+};
+
 const dubaiApi = {
     addDubaiProduct,
-    allProduct
+    allProduct,
+    deleteDubaiProduct
 };
 
 export default dubaiApi;

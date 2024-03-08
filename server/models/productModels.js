@@ -3,11 +3,10 @@ const { Schema } = mongoose;
 
 const productSchema = new Schema(
     {
-        sku:{
-            type:String,
-            required:true,
-            unique: true
-        
+        sku: {
+            type: String,
+            required: true,
+            unique: true,
         },
         productName: {
             type: String,
@@ -22,7 +21,7 @@ const productSchema = new Schema(
         },
         image: {
             type: String,
-            },
+        },
         asin: {
             type: Schema.Types.Mixed,
             required: true,
@@ -35,7 +34,7 @@ const productSchema = new Schema(
         currency: {
             type: String,
             required: true,
-            enum: ["$","AED","SAU"],
+            enum: ["$", "AED", "SAU"],
         },
         pastmonth: {
             type: String,
@@ -64,31 +63,40 @@ const productSchema = new Schema(
             type: String,
             required: true,
         },
-        employeeName:{
-            type:String,
-            required:true,
+        employeeName: {
+            type: String,
+            required: true,
         },
         tracking: {
             type: String,
             enum: ["tracking", "tracked", "pending"],
             default: "pending",
         },
-        selectItem:{
-            type:String,
-            enum:["priority","seasonal","holding","tracking"],
-            required:true
+        selectItem: {
+            type: String,
+            enum: ["priority", "seasonal", "holding", "tracking"],
+            required: true,
         },
-        company:{
-            type:String,
-            enum:["amazon","noon"],
-            required:true,
+        company: {
+            type: String,
+            enum: ["amazon", "noon"],
+            required: true,
         },
-        seasonalCategory:{
-            type:String,
-            enum:["winter","summer","ramzan","halloween","christmas","diwali","holi"]
-            
-        }
-
+        seasonalCategory: {
+            type: String,
+            enum: [
+                "winter",
+                "summer",
+                "ramzan",
+                "halloween",
+                "christmas",
+                "diwali",
+                "holi",
+            ],
+        },
+        reminder: {
+            type: Date,
+        },
     },
     {
         timestamps: true,

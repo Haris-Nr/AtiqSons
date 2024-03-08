@@ -48,7 +48,7 @@ export const updateOrder = createAsyncThunk(
     async ({ id, orderData, onSuccess, onFail }, thunkAPI) => {
         try {
             const response = await orderApi.updateOrder(id, orderData, onSuccess, onFail);
-            return response;
+            return response.data;
         } catch (error) {
             return thunkAPI.rejectWithValue(error);
         }
@@ -82,6 +82,17 @@ export const deleteOrder = createAsyncThunk(
 );
 
 
+export const copyToInventory = createAsyncThunk(
+    "order/copyToInventory",
+    async ({id, onSuccess, onFail}, thunkAPI) => {
+        try {
+            const response = await orderApi.copyToInventory(id, onSuccess, onFail);
+            return response;
+        } catch (error) {
+            return thunkAPI.rejectWithValue(error);
+        }
+    }
+);
 
 
 
@@ -158,6 +169,17 @@ export const orderSlice = createSlice({
                 state.isLoading = false;
             })
             .addCase(deleteOrder.rejected, (state) => {
+                state.isLoading = false;
+            })
+
+            // copy to inventory
+            .addCase(copyToInventory.pending, (state) => {
+                state.isLoading = true;
+            })
+            .addCase(copyToInventory.fulfilled, (state) => {
+                state.isLoading = false;
+            })
+            .addCase(copyToInventory.rejected, (state) => {
                 state.isLoading = false;
             })
     },

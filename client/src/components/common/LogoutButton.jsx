@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useContext, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   logoutUser,
@@ -9,17 +9,19 @@ import { TbLogout } from "react-icons/tb";
 import { message } from "antd";
 import { resetFetchState } from "../../redux/Features/auth/fetchSlice";
 import socket from "../../redux/api/socket";
+import { TimerContext } from "../../contexts/TimerContext";
 
 const LogoutButton = () => {
   
   const dispatch = useDispatch();
-  const Navigate = useNavigate();
+  const navigate = useNavigate();
+  const { handleClockOut } = useContext(TimerContext);
   const { user } = useSelector((state) => state.fetch);
   const { logoutData } = useSelector((state) => state.auth);
 
   useEffect(() => {
     if (logoutData.success && logoutData.message) {
-      Navigate("/");
+      navigate("/");
       message.success(logoutData.message);
       dispatch(resetLogoutState());
       dispatch(resetFetchState());
@@ -27,10 +29,11 @@ const LogoutButton = () => {
       message.error(logoutData.message);
       dispatch(resetLogoutState());
     }
-  }, [logoutData, Navigate, dispatch]);
+  }, [logoutData, navigate, dispatch]);
 
   const handleLogout = useCallback(() => {
     try {
+      handleClockOut();
       dispatch(logoutUser(user.employee._id)).then(() => {
         localStorage.removeItem("token");
         socket.disconnect();

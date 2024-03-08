@@ -80,6 +80,34 @@ const TaskButton = () => {
     label: emp.fullname,
   }));
 
+  const priority = [
+    {
+      value:"low",
+      label: "Low"
+    },
+    {
+      value:"medium",
+      label:"Medium"
+    },
+    {
+      value:"high",
+      label:"High"
+    }
+  ]
+
+  const tasktypes = [
+    {
+      value:"daily",
+      label: "Daily"
+    },
+    {
+      value:"onetime",
+      label:"One Time"
+    }
+  ]
+
+
+
   return (
     <>
       <Button
@@ -104,6 +132,7 @@ const TaskButton = () => {
           size="large"
           layout="vertical"
           ref={formRef}
+          
         >
           <Form.Item
             label="Task "
@@ -142,6 +171,23 @@ const TaskButton = () => {
               options={employee}
             />
           </Form.Item>
+
+          <Form.Item
+          label="Priority"
+          name="priority"
+          rules={[{ required: true, message: "Please select a priorty!" }]}
+          >
+            <Select options={priority}/>
+          </Form.Item>
+
+          <Form.Item
+          label="Task Type"
+          name="tasktype"
+          rules={[{ required: true, message: "Please select a type!" }]}
+          >
+            <Select options={tasktypes}/>
+          </Form.Item>
+
         </Form>
       </Modal>
     </>

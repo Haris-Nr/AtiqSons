@@ -82,7 +82,7 @@ const DubaiProductTable = () => {
     };
   };
 
-  const dataSourceWithKeys = dubaiProductData.data
+  const dataSourceWithKeys = dubaiProductData?.data
     ? dubaiProductData.data
         .filter((item) =>
           Object.values(item)

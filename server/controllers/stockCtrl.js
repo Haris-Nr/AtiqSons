@@ -1,6 +1,6 @@
 const Stock = require("../models/stockModel");
 const csvtojson = require("csvtojson");
-const fs = require("fs");
+const fs = require("fs").promises;
 const xlsx = require('xlsx');
 const path = require("path");
 
@@ -129,6 +129,19 @@ const uploadFile = async (req, res) => {
 const deleteStock = async (req, res) => {
   try {
     const { id } = req.params;
+    const product = await Stock.findById(id);
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found!",
+      });
+    }  
+
+    if(product.image){
+      const imagePath = path.join(__dirname, '../public', product.image);
+      await fs.unlink(imagePath);
+    }
+
     const deletedItem = await Stock.findByIdAndDelete(id);
 
     if (!deletedItem) {
@@ -143,6 +156,7 @@ const deleteStock = async (req, res) => {
       message: "Stock item deleted successfully.",
     });
   } catch (error) {
+    console.log(error.message)
     res.status(500).json({
       success: false,
       message: error.message,

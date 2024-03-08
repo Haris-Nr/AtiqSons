@@ -19,6 +19,7 @@ import ChangeStatusButton from "./ChangeStatusButton";
 import ChangeTrackStatusButton from "./ChangeTrackStatusButton";
 import Find from "../Dubai/Find";
 import ProductButton from "../Lahore/ProductButton";
+import DubaiProductData from "../Admin/DubaiProductData";
 
 const baseURL = import.meta.env.VITE_API_BASE_URL;
 
@@ -119,7 +120,7 @@ const SingleProductPage = () => {
       label: "Product Image",
       children: (
         <>
-          <Image width={100} src={imageUrl} alt={product?.productName} />
+          <Image width={30} src={imageUrl} alt={product?.productName} />
         </>
       ),
     },
@@ -202,8 +203,14 @@ const SingleProductPage = () => {
       label: "selectItem",
       children: product?.selectItem,
     },
-    {
+    ...(product?.selectItem === "seasonal" ? [{
       key: "13",
+      label: "Seasonal Category",
+      children: product?.seasonalCategory,
+      span:2
+    }] : []),
+    {
+      key: "14",
       label: "Amazon",
       children: (
         <Link
@@ -216,21 +223,23 @@ const SingleProductPage = () => {
       ),
     },
     {
-      key: "14",
+      key: "15",
       label: "Company",
       children: product?.company,
     },
     {
-      key: "15",
+      key: "16",
       label: "Seller",
       children:product?.seller,
     },
     {
-      key: "16",
+      key: "17",
       label: "About This Item",
       children: product?.description,
+      span: 2
     },
   ];
+
 
   return (
     <div className="space-y-5">
@@ -279,6 +288,13 @@ const SingleProductPage = () => {
           </div>
         }
       />
+    {
+      (user?.employee?.dashboard === "dubai" || user?.employee?.dashboard === "admin") &&
+      <div>
+        <h3 className="text-xl font-semibold">Dubai Data</h3>
+      <DubaiProductData id={id}/>
+    </div>
+    }
     </div>
   );
 };

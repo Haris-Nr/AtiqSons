@@ -55,6 +55,12 @@ const OrderForm = ({ onSubmit, order }) => {
       >
         <Input />
       </Form.Item>
+      <Form.Item
+        label="ASIN"
+        name="asin"
+      >
+        <Input />
+      </Form.Item>
 
       <Form.Item
         label="Product Name"
@@ -73,6 +79,20 @@ const OrderForm = ({ onSubmit, order }) => {
       </Form.Item>
 
       <Form.Item
+        label="Price"
+        name="price"
+      >
+        <InputNumber min={1} />
+      </Form.Item>
+
+      <Form.Item
+        label="EXW Price"
+        name="exwPrice"
+      >
+        <InputNumber min={1}/>
+      </Form.Item>
+
+      <Form.Item
         label="Picture"
         name="picture"
         valuePropName="fileList"
@@ -80,7 +100,7 @@ const OrderForm = ({ onSubmit, order }) => {
         extra={!order?  "Upload an image for the product": "Upload a new image to replace the old one"}
         rules={[{ required: !order, message: 'Please upload a picture!' }]}
       >
-        <Upload beforeUpload={beforeUpload} maxCount={1}>
+        <Upload beforeUpload={beforeUpload} listType="picture" maxCount={1}>
           <Button icon={<AiOutlineUpload />}>Click to Upload</Button>
         </Upload>
       </Form.Item>

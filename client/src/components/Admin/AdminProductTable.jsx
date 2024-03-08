@@ -1,4 +1,4 @@
-import { Table, Tag, message,InputNumber,Button } from "antd";
+import { Table, Tag,InputNumber,Button } from "antd";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Highlighter from "react-highlight-words";
@@ -32,7 +32,6 @@ const AdminProductTable = () => {
     pageSize,
     totalProduct,
     search,
-    error,
     priceLow,
     priceHigh,
   } = useSelector((state) => state.product);
@@ -82,10 +81,7 @@ const AdminProductTable = () => {
       dispatch(fetchProductsBySelectItem(selectItemValue));
     }
     socket.connect();
-    if (error.success === false) {
-      message.error(error.message);
-    }
-  }, [dispatch, currentPage, pageSize, search, error.success, error.message,selectItemValue,company, priceLow,
+  }, [dispatch, currentPage, pageSize, search,selectItemValue,company, priceLow,
     priceHigh,]);
 
 

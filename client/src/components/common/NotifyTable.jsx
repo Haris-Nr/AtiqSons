@@ -65,6 +65,7 @@ const NotifyTable = () => {
       title: "Title",
       dataIndex: "title",
       render: (text, record) => {
+        console.log(record)
         return (
           <Link
             to={`../${record.onClick}`} relative="path"

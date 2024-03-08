@@ -10,6 +10,7 @@ const initialState = {
   gettrackproduct: [],
   dubaiProductData: [],
   alltrackingProduct:{},
+  data: [],
 
   productdata: {},
   SingleProductData: {},
@@ -240,6 +241,19 @@ export const deleteTrack = createAsyncThunk(
     }
   }
 )
+
+export const searchProducts = createAsyncThunk(
+  'products/search',
+  async (query, { rejectWithValue }) => {
+    try {
+      const response = await productApi.searchProducts(query);
+      return response;
+    } catch (error) {
+      // Use `rejectWithValue` to return a custom error payload
+      return rejectWithValue(error.response?.data || { message: "Could not complete the search." });
+    }
+  }
+);
 
 export const productSlice = createSlice({
   name: "product",
@@ -478,6 +492,18 @@ export const productSlice = createSlice({
         state.isLoading=false;
         state.error = action.payload;
       })
+      .addCase(searchProducts.pending, (state) => {
+        state.isLoading = true;
+            
+      })
+      .addCase(searchProducts.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.data = action.payload;
+      })
+      .addCase(searchProducts.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload.message;
+      });
   },
 });
 

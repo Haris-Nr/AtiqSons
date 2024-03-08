@@ -83,6 +83,7 @@ const StockForm = ({ onSubmit, order }) => {
 
         <Form.Item label="Image Upload" name="image" hasFeedback>
           <Upload
+          listType="picture"
             maxCount={1}
             fileList={fileList}
             onChange={({ fileList: newFileList }) => setFileList(newFileList)}

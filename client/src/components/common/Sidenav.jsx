@@ -11,6 +11,7 @@ import {
   FaLeaf,
   FaBoxOpen,
 } from "react-icons/fa";
+import { AiFillFileText } from "react-icons/ai";
 import { FaTasks, FaCog } from "react-icons/fa";
 import { FaPersonShelter } from "react-icons/fa6";
 import { BsCameraFill, BsPersonFill } from "react-icons/bs";
@@ -83,6 +84,11 @@ const Sidenav = ({
       key: "lahoreproducttable/selectItem/holding",
       icon: <FaBoxOpen />,
     },
+    employeeDashboard === "lahore" && {
+      label: "Fullfilment",
+      key: "fullfilment",
+      // icon: <FaTasks />,
+    },
 
     // dubai
     employeeDashboard === "dubai" && {
@@ -94,6 +100,11 @@ const Sidenav = ({
       label: "Task",
       key: "task",
       icon: <FaTasks />,
+    },
+    employeeDashboard === "dubai" && {
+      label: "Fullfilment",
+      key: "fullfilment",
+      // icon: <FaTasks />,
     },
 
     // china
@@ -164,9 +175,19 @@ const Sidenav = ({
       // icon: <FaTasks />,
     },
     employeeDashboard === "admin" && {
+      label: "Fullfilment",
+      key: "fullfilment",
+      // icon: <FaTasks />,
+    },
+    employeeDashboard === "admin" && {
       label: "Orders",
       key: "orders",
       icon: <FaShoppingCart />,
+    },
+    employeeDashboard === "admin" && {
+      label: "Exchange Rates",
+      key: "exchange-rates",
+      icon: <FaMoneyBillAlt />,
     },
     employeeDashboard === "admin" && {
       label: "Fiance",
@@ -188,6 +209,11 @@ const Sidenav = ({
       label: "Screen Shots",
       key: "screenshots",
       icon: <BsCameraFill />,
+    },
+    employeeDashboard === "admin" && {
+      label: "Activity Logs",
+      key: "activity-logs",
+      icon: <AiFillFileText />,
     },
     employeeDashboard === "admin" && {
       label: "Warehouse Stock",

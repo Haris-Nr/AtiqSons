@@ -8,6 +8,7 @@ import {
   message,
   Modal,
   Select,
+  DatePicker,
 } from "antd";
 import {
   UploadOutlined,
@@ -57,6 +58,7 @@ const ProductButton = ({ productId, productData: initialProductData }) => {
         asin: initialProductData.asin,
         bestseller: initialProductData.bestseller,
         selectItem: initialProductData.selectItem,
+        seasonalCategory: initialProductData.seasonalCategory,
         company: initialProductData.company,
         url: initialProductData.url,
         seller: initialProductData.seller,
@@ -228,6 +230,10 @@ const ProductButton = ({ productId, productData: initialProductData }) => {
     setChangeSelectItem(value);
   };
 
+  const onChange = (date, dateString) => {
+    console.log(date, dateString);
+  };
+
   return (
     <>
       <Button
@@ -373,18 +379,31 @@ const ProductButton = ({ productId, productData: initialProductData }) => {
               onChange={(value) => changeHandle(value)}
             />
           </Form.Item>
-          {changeSelectItem === "seasonal" && (
-            <Form.Item
-              label="Seasonal Category"
-              name="seasonalCategory"
-              required="true"
-              message="Please select which Category"
-              hasFeedback
-              labelCol={{ span: 8 }}
-              wrapperCol={{ span: 12 }}
-            >
-              <Select size="middle" options={seasonalCategory} />
-            </Form.Item>
+          {(changeSelectItem === "seasonal" ||
+            initialProductData?.selectItem === "seasonal") && (
+            <>
+              {" "}
+              <Form.Item
+                label="Seasonal Category"
+                name="seasonalCategory"
+                required="true"
+                message="Please select which Category"
+                hasFeedback
+                labelCol={{ span: 8 }}
+                wrapperCol={{ span: 12 }}
+              >
+                <Select size="middle" options={seasonalCategory} />
+              </Form.Item>
+              <Form.Item
+                label="Reminder"
+                name="reminder"
+                required="true"
+                message="Please enter reminder"
+                hasFeedback
+              >
+                <DatePicker className="w-full" onChange={onChange} />
+              </Form.Item>
+            </>
           )}
           <Form.Item
             label="Company"
@@ -418,7 +437,7 @@ const ProductButton = ({ productId, productData: initialProductData }) => {
 
           <Form.Item label="Image Upload" name="image" hasFeedback>
             <Upload
-            listType="picture"
+              listType="picture"
               maxCount={1}
               fileList={fileList}
               onChange={({ fileList: newFileList }) => setFileList(newFileList)}

@@ -6,8 +6,19 @@ const createOrder = async (values, onSuccess, onFail) => {
 
         const formData = new FormData();
         formData.append('sku', values.sku);
+        if (values.asin) {
+            formData.append('asin', values.asin);
+        }
         formData.append('productName', values.productName);
         formData.append('quantity', values.quantity);
+        if (values.price) {
+
+
+            formData.append('price', values.price);
+        }
+        if (values.exwPrice) {
+            formData.append('exwPrice', values.exwPrice);
+        }
         formData.append('status', values.status);
 
 
@@ -18,9 +29,9 @@ const createOrder = async (values, onSuccess, onFail) => {
             }
         });
 
-        if(response.status === 201 || response.status === 200){
+        if (response.status === 201 || response.status === 200) {
             onSuccess();
-        }else{
+        } else {
             onFail();
         }
 
@@ -52,28 +63,37 @@ const getOrder = async (id) => {
 const updateOrder = async (id, orderData, onSuccess, onFail) => {
     try {
         const formData = new FormData();
-        
-        if(orderData.sku){
+
+        if (orderData.sku) {
             formData.append('sku', orderData.sku);
         }
 
-        if(orderData.productName){
+
+        if (orderData.asin) {
+            formData.append('asin', orderData.asin);
+        }
+
+        if (orderData.productName) {
             formData.append('productName', orderData.productName);
         }
 
-        if(orderData.quantity){
+        if (orderData.quantity) {
             formData.append('quantity', orderData.quantity);
         }
 
-        if(orderData.price){
+        if (orderData.price) {
             formData.append('price', orderData.price);
         }
 
-        if(orderData.status){
+        if (orderData.exwPrice) {
+            formData.append('exwPrice', orderData.exwPrice);
+        }
+
+        if (orderData.status) {
             formData.append('status', orderData.status);
         }
 
-        if(orderData.picture){
+        if (orderData.picture) {
             formData.append('picture', orderData.picture[0].originFileObj);
         }
 
@@ -85,7 +105,7 @@ const updateOrder = async (id, orderData, onSuccess, onFail) => {
             }
         });
 
-        if(response.status === 200){
+        if (response.status === 200) {
             onSuccess();
         } else {
             onFail();
@@ -102,9 +122,9 @@ const updateOrder = async (id, orderData, onSuccess, onFail) => {
 const deleteOrder = async (id, onSuccess, onFail) => {
     try {
         const response = await axiosInstance.delete(`/api/order/${id}`);
-        if(response.status === 200){
+        if (response.status === 200) {
             onSuccess();
-        }else{
+        } else {
             onFail();
         }
         return response.data;
@@ -118,9 +138,9 @@ const deleteOrder = async (id, onSuccess, onFail) => {
 const reOrder = async (id, onSuccess, onFail) => {
     try {
         const response = await axiosInstance.put(`/api/order/${id}/re-order`);
-        if(response.status === 200){
+        if (response.status === 200) {
             onSuccess();
-        }else{
+        } else {
             onFail();
         }
         return response.data;
@@ -131,6 +151,21 @@ const reOrder = async (id, onSuccess, onFail) => {
 }
 
 
+const copyToInventory = async (id, onSuccess, onFail) => {
+    try {
+        const response = await axiosInstance.put(`/api/order/${id}/copy-to-inventory`);
+        if (response.status === 200) {
+            onSuccess();
+        } else {
+            onFail();
+        }
+        return response.data;
+    } catch (error) {
+        onFail();
+        throw error.response.data
+    }
+}
+
 
 const orderApi = {
     createOrder,
@@ -139,6 +174,7 @@ const orderApi = {
     updateOrder,
     deleteOrder,
     reOrder,
+    copyToInventory
 };
 
 export default orderApi;

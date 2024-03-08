@@ -8,6 +8,9 @@ const orderSchema = new Schema({
         type: String,
         required: true,
     },
+    asin: {
+        type: String,
+    },
     productName: {
         type: String,
         required: true,
@@ -17,6 +20,10 @@ const orderSchema = new Schema({
         required: true,
     },
     price: {
+        type: Number,
+        default: -1,
+    },
+    exwPrice: {
         type: Number,
         default: -1,
     },

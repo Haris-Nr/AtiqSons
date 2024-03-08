@@ -144,6 +144,22 @@ const deleteTrack = async (id) => {
     }
 }
 
+const searchProducts = async (query) => {
+    try {
+        const encodedQuery = encodeURIComponent(query);
+
+        console.log(encodedQuery)
+        const response = await axiosInstance.get(`/api/product/search?query=${encodedQuery}`);
+        console.log(response)
+
+        // Return the response data
+        return response.data;
+    } catch (error) {
+        console.error("Error searching products:", error.response?.data?.message || error.message);
+        throw error;
+    }
+};
+
 
 
 
@@ -161,7 +177,8 @@ const productApi = {
     dubaiProduct,
     updateProduct,
     allTrackingProduct,
-    deleteTrack
+    deleteTrack,
+    searchProducts
 };
 
 export default productApi;

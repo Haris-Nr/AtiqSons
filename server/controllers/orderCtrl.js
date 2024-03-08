@@ -1,7 +1,13 @@
 const Order = require("../models/orderModel");
 const Notification = require("../models/notificationModel");
+const Inventory = require("../models/stockModel");
 const { createRoomNotification } = require("../util/notification");
 const fs = require("fs");
+
+
+function isAdmin(user){
+    return user.role === "admin" || user.role === "superadmin";
+}
 
 const getOrders = async (req, res) => {
     try {
@@ -137,7 +143,7 @@ const updateOrder = async (req, res) => {
         }
 
         if (order) {
-            if (req.body.status !== order.status) {
+            if (!isAdmin(req.user) && req.body.status && req.body.status !== order.status) {
                 createRoomNotification({
                     io: req.app.get("io"),
                     room: "all-admins",
@@ -149,7 +155,7 @@ const updateOrder = async (req, res) => {
                 });
             }
 
-            if (req.body.price !== order.price) {
+            if (!isAdmin(req.user) &&  req.body.price && req.body.price !== order.price) {
                 createRoomNotification({
                     io: req.app.get("io"),
                     room: "all-admins",
@@ -161,11 +167,26 @@ const updateOrder = async (req, res) => {
                 });
             }
 
+            if(!isAdmin(req.user) &&  req.body.exwPrice && req.body.exwPrice !== order.exwPrice){
+                createRoomNotification({
+                    io: req.app.get("io"),
+                    room: "all-admins",
+                    actionUser: req.user._id,
+                    title: "Order EXW Price Update",
+                    message: `Order EXW price for product "${order.productName}" has been updated to "${req.body.exwPrice}"`,
+                    image: order.picture,
+                    onClick: "/admin/orders",
+                });
+            }
+
+
             order.status = req.body.status || order.status;
             order.sku = req.body.sku || order.sku;
+            order.asin = req.body.asin || order.asin;
             order.productName = req.body.productName || order.productName;
             order.quantity = req.body.quantity || order.quantity;
             order.price = req.body.price || order.price;
+            order.exwPrice = req.body.exwPrice || order.exwPrice;
 
             const updatedOrder = await order.save();
             res.json(updatedOrder);
@@ -238,6 +259,32 @@ const reOrder = async (req, res) => {
     }
 };
 
+
+const copyToInventory = async (req, res) => {
+    try {
+        const order = await Order.findById(req.params.id);
+        if (order) {
+            const  newFileName = Date.now() + "." + order.picture.split(".").pop();
+
+            fs.copyFileSync(`./public${order.picture}`, `./public/uploads/${newFileName}`);
+
+            const inventory = new Inventory({
+                asin: order.asin,
+                productName: order.productName,
+                quantity: order.quantity,
+                price: order.price,
+                image: `/uploads/${newFileName}`,
+            });
+            const savedInventory = await inventory.save();
+            res.status(200).json(savedInventory);
+        } else {
+            res.status(404).json({ message: "Order not found" });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 module.exports = {
     getOrders,
     createOrder,
@@ -245,4 +292,5 @@ module.exports = {
     deleteOrder,
     getOrder,
     reOrder,
+    copyToInventory
 };

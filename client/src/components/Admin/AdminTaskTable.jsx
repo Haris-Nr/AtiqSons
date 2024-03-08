@@ -57,6 +57,11 @@ useEffect(() => {
       render: (dueDate) => moment(dueDate).format('DD/MM/YYYY'),
     },
     {
+      title: "Priority",
+      dataIndex: "priority",
+      key:"priority",
+    },
+    {
       title: "Status",
       dataIndex: "status",
       render: (_, { status }) => (

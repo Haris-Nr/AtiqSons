@@ -35,16 +35,6 @@ const CrumBread = () => {
     return <span>{route.title}</span>;
   };
   
-  // const itemRender = (route, params, items) => {
-  //   const last = items.indexOf(route) === items.length - 1;
-  //   return last ? (
-  //     <span>{route.title}</span>
-  //   ) : (
-  //     <Link to=".." relative="path">
-  //       route.title
-  //     </Link>
-  //   );
-  // };
   return (
     <>
       <Breadcrumb

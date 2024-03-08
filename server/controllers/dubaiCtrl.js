@@ -1,6 +1,8 @@
 const Dubai = require("../models/dubaiModels");
 const User = require("../models/userModel");
 const { createNotification } = require("../util/notification");
+const path = require("path");
+const fs = require("fs").promises;
 
 // create dubai product
 const createProduct = async (req, res) => {
@@ -76,7 +78,38 @@ const allProduct = async (req, res) => {
   }
 };
 
+const deleteDubaiProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const product = await Dubai.findById(id);
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found!",
+      });
+    }
+
+    const imagePath = path.join(__dirname, '../public', product.image);
+
+    await fs.unlink(imagePath);
+    await Dubai.findByIdAndDelete(id);
+
+    res.status(200).json({
+      success: true,
+      message: "Product has been deleted!",
+    });
+  } catch (error) {
+    console.log(error.message)
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   createProduct,
   allProduct,
+  deleteDubaiProduct
 };

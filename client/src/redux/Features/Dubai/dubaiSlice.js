@@ -4,8 +4,9 @@ import dubaiApi from "../../api/dubaiApi";
 const initialState = {
     addDubaiProductData: {},
     AllProductData: [],
+    deleteProductData: {},
     isLoading: false,
-    error:{}
+    error: {},
 };
 
 export const createDubaiProduct = createAsyncThunk(
@@ -32,6 +33,17 @@ export const AllProduct = createAsyncThunk(
     }
 );
 
+export const deleteDubaiProduct = createAsyncThunk(
+    "dubai/deleteProduct",
+    async (productId, thunkAPI) => {
+        try {
+            const response = await dubaiApi.deleteDubaiProduct(productId);
+            return response;
+        } catch (error) {
+            return thunkAPI.rejectWithValue(error);
+        }
+    }
+);
 
 export const dubaiSlice = createSlice({
     name: "dubai",
@@ -39,6 +51,7 @@ export const dubaiSlice = createSlice({
     reducers: {
         resetDubaiProductState: (state) => {
             state.addDubaiProductData = {};
+            state.deleteProductData = {};
         },
     },
     extraReducers: (builder) => {
@@ -67,10 +80,20 @@ export const dubaiSlice = createSlice({
                 state.isLoading = false;
                 state.error = action.payload;
             })
+            // delete product
+            .addCase(deleteDubaiProduct.pending, (state) => {
+                state.isLoading = true;
+            })
+            .addCase(deleteDubaiProduct.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.deleteProductData = action.payload;
+            })
+            .addCase(deleteDubaiProduct.rejected, (state, action) => {
+                state.isLoading = false;
+                state.deleteProductData = action.payload;
+            });
     },
 });
 
-export const {
-    resetDubaiProductState,
-} = dubaiSlice.actions;
+export const { resetDubaiProductState } = dubaiSlice.actions;
 export default dubaiSlice.reducer;

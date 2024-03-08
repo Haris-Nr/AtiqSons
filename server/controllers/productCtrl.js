@@ -187,7 +187,7 @@ const allProduct = async (req, res) => {
           { employeeName: { $regex: search, $options: "i" } },
           { asin: { $regex: search, $options: "i" } },
         ],
-      };y
+      };
     }
 
     if (company) {
@@ -220,6 +220,7 @@ const allProduct = async (req, res) => {
       priceHigh:priceHigh,
     });
   } catch (error) {
+    console.log(error.message)
     res.status(400).json({
       success: false,
       message: error.message,
@@ -677,6 +678,39 @@ const deleteTrack = async (req, res) => {
   }
 };
 
+const searchProducts = async (req, res) => {
+  try {
+      const { query } = req.query;
+
+      console.log(req.query)
+
+      if (query) {
+          const regex = new RegExp(query, 'i');
+          const searchCriteria = [
+              { sku: regex },
+              { productName: regex },
+              { description: regex },
+              { asin: regex },
+              { seller: regex },
+              { company: regex },
+              { seasonalCategory: regex }
+          ];
+
+          const products = await Product.find({ $or: searchCriteria });
+          console.log(products)
+
+          // Send the found products as a response
+          res.status(200).json(products);
+      } else {
+          // If no query is provided, don't perform a search. Return an empty array or a specific message.
+          res.status(200).json({ message: "Please provide a search term." });
+      }
+  } catch (error) {
+    console.log(error.message)
+      res.status(500).json({ message: "Error searching for products", error: error.message });
+  }
+};
+
 module.exports = {
   createProduct,
   fetchProducts,
@@ -693,4 +727,5 @@ module.exports = {
   updateProduct,
   allTrackingProduct,
   deleteTrack,
+  searchProducts
 };
