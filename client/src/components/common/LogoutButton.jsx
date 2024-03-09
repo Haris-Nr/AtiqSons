@@ -21,6 +21,8 @@ const LogoutButton = () => {
 
   useEffect(() => {
     if (logoutData.success && logoutData.message) {
+      localStorage.removeItem("token");
+      handleClockOut();
       navigate("/");
       message.success(logoutData.message);
       dispatch(resetLogoutState());
@@ -29,19 +31,21 @@ const LogoutButton = () => {
       message.error(logoutData.message);
       dispatch(resetLogoutState());
     }
-  }, [logoutData, navigate, dispatch]);
+  }, [logoutData, navigate, dispatch,handleClockOut]);
 
   const handleLogout = useCallback(() => {
     try {
-      handleClockOut();
       dispatch(logoutUser(user.employee._id)).then(() => {
-        localStorage.removeItem("token");
-        socket.disconnect();
+        if(logoutData.success === true){
+          localStorage.removeItem("token");
+          handleClockOut();
+          socket.disconnect();
+        }
       });
     } catch (error) {
       message.error("Logout failed", error);
     }
-  }, [dispatch, user]);
+  }, [dispatch, user,handleClockOut,logoutData.success]);
 
   return (
     <>

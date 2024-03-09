@@ -382,7 +382,6 @@ const ProductButton = ({ productId, productData: initialProductData }) => {
           {(changeSelectItem === "seasonal" ||
             initialProductData?.selectItem === "seasonal") && (
             <>
-              {" "}
               <Form.Item
                 label="Seasonal Category"
                 name="seasonalCategory"

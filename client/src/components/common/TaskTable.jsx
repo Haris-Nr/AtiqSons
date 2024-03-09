@@ -1,6 +1,6 @@
 import { message, Table, Tag } from "antd";
 import { useDispatch, useSelector } from 'react-redux';
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { TasksForEmployee, changeTaskStatus, resetStatusState } from "../../redux/Features/Task/taskSlice";
 import ChangeTaskButton from "./ChangeTaskButton";
 import moment from "moment";
@@ -40,6 +40,16 @@ const TaskTable = () => {
       title: "Due Date",
       dataIndex: "dueDate",
       render: (dueDate) => moment(dueDate).format('DD/MM/YYYY'),
+    },
+    {
+      title:"Priority",
+      dataIndex:"priority",
+      key:"priority"
+    },
+    {
+      title:"Task Type",
+      dataIndex:"tasktype",
+      key:"tasktype"
     },
     {
       title: "Status",

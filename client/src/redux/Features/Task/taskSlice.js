@@ -5,6 +5,7 @@ const initialState = {
 
     fetchtaskData: [],
     fetchtalltaskData: [],
+    dailytask:[],
 
     Addtaskdata: {},
     deleteTaskData: {},
@@ -50,6 +51,17 @@ export const TasksAllEmployee = createAsyncThunk(
     }
 );
 
+export const DailyTasksEmployee = createAsyncThunk(
+    "task/dailytasksAllEmployee",
+    async (_, thunkAPI) => {
+        try {
+            const response = await taskApi.dailyTasksForEmployee();
+            return response;
+        } catch (error) {
+            return thunkAPI.rejectWithValue(error);
+        }
+    }
+);
 export const changeTaskStatus = createAsyncThunk(
     "task/changeStatus",
     async ({ id, newStatus }, thunkAPI) => {
@@ -111,6 +123,18 @@ export const taskSlice = createSlice({
                 state.fetchtaskData = action.payload;
             })
             .addCase(TasksForEmployee.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.payload;
+            })
+            // daily task for employee
+            .addCase(DailyTasksEmployee.pending, (state) => {
+                state.isLoading = true;
+            })
+            .addCase(DailyTasksEmployee.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.dailytask = action.payload;
+            })
+            .addCase(DailyTasksEmployee.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload;
             })

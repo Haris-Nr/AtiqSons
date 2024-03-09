@@ -1,7 +1,7 @@
 const Stock = require("../models/stockModel");
 const csvtojson = require("csvtojson");
 const fs = require("fs").promises;
-const xlsx = require('xlsx');
+const exceljs = require('exceljs');
 const path = require("path");
 
 const addStock = async (req, res) => {
@@ -89,15 +89,27 @@ const uploadFile = async (req, res) => {
       throw new Error("File not found");
     }
 
+    console.log(exceljs)
+
     let jsonArray = [];
     if (req.file.originalname.endsWith('.csv')) {
       jsonArray = await csvtojson().fromFile(req.file.path);
     } else if (req.file.originalname.endsWith('.xlsx')) {
-      const workbook = xlsx.readFile(req.file.path);
-      workbook.SheetNames.forEach((sheetName) => {
-        const sheet = workbook.Sheets[sheetName];
-        const data = xlsx.utils.sheet_to_json(sheet);
-        jsonArray.push(...data);
+      const workbook = new exceljs.Workbook();
+      await workbook.xlsx.readFile(req.file.path);
+      workbook.eachSheet((worksheet, sheetId) => {
+        worksheet.eachRow((row, rowNumber) => {
+          let rowValues = row.values;
+          // Cleaning up the row values to remove undefined entries
+          rowValues = rowValues.map(cell => cell === null ? '' : cell); // Adjust this line based on your needs
+          let rowObject = {};
+          if (rowNumber > 1) { // Assuming first row is headers
+            worksheet.getRow(1).values.forEach((column, index) => {
+              rowObject[column] = rowValues[index];
+            });
+            jsonArray.push(rowObject);
+          }
+        });
       });
     } else {
       throw new Error("Unsupported file format");

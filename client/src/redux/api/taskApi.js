@@ -19,6 +19,15 @@ const fetchTasksForEmployee = async () => {
     }
 };
 
+const dailyTasksForEmployee = async () => {
+    try {
+        const response = await axiosInstance.get(`/api/task/dailytask`);
+        return response.data;
+    } catch (error) {
+        throw error.response.data;
+    }
+};
+
 const fetchTasksAllEmployee = async () => {
     try {
         const response = await axiosInstance.get(`/api/task/fetchTaskAllEmployee`);
@@ -51,7 +60,8 @@ const taskApi = {
     fetchTasksForEmployee,
     changeStatus,
     fetchTasksAllEmployee,
-    deleteTask
+    deleteTask,
+    dailyTasksForEmployee
 };
 
 export default taskApi;

@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useRef} from 'react';
 import { Table, Tag, message } from 'antd';
 import { useDispatch , useSelector } from 'react-redux';
 import TaskButton from './TaskButton';
@@ -13,6 +13,7 @@ const AdminTaskTable = () => {
 
   const dispatch = useDispatch();
 
+  const tableRef = useRef(null);
   const { fetchtalltaskData, deleteTaskData,isLoading } = useSelector((state)=>state.task)
   
 
@@ -39,6 +40,9 @@ useEffect(() => {
   }
 }, [deleteTaskData, dispatch]);
 
+
+
+
   const columns = [
     {
       title: "Employee Name",
@@ -60,6 +64,11 @@ useEffect(() => {
       title: "Priority",
       dataIndex: "priority",
       key:"priority",
+    },
+    {
+      title:"Task Type",
+      dataIndex:"tasktype",
+      key:"tasktype",
     },
     {
       title: "Status",
@@ -111,8 +120,9 @@ const dataSourceWithKeys = fetchtalltaskData?.data
 };
 
   return (
-    <div>
+
       <Table
+      ref={tableRef}
        bordered
        size="small"
        loading={isLoading}
@@ -123,7 +133,7 @@ const dataSourceWithKeys = fetchtalltaskData?.data
         pagination={true}
         rowClassName={rowClassName}
         />
-    </div>
+
 );
 };
 

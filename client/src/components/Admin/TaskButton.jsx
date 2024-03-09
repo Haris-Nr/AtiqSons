@@ -18,6 +18,7 @@ const TaskButton = () => {
   const [open, setOpen] = useState(false);
   const [form] = Form.useForm();
   const [confirmLoading, setConfirmLoading] = useState(false);
+  const [type, setType] = useState(null);
   const dispatch = useDispatch();
   const { getEmployeedata } = useSelector((state) => state.employee);
 
@@ -106,6 +107,9 @@ const TaskButton = () => {
     }
   ]
 
+  const changeHandle = (value) => {
+    setType(value);
+  };
 
 
   return (
@@ -142,13 +146,7 @@ const TaskButton = () => {
             <TextArea />
           </Form.Item>
 
-          <Form.Item
-            label="Deadline"
-            name="dueDate"
-            rules={[{ required: true, message: "Please select a deadline!" }]}
-          >
-            <DatePicker format={dateFormat} />
-          </Form.Item>
+        
 
           <Form.Item
             label="Assign to"
@@ -185,8 +183,22 @@ const TaskButton = () => {
           name="tasktype"
           rules={[{ required: true, message: "Please select a type!" }]}
           >
-            <Select options={tasktypes}/>
+            <Select 
+            options={tasktypes}
+            onChange={(value)=>{changeHandle(value)}}
+            />
           </Form.Item>
+              {
+                type === "onetime" &&
+             
+          <Form.Item
+            label="Deadline"
+            name="dueDate"
+            rules={[{ required: true, message: "Please select a deadline!" }]}
+          >
+            <DatePicker format={dateFormat} />
+          </Form.Item>
+           }
 
         </Form>
       </Modal>

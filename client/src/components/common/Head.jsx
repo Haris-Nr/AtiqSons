@@ -9,6 +9,8 @@ import PropTypes from "prop-types";
 const Head = ({ collapsed, toggleCollapsed, isMobile, headerMobile, user }) => {
   const { employee } = user;
 
+
+
   const headerStyle = {
     position: "fixed",
     zIndex: 1,

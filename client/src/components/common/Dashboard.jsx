@@ -7,6 +7,7 @@ import { getEmployee } from "../../redux/Features/Employees/employeeSlice";
 import { Link } from "react-router-dom";
 import Timer from "./Timer";
 import Search from "./Search";
+import DailyTaskTable from "./DailyTaskTable";
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -100,6 +101,7 @@ const Dashboard = () => {
       <div className="flex justify-start mt-5">
         <Search />
       </div>
+      {!isAdmin() && <DailyTaskTable/> }
     </>
   );
 };

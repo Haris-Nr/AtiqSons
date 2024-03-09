@@ -37,7 +37,6 @@ const createTask = async (req, res) => {
   }
 };
 
-
 const deleteTask = async (req, res) => {
   try {
     const deletedTask = await Task.findByIdAndDelete(req.params.id);
@@ -58,7 +57,6 @@ const deleteTask = async (req, res) => {
   }
 };
 
-
 const fetchTasksAllemployee = async (req, res) => {
   try {
 
@@ -75,8 +73,6 @@ const fetchTasksAllemployee = async (req, res) => {
     });
   }
 };
-
-
 
 const fetchTasksForEmployee = async (req, res) => {
   try {
@@ -140,6 +136,20 @@ const changeTaskStatus = async (req, res) => {
 };
 
 
+const dailyTasksForEmployee = async (req, res) => {
+  try {
+      const userId = req.body.userId;
+      const tasks = await Task.find({ employee: userId, tasktype:"daily" }).sort({ createdAt: -1 });
+
+      res.json({
+        data: tasks,
+      });
+    } catch (error) {
+    return res.json({
+      message: error.message,
+    });
+  }
+};
 
 
 module.exports = {
@@ -147,5 +157,6 @@ module.exports = {
   deleteTask,
   fetchTasksForEmployee,
   changeTaskStatus,
-  fetchTasksAllemployee
+  fetchTasksAllemployee,
+  dailyTasksForEmployee
 };

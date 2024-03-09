@@ -3,6 +3,7 @@ const Log = require("../models/logModel");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const { createNotification } = require("../util/notification");
+const Task = require("../models/taskModels");
 const secret = process.env.JWT_SECRET;
 
 // create User
@@ -280,6 +281,19 @@ const logout = async (req, res) => {
     const { userId } = req.body;
 
     let user = await User.findById(userId);
+
+    const incompleteTasks = await Task.find({
+      employee: userId,
+      status: "incomplete",
+      tasktype: "daily",
+    });
+
+    if (incompleteTasks.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: "You have incomplete daily tasks. Please complete them before logging out.",
+      });
+    }
 
     // Find the most recent login log entry for this user
     const LoginLog = await Log.findOne({

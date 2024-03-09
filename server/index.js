@@ -10,6 +10,8 @@ require("dotenv").config();
 const dbConnect = require("./config/dbConnect");
 dbConnect();
 const scheduleProductReminders = require('./util/scheduleNotifications');
+require('./util/dailyTaskScheduler');
+
 
 
 const io = initSocket(server);

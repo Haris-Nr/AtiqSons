@@ -8,7 +8,7 @@ const createActivityLog = async (data, onSuccess, onFail) => {
         } else {
             onFail();
         }
-        return response;
+        return response.data;
     } catch (error) {
         onFail();
         throw error.response.data
