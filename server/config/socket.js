@@ -6,9 +6,10 @@ const Notifications = require("../models/notificationModel");
 
 let loggedInEmployeeCount = 0;
 let loggedInAdminCount = 0;
+let io;
 
-module.exports = (server) => {
-  const io = socketIO(server, {
+const initSocket = (server) => {
+  io = socketIO(server, {
     cors: {
       origin: process.env.CLIENT_URL,
       methods: "*",
@@ -202,3 +203,13 @@ module.exports = (server) => {
 
   return io;
 };
+
+
+const getIO = () => {
+  if (!io) {
+    throw new Error("Socket.io not initialized!");
+  }
+  return io;
+};
+
+module.exports = { initSocket, getIO };

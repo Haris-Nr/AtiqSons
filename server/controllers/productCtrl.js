@@ -682,8 +682,6 @@ const searchProducts = async (req, res) => {
   try {
       const { query } = req.query;
 
-      console.log(req.query)
-
       if (query) {
           const regex = new RegExp(query, 'i');
           const searchCriteria = [
@@ -697,7 +695,6 @@ const searchProducts = async (req, res) => {
           ];
 
           const products = await Product.find({ $or: searchCriteria });
-          console.log(products)
 
           // Send the found products as a response
           res.status(200).json(products);

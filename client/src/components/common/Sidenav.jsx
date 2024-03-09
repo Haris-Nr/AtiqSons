@@ -237,7 +237,7 @@ const Sidenav = ({
 
   const siderStyle = {
     overflow: "auto",
-    height: "105vh",
+    height: "100vh",
     position: "fixed",
     left: 0,
     zIndex: 3,

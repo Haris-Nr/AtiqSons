@@ -2,15 +2,17 @@ const http = require("http");
 const express = require("express");
 const app = express();
 const server = http.createServer(app);
-const socketIO = require("./config/socket");
+const {initSocket} = require("./config/socket");
 const cors = require("cors");
 const path = require("path");
 const morgan = require("morgan");
 require("dotenv").config();
 const dbConnect = require("./config/dbConnect");
 dbConnect();
+const scheduleProductReminders = require('./util/scheduleNotifications');
 
-const io = socketIO(server);
+
+const io = initSocket(server);
 app.set("io", io);
 
 app.use(morgan("tiny"));
@@ -60,6 +62,8 @@ app.use("/api/activity-log", activityLogRoutes);
 app.use('/api/sellerflex', flexRoutes);
 app.use('/api/fiance', fianceRoutes);
 app.use('/api/fullfilment', fullfilmentRoutes);
+
+scheduleProductReminders();
 
 
 
