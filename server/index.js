@@ -47,6 +47,7 @@ const activityLogRoutes = require("./routes/activityLogRoutes");
 const flexRoutes = require('./routes/flexRoutes');
 const fianceRoutes = require('./routes/fianceRoutes');
 const fullfilmentRoutes = require('./routes/fullfilmentRoutes');
+const statsRoutes = require('./routes/statsRoutes');
 
 // Define your routes
 app.use("/api/user", userRoutes);
@@ -64,14 +65,15 @@ app.use("/api/activity-log", activityLogRoutes);
 app.use('/api/sellerflex', flexRoutes);
 app.use('/api/fiance', fianceRoutes);
 app.use('/api/fullfilment', fullfilmentRoutes);
+app.use('/api/stats', statsRoutes);
 
 scheduleProductReminders();
 
 
 
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "dist/index.html"));
-});
+// app.get("*", (req, res) => {
+//   res.sendFile(path.join(__dirname, "dist/index.html"));
+// });
 
 const PORT = process.env.PORT;
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));

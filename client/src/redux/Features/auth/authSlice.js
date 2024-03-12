@@ -4,11 +4,11 @@ import authApi from "../../api/authApi";
 
 
 const initialState = {
-    signupData: {},
     loginData:{},
     resetData:{},
     logoutData:{},
     isLoading: false,
+    resMessage:{},
 };
 
 export const signupUser = createAsyncThunk( "user/signup", async (userdata, thunkAPI) => {
@@ -53,8 +53,8 @@ export const authSlice = createSlice({
     name: "auth",
     initialState,
     reducers: {
-        resetSignupState: (state) => {
-            state.signupData = {};
+        resetresMessageState: (state) => {
+            state.resMessage = {};
         },
         resetLoginState: (state) => {
             state.loginData = {};
@@ -70,16 +70,11 @@ export const authSlice = createSlice({
     extraReducers: (builder) => {
         builder
         //signup
-            .addCase(signupUser.pending, (state) => {
-                state.isLoading = true;
-            })
             .addCase(signupUser.fulfilled, (state, action) => {
-                state.isLoading = false;
-                state.signupData = action.payload;
+                state.resMessage = action.payload;
             })
             .addCase(signupUser.rejected, (state, action) => {
-                state.isLoading = false;
-                state.signupData = action.payload;
+                state.resMessage = action.payload;
             })
              //login
             .addCase(loginUser.pending, (state) => {
@@ -120,5 +115,5 @@ export const authSlice = createSlice({
     },
 });
 
-export const { resetSignupState,resetLoginState,resetPasswordState,resetLogoutState } = authSlice.actions;
+export const { resetresMessageState,resetLoginState,resetPasswordState,resetLogoutState } = authSlice.actions;
 export default authSlice.reducer;

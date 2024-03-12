@@ -197,7 +197,13 @@ const LahoreProductTable = () => {
         dataIndex: "company",
         key: "company",
         render: (text) => renderColumnWithHighlight(text),
-      }
+      },
+      ...(selectItemValue === "seasonal" ? [{
+        title:"Seasonal Category",
+        dataIndex:"seasonalCategory",
+        key:"seasonalCategory",
+        render: (text) => renderColumnWithHighlight(text),
+      }] : []),
     );
   }
 

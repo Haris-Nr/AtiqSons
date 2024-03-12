@@ -58,14 +58,14 @@ const createUser = async (req, res) => {
     }
 
     res.status(201).json({
-      success: true,
+      type: "success",
       message:
         "New user account created successfully!!" +
         newUser.fullname,
     });
   } catch (error) {
     res.status(500).json({
-      success: false,
+      type: "error",
       message: error.message,
     });
   }

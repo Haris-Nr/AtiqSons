@@ -581,7 +581,7 @@ const fetchProductsBySelectItem = async (req, res) => {
       .skip(skip)
       .limit(limit)
       .populate("createdBy", "fullname")
-      .select("image productName employeeName asin status company price currency sku")
+      .select("image productName employeeName asin status company price currency sku seasonalCategory")
       .sort({ createdAt: -1 })
       .exec();
 

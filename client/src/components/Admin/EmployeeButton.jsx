@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Button, Form, Input, Modal, Select, message } from "antd";
+import { Button, Form, Input, Modal, Select } from "antd";
 import {
   PlusCircleOutlined,
   LockOutlined,
@@ -8,7 +8,7 @@ import {
 } from "@ant-design/icons";
 import { useSelector, useDispatch } from "react-redux";
 import {
-  resetSignupState,
+  resetresMessageState,
   signupUser,
 } from "../../redux/Features/auth/authSlice";
 import PhoneInput from "react-phone-number-input";
@@ -18,78 +18,35 @@ import {
 } from "../../redux/Features/Employees/employeeSlice";
 import socket from "../../redux/api/socket";
 import { useLocation } from "react-router-dom";
+import { showMessage } from "../../redux/Features/message/messageSlice";
 
 const EmployeeButton = () => {
-  
   const location = useLocation();
   const [open, setOpen] = useState(false);
   const [form] = Form.useForm();
   const dispatch = useDispatch();
-  const { signupData } = useSelector((state) => state.auth);
+  const { resMessage } = useSelector((state) => state.auth);
   const { user } = useSelector((state) => state.fetch);
   const userRole = user?.employee?.role;
   const formRef = useRef(null);
 
   const isEmployeePage = location.pathname.includes("/employees");
 
-  const initialFormValues = {
-    role: isEmployeePage ? "employee" : "admin",
-    dashboard:isEmployeePage ? "lahore" : "admin"
-  };
+  const dashboardOptions = [
+    { value: "lahore", label: "Lahore" },
+    { value: "dubai", label: "Dubai" },
+    { value: "china", label: "China" },
+  ];
 
   const dashboard =
-    userRole === "superadmin"
-      ? [
-          {
-            value: "lahore",
-            label: "Lahore",
-          },
-          {
-            value: "dubai",
-            label: "Dubai",
-          },
-          {
-            value: "china",
-            label: "China",
-          },
-          {
-            value: "admin",
-            label: "Admin",
-          },
-        ]
-      : [
-          {
-            value: "lahore",
-            label: "Lahore",
-          },
-          {
-            value: "dubai",
-            label: "Dubai",
-          },
-          {
-            value: "china",
-            label: "China",
-          },
-        ];
+    isEmployeePage || userRole !== "superadmin"
+      ? dashboardOptions
+      : [{ value: "admin", label: "Admin" }];
 
   const dropdownOptions =
-    userRole === "superadmin"
-      ? [
-          {
-            value: "admin",
-            label: "Admin",
-          },
-          {
-            value: "employee",
-            label: "Employee",
-          },
-        ]
-      : [
-          {
-            value: "employee",
-            label: "Employee",
-          },
-        ];
+    isEmployeePage || userRole !== "superadmin"
+      ? [{ value: "employee", label: "Employee" }]
+      : [{ value: "admin", label: "Admin" }];
 
   const onFinish = async (values) => {
     dispatch(signupUser(values)).then(() => {
@@ -116,20 +73,20 @@ const EmployeeButton = () => {
   };
 
   useEffect(() => {
-    try {
-      socket.connect();
-      if (signupData.success === true) {
-        message.success(signupData.message);
-        resetFormAndCloseModal();
-        dispatch(resetSignupState());
-      } else if (signupData.success === false) {
-        message.error(signupData.message);
-        dispatch(resetSignupState());
-      }
-    } catch (error) {
-      message.error(error);
+    socket.connect();
+    if (resMessage.type === "success") {
+      dispatch(
+        showMessage({ message: resMessage.message, type: resMessage.type })
+      );
+      resetFormAndCloseModal();
+      dispatch(resetresMessageState());
+    } else if (resMessage.type === "error") {
+      dispatch(
+        showMessage({ message: resMessage.message, type: resMessage.type })
+      );
+      dispatch(resetresMessageState());
     }
-  }, [dispatch, signupData]);
+  }, [dispatch, resMessage]);
 
   return (
     <>
@@ -155,7 +112,6 @@ const EmployeeButton = () => {
           size="large"
           layout="vertical"
           ref={formRef}
-          initialValues={initialFormValues}
         >
           <Form.Item
             name="fullname"

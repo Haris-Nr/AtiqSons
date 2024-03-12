@@ -1,34 +1,41 @@
 import React, { useEffect, useState } from "react";
 import { LockOutlined, UserOutlined, MailOutlined } from "@ant-design/icons";
-import { Button, Select, Form, Input, message } from "antd";
+import { Button, Select, Form, Input } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import { useSelector, useDispatch } from "react-redux";
-import { resetSignupState, signupUser } from "../redux/Features/auth/authSlice";
+import {
+  resetresMessageState,
+  signupUser,
+} from "../redux/Features/auth/authSlice";
+import { showMessage } from "../redux/Features/message/messageSlice";
 
 const Signup = () => {
-
   const [clientReady, setClientReady] = useState(false);
   const [form] = Form.useForm();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { signupData } = useSelector((state) => state.auth);
+  const { resMessage } = useSelector((state) => state.auth);
 
   const onFinish = async (values) => {
     dispatch(signupUser(values));
   };
 
   useEffect(() => {
-      if (signupData.success === true) {
-        navigate("/");
-        message.success(signupData.message);
-        dispatch(resetSignupState());
-      } else if (signupData.success === false) {
-        message.error(signupData.message);
-        dispatch(resetSignupState());
-      }
-  }, [dispatch, navigate, signupData]);
+    if (resMessage.type === "success") {
+      navigate("/");
+      dispatch(
+        showMessage({ message: resMessage.message, type: resMessage.type })
+      );
+      dispatch(resetresMessageState());
+    } else if (resMessage.type === "error") {
+      dispatch(
+        showMessage({ message: resMessage.message, type: resMessage.type })
+      );
+      dispatch(resetresMessageState());
+    }
+  }, [dispatch, navigate, resMessage]);
 
   useEffect(() => {
     setClientReady(true);
@@ -113,7 +120,7 @@ const Signup = () => {
           hasFeedback
         >
           <Input.Password
-          autoComplete="current-password"
+            autoComplete="current-password"
             placeholder="Enter Your Password"
             prefix={<LockOutlined className="site-form-item-icon" />}
             className="sm:text-lg"
