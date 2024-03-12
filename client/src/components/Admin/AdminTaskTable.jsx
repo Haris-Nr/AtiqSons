@@ -107,15 +107,16 @@ const dataSourceWithKeys = fetchtalltaskData?.data
     const isIncomplete = record.status.toLowerCase() !== 'complete';
     const hasDueDate = record.dueDate !== null && record.dueDate !== undefined;
 
-    if (hasDueDate && isIncomplete) {
+    // Check if the task type is 'daily' and apply blue background
+    if (record.tasktype === 'daily') {
+        return 'blue-background'; // This class should set the background to blue
+    } else if (hasDueDate && isIncomplete) {
         const dueDate = new Date(record.dueDate);
         const currentDate = new Date();
-
         if (dueDate < currentDate) {
-            return 'red-background'; 
+            return 'red-background'; // Existing logic for overdue tasks
         }
     }
-
     return '';
 };
 

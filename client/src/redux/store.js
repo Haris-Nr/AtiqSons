@@ -16,6 +16,7 @@ import flexReducer from "./Features/flex/flexSlice";
 import fianceReducer from "./Features/fiance/fianceSlice";
 import fullfilmentsReducer from './Features/fulfilment/fullfilmentSlice';
 import activityLogReducer from './Features/ActivityLog/activityLogSlice'
+import responseMessageReducer from './Features/message/messageSlice'
 
 export const store = configureStore({
   reducer: {
@@ -35,6 +36,7 @@ export const store = configureStore({
     flex: flexReducer,
     fiance:fianceReducer,
     fullfilments: fullfilmentsReducer,
-    activityLog: activityLogReducer
+    activityLog: activityLogReducer,
+    responseMessage: responseMessageReducer,
   },
 });

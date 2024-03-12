@@ -69,7 +69,11 @@
 
 .red-background {
   color: white;
-  background-color: #e73939;
+  background-color: #e43434;
+}
+
+.blue-background {
+  background-color: #e6f7ff; /* A light blue background */
 }
 
 .ant-table-cell-row-hover {

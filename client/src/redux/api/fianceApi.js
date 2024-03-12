@@ -1,11 +1,11 @@
 import axiosInstance from './axiosInstance';
 
 
-const uploadImage = (file) => {
+const uploadImage = async (file) => {
     const formData = new FormData();
     formData.append('image', file);
 
-    return axiosInstance.post('/api/fiance/upload', formData, {
+    return await axiosInstance.post('/api/fiance/upload', formData, {
         headers: {
             'Content-Type': 'multipart/form-data',
         },
@@ -14,12 +14,12 @@ const uploadImage = (file) => {
 
 
 
-const allImage = () => {
-    return axiosInstance.get('/api/fiance/allfianceimage');
+const allImage = async () => {
+    return await axiosInstance.get('/api/fiance/allfianceimage');
 };
 
-const deleteImage = (id) => {
-    return axiosInstance.delete(`/api/fiance/delete/${id}`);
+const deleteImage = async (id) => {
+    return await axiosInstance.delete(`/api/fiance/delete/${id}`);
 };
 
 

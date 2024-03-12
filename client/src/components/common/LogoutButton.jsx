@@ -20,14 +20,14 @@ const LogoutButton = () => {
   const { logoutData } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    if (logoutData.success && logoutData.message) {
+    if (logoutData?.success && logoutData?.message) {
       localStorage.removeItem("token");
       handleClockOut();
       navigate("/");
       message.success(logoutData.message);
       dispatch(resetLogoutState());
       dispatch(resetFetchState());
-    } else if (logoutData.success === false && logoutData.message) {
+    } else if (logoutData?.success === false && logoutData?.message) {
       message.error(logoutData.message);
       dispatch(resetLogoutState());
     }

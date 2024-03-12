@@ -1,8 +1,7 @@
 const schedule = require('node-schedule');
 const Task = require('../models/taskModels');
 
-// Schedule a job to run at 00:01 every day
-const job = schedule.scheduleJob('0 5 * * *', async function() {
+const job = schedule.scheduleJob('0 0 5 * * *', async function() {
   try {
     const result = await Task.updateMany(
       { tasktype: 'daily', status: 'complete' },

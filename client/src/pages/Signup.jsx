@@ -96,6 +96,7 @@ const Signup = () => {
           ]}
         >
           <Input
+            autoComplete="email"
             prefix={<MailOutlined className="site-form-item-icon" />}
             placeholder="Enter your Email"
             className="text-lg"
@@ -112,6 +113,7 @@ const Signup = () => {
           hasFeedback
         >
           <Input.Password
+          autoComplete="current-password"
             placeholder="Enter Your Password"
             prefix={<LockOutlined className="site-form-item-icon" />}
             className="sm:text-lg"

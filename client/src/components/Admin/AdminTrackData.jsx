@@ -1,7 +1,7 @@
 import { Table,message } from "antd";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteTrack, getTrackingProduct } from "../../redux/Features/Product/productSlice";
+import { SingleProduct, deleteTrack, getTrackingProduct } from "../../redux/Features/Product/productSlice";
 import moment from "moment";
 import DeleteButton from "../common/DeleteButton";
 import { useParams } from 'react-router-dom';
@@ -15,6 +15,7 @@ const AdminTrackData = () => {
 
   useEffect(() => {
     dispatch(getTrackingProduct(id));
+    dispatch(SingleProduct(id));
   }, [dispatch, id, reload]);
 
   const handleDelete = (trackid) => {

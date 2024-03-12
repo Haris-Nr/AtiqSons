@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Button, Modal, Form, InputNumber, Table } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  SingleProduct,
   TrackingProduct,
   deleteTrack,
   getTrackingProduct,
@@ -22,6 +23,7 @@ const TrackProduct = () => {
 
   useEffect(() => {
     dispatch(getTrackingProduct(id));
+    dispatch(SingleProduct(id));
   }, [reload, dispatch, id]);
 
   const showModal = () => {

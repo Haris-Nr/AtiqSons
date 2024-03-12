@@ -1,3 +1,6 @@
+import { message } from "antd";
+import { useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import "./App.css";
 import {
   Route,
@@ -55,6 +58,7 @@ import StockTable from "./components/Admin/StockTable";
 import Flex from "./components/Admin/Flex";
 import Fiance from "./components/Admin/Fiance";
 import Fullfilment from "./components/common/Fullfilment";
+import { clearMessage } from "./redux/Features/message/messageSlice";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -136,8 +140,24 @@ const router = createBrowserRouter(
 );
 
 function App() {
+  
+  const dispatch = useDispatch();
+  const [messageApi, contextHolder] = message.useMessage();
+  const responseMessage = useSelector((state) => state.responseMessage);
+
+  useEffect(() => {
+    if (responseMessage.message && responseMessage.type) {
+      if (responseMessage.type === "success") {
+        messageApi.success(responseMessage.message);
+      } else if (responseMessage.type === "error") {
+        messageApi.error(responseMessage.message);
+      }
+      dispatch(clearMessage());
+    }
+  }, [responseMessage, dispatch, messageApi]);
   return (
     <>
+      {contextHolder}
       <TimerProvider>
         <OrdersProvider>
           <RouterProvider router={router} />

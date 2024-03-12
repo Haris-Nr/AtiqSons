@@ -1,6 +1,6 @@
 const nodeSchedule = require('node-schedule');
-const Product = require('../models/productModels'); // Adjust the path as necessary
-const {createNotification} = require('./notification'); // Adjust the path as necessary
+const Product = require('../models/productModels');
+const {createNotification} = require('./notification');
 const { getIO }  = require('../config/socket')
 
 
@@ -46,8 +46,8 @@ const scheduleProductReminders = async () => {
             message,
             title,
             actionUser,
-            product.image, // Assuming the product image is relevant
-            product._id // Your onClick action URL or function
+            product.image,
+            product._id
           );
         });
       }
