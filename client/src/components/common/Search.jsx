@@ -22,32 +22,38 @@ const Search = () => {
   }, [query, handleSearch]);
 
   return (
-    <div className="flex flex-col items-center justify-center">
-      <h3 className="text-xl font-bold">Search products</h3>
-      <Select
-        showSearch
-        size="large"
-        value={query}
-        placeholder="Search for products"
-        defaultActiveFirstOption={false}
-        suffixIcon={false}
-        filterOption={false}
-        onSearch={setQuery}
-        onChange={setQuery}
-        notFoundContent={isLoading ? 'Loading...' : 'No products found'}
-        onBlur={() => setQuery('')}
-        style={{ width: 300 }}
-      >
-        {Array.isArray(products) && products.map(product => (
-          <Option key={product._id} value={product.productName}>
-            <Link to={`${product._id}`}>{product.productName}</Link>
-          </Option>
-        ))}
-      </Select>
-      <Button onClick={handleSearch} disabled={isLoading || !query} type="primary" style={{ marginTop: 16 }}>
+    <div className="flex flex-col">
+    <h1 className="text-xl text-left font-bold">Search products</h1>
+    <div className="flex gap-1 items-center">
+        <Select
+          showSearch
+          size="middle"
+          value={query}
+          placeholder="Search for products"
+          defaultActiveFirstOption={false}
+          suffixIcon={false}
+          filterOption={false}
+          onSearch={setQuery}
+          onChange={setQuery}
+          notFoundContent={isLoading ? 'Loading...' : 'No products found'}
+          onBlur={() => setQuery('')}
+          style={{ width: '100%'}}
+        >
+          {Array.isArray(products) && products.map(product => (
+            <Option key={product._id} value={product.productName}>
+              <Link to={`${product._id}`}>{product.productName}</Link>
+            </Option>
+          ))}
+        </Select>
+      <Button onClick={handleSearch} disabled={isLoading || !query} type="primary" style={{ color:'white' }} >
         Search
       </Button>
+
     </div>
+  </div>
+  
+  
+  
   );
 };
 

@@ -116,3 +116,7 @@
 ::-webkit-scrollbar {
   display: none;
 }
+
+.ant-col-24{
+  display: flex !important;
+}

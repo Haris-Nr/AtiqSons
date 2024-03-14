@@ -17,6 +17,7 @@ import fianceReducer from "./Features/fiance/fianceSlice";
 import fullfilmentsReducer from './Features/fulfilment/fullfilmentSlice';
 import activityLogReducer from './Features/ActivityLog/activityLogSlice';
 import responseMessageReducer from './Features/message/messageSlice';
+import statsReducer from './Features/Stats/statsSlice';
 
 export const store = configureStore({
   reducer: {
@@ -38,5 +39,6 @@ export const store = configureStore({
     fullfilments: fullfilmentsReducer,
     activityLog: activityLogReducer,
     responseMessage:responseMessageReducer,
+    stats: statsReducer,
   },
 });

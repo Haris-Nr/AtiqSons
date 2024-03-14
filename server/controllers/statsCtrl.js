@@ -1,14 +1,16 @@
 const Product = require("../models/productModels");
+const Task = require("../models/taskModels");
+const User = require("../models/userModel");
 
 // Utility functions to calculate the start and end dates
 const getStartEndDate = (timeFrame) => {
     const now = new Date();
     let start, end;
-
+    
     switch (timeFrame) {
         case "week":
             const first =
-                now.getDate() - now.getDay() + (now.getDay() === 0 ? -6 : 1); // correct for Sunday
+            now.getDate() - now.getDay() + (now.getDay() === 0 ? -6 : 1);
             start = new Date(now.setDate(first));
             end = new Date(start.getTime());
             end.setDate(start.getDate() + 6);
@@ -42,7 +44,7 @@ const productInfo = async (req, res) => {
             selectItem: "holding",
         });
         const trackingCount = await Product.countDocuments({
-            selectItem: "tracking",
+          tracking: "tracking",
         });
         const seasonalCount = await Product.countDocuments({
             selectItem: "seasonal",
@@ -83,7 +85,59 @@ const productInfo = async (req, res) => {
     }
 };
 
+const getCompletedDailyTasksWithEmployeeDetails = async (req, res) => {
+    try {
+        const tasksStats = await Task.aggregate([
+          {
+            $match: {
+              tasktype: 'daily', // Consider only daily tasks
+            }
+          },
+          {
+            $lookup: {
+              from: 'users', // Ensure this matches your users collection name
+              localField: 'employee',
+              foreignField: '_id',
+              as: 'employeeDetails'
+            }
+          },
+          {
+            $unwind: '$employeeDetails' // Flatten the array
+          },
+          {
+            $group: {
+              _id: '$employee',
+              totalDailyTasks: { $sum: 1 }, // Count total daily tasks assigned
+              completedTasks: {
+                $sum: {
+                  $cond: [{ $eq: ['$status', 'complete'] }, 1, 0] // Count only completed tasks
+                }
+              },
+              employeeDetails: { $first: '$employeeDetails' } // Keep employee details
+            }
+          },
+          {
+            $project: {
+              _id: 0,
+            //   employeeId: '$_id',
+              employeeName: '$employeeDetails.fullname',
+              totalDailyTasks: 1,
+              completedTasks: 1,
+              // You can include more fields from employeeDetails if needed
+            }
+          }
+        ]);
+    
+        res.json(tasksStats);
+      } catch (error) {
+        console.error('Error fetching daily task statistics by employee:', error);
+        res.status(500).json({ success: false, message: "An error occurred while fetching the task statistics." });
+      }
+  };
+
+
 
 module.exports = {
-    productInfo
+    productInfo,
+    getCompletedDailyTasksWithEmployeeDetails
 }

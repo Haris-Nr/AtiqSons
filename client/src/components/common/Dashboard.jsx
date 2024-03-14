@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { UserOutlined, ShoppingOutlined } from "@ant-design/icons";
+import { UserOutlined,CoffeeOutlined, ProductOutlined } from "@ant-design/icons";
 import DashboardCard from "./DashboardCard";
 import { useDispatch, useSelector } from "react-redux";
 import socket from "../../redux/api/socket";
 import { getEmployee } from "../../redux/Features/Employees/employeeSlice";
+// import { getAllStats } from "../../redux/Features/Stats/statsSlice";
 import { Link } from "react-router-dom";
 import Timer from "./Timer";
 import Search from "./Search";
 import DailyTaskTable from "./DailyTaskTable";
+import AllStats from "./AllStats";
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -17,6 +19,7 @@ const Dashboard = () => {
   } = useSelector((state) => state.fetch);
 
   const { totalItems } = useSelector((state) => state.employee);
+  const { statsData } = useSelector((state) => state.stats);
 
   const getPeriodOfDay = (hour) =>
     hour >= 5 && hour < 12
@@ -31,6 +34,7 @@ const Dashboard = () => {
     const currentHour = new Date().getHours();
     setPeriodOfDay(currentHour === 12 ? "noon" : getPeriodOfDay(currentHour));
     dispatch(getEmployee());
+    // dispatch(getAllStats());
     socket.connect();
 
     // Listen for user count updates
@@ -70,7 +74,7 @@ const Dashboard = () => {
             <div className="md:flex gap-3">
               <div className="flex justify-center gap-3">
                 {employee?.dashboard === "admin" && (
-                  <>
+                  <div className="sm:flex gap-4">
                     <Link to={"employees"}>
                       <DashboardCard
                         icon={
@@ -87,7 +91,39 @@ const Dashboard = () => {
                         value={`${totalItems}/${userCount}`}
                       />
                     </Link>
-                  </>
+                    <Link to={"productTable/selectItem/:selectItemValue"}>
+                      <DashboardCard
+                        icon={
+                          <ProductOutlined
+                            className="text-sm  md:text-2xl lg:p-3"
+                            style={{
+                              color: "purple",
+                              backgroundColor: "#F8F8FB",
+                              borderRadius: 40,
+                            }}
+                          />
+                        }
+                        title={`Total Products`}
+                        value={statsData.totalproduct}
+                      />
+                    </Link>
+                    <Link to={"productTable/selectItem/:selectItemValue"}>
+                      <DashboardCard
+                        icon={
+                          <CoffeeOutlined
+                            className="text-sm  md:text-2xl lg:p-3"
+                            style={{
+                              color: "purple",
+                              backgroundColor: "#F8F8FB",
+                              borderRadius: 40,
+                            }}
+                          />
+                        }
+                        title={`Pending Products`}
+                        value={statsData.pendingCount}
+                      />
+                    </Link>
+                  </div>
                 )}
               </div>
             </div>
@@ -98,10 +134,12 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <div className="flex justify-start mt-5">
+      <div className="pt-5">
         <Search />
       </div>
       {!isAdmin() && <DailyTaskTable/> }
+      {isAdmin() && <AllStats/> }
+    
     </>
   );
 };

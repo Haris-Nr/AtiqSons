@@ -4,7 +4,7 @@ import React from "react";
 
 const DashboardCard = ({ icon, title, value }) => {
   return (
-    <div className="relative flex justify-center text-gray-700 bg-white shadow-md p-1 items-center h-16 my-5 w-[10rem] md:w-[9.5rem] lg:w-[13.5rem] lg:h-20 rounded-none bg-clip-border">
+    <div className="relative flex justify-center text-gray-700 bg-white shadow-md p-1 items-center h-16 my-5 w-[10rem] md:w-[9.5rem] lg:w-[15.5rem] lg:h-20 rounded-none bg-clip-border">
       <Space direction="horizontal" className="items-center ">
         {icon}
         <Typography.Text className="font-sans text-xs lg:text-lg font-semibold tracking-normal text-blue-gray-900">
@@ -20,7 +20,7 @@ const DashboardCard = ({ icon, title, value }) => {
 DashboardCard.propTypes = {
   icon: PropTypes.node.isRequired,
   title: PropTypes.string.isRequired,
-  value: PropTypes.string.isRequired,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 };
 
 export default DashboardCard;
