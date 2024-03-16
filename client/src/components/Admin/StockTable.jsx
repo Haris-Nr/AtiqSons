@@ -105,6 +105,7 @@ const StockTable = () => {
   };
 
   const showUploadModal = () => setIsUploadModalOpen(true);
+
   const handleUploadModalCancel = () => {
     setIsUploadModalOpen(false);
     form.resetFields();
@@ -114,9 +115,9 @@ const StockTable = () => {
   const onFinish = (values) => {
     dispatch(uploadStock(values));
     form.resetFields();
+    setReload(!reload);
     setFileList([]);
     setIsUploadModalOpen(false);
-    setReload(!reload);
     dispatch(
       getStock({
         search: search.trim(),

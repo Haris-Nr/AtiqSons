@@ -1,44 +1,19 @@
-import React, { useEffect, useState } from "react";
-import { LockOutlined, UserOutlined, MailOutlined } from "@ant-design/icons";
-import { Button, Select, Form, Input } from "antd";
+import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
-import { useSelector, useDispatch } from "react-redux";
-import {
-  resetresMessageState,
-  signupUser,
-} from "../redux/Features/auth/authSlice";
-import { showMessage } from "../redux/Features/message/messageSlice";
+import { useDispatch } from "react-redux";
+import { signupUser } from "../redux/Features/auth/authSlice";
+import SignupForm from "../components/form/SignupForm";
 
 const Signup = () => {
-  const [clientReady, setClientReady] = useState(false);
-  const [form] = Form.useForm();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { resMessage } = useSelector((state) => state.auth);
 
   const onFinish = async (values) => {
     dispatch(signupUser(values));
   };
 
   useEffect(() => {
-    if (resMessage.type === "success") {
-      navigate("/");
-      dispatch(
-        showMessage({ message: resMessage.message, type: resMessage.type })
-      );
-      dispatch(resetresMessageState());
-    } else if (resMessage.type === "error") {
-      dispatch(
-        showMessage({ message: resMessage.message, type: resMessage.type })
-      );
-      dispatch(resetresMessageState());
-    }
-  }, [dispatch, navigate, resMessage]);
-
-  useEffect(() => {
-    setClientReady(true);
     const token = localStorage.getItem("token");
     if (token) {
       navigate("/");
@@ -63,120 +38,15 @@ const Signup = () => {
   return (
     <div>
       <h3 className="text-blue-800 font-bold text-lg ">Sign Up</h3>
-      <Form
-        form={form}
-        name="signupForm"
+      <SignupForm
         onFinish={onFinish}
-        size="large"
-        layout="vertical"
-      >
-        <Form.Item
-          name="fullname"
-          hasFeedback
-          rules={[
-            {
-              required: true,
-              message: "Please enter your full name!",
-            },
-            { whitespace: true },
-          ]}
-        >
-          <Input
-            prefix={<UserOutlined className="site-form-item-icon" />}
-            placeholder="Enter your Full Name"
-            className="text-lg"
-          />
-        </Form.Item>
-
-        <Form.Item
-          name="email"
-          hasFeedback
-          rules={[
-            {
-              required: true,
-              message: "Please enter your email!",
-            },
-            {
-              type: "email",
-              message: "Enter a valid email!",
-            },
-          ]}
-        >
-          <Input
-            autoComplete="email"
-            prefix={<MailOutlined className="site-form-item-icon" />}
-            placeholder="Enter your Email"
-            className="text-lg"
-          />
-        </Form.Item>
-        <Form.Item
-          name="password"
-          rules={[
-            {
-              required: true,
-              message: "Please input your password!",
-            },
-          ]}
-          hasFeedback
-        >
-          <Input.Password
-            autoComplete="current-password"
-            placeholder="Enter Your Password"
-            prefix={<LockOutlined className="site-form-item-icon" />}
-            className="sm:text-lg"
-          />
-        </Form.Item>
-
-        <Form.Item
-          name="mobile"
-          rules={[
-            {
-              required: true,
-              message: "Please input your phone number!",
-            },
-          ]}
-          prefix={<LockOutlined className="site-form-item-icon" />}
-          hasFeedback
-        >
-          <PhoneInput placeholder="Enter phone number +92..." />
-        </Form.Item>
-        <Form.Item
-          name="dashboard"
-          required="true"
-          message="Please select a Dashboard"
-          hasFeedback
-        >
-          <Select
-            placeholder="Select a Dashboard"
-            size="large"
-            options={dashboard}
-          />
-        </Form.Item>
-        <Form.Item shouldUpdate>
-          {() => (
-            <Button
-              block
-              className="font-bold"
-              htmlType="submit"
-              shape="round"
-              disabled={
-                !clientReady ||
-                !form.isFieldsTouched(true) ||
-                !!form.getFieldsError().filter(({ errors }) => errors.length)
-                  .length
-              }
-            >
-              Sign Up
-            </Button>
-          )}
-        </Form.Item>
-        <Form.Item>
-          Already have an account?&nbsp;
-          <Link to="/" className="text-blue-400 underline">
-            Login
-          </Link>
-        </Form.Item>
-      </Form>
+        dashboard={dashboard}
+        navigate={navigate}
+      />
+      Already have an account?&nbsp;
+      <Link to="/" className="text-blue-400 underline">
+        Login
+      </Link>
     </div>
   );
 };

@@ -89,8 +89,6 @@ const uploadFile = async (req, res) => {
       throw new Error("File not found");
     }
 
-    console.log(exceljs)
-
     let jsonArray = [];
     if (req.file.originalname.endsWith('.csv')) {
       jsonArray = await csvtojson().fromFile(req.file.path);
@@ -116,6 +114,8 @@ const uploadFile = async (req, res) => {
     }
 
     await Stock.insertMany(jsonArray);
+
+    console.log(req.file.path)
 
     const filePath = path.join(__dirname, "..", req.file.path);
 

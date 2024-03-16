@@ -135,13 +135,13 @@ const loginUser = async (req, res) => {
     }
 
     res.status(200).json({
-      success: true,
+      type: "success",
       message: user.fullname + " Logged in",
       token: token,
     });
   } catch (error) {
     res.status(500).json({
-      success: false,
+      type: "error",
       message: error.message,
     });
   }
@@ -206,12 +206,12 @@ const resetPassword = async (req, res) => {
     );
 
     res.status(200).json({
-      success: true,
+      type: "success",
       message: "Password updated successfully",
     });
   } catch (error) {
     res.status(500).json({
-      success: false,
+      type: "error",
       message: error.message,
     });
   }
@@ -245,12 +245,10 @@ const fetchUser = async (req, res) => {
       .select("-confirmpassword");
 
     res.status(200).json({
-      success: true,
       employee: user,
     });
   } catch (error) {
     res.status(500).json({
-      success: false,
       message: error.message,
     });
   }
@@ -350,12 +348,12 @@ const logout = async (req, res) => {
     }
 
     res.status(200).json({
-      success: true,
+      type: "success",
       message: "Logged out successfully",
     });
   } catch (error) {
     res.status(500).json({
-      success: false,
+      type: "error",
       message: error.message,
     });
   }

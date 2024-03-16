@@ -9,11 +9,13 @@ const getAllLogs = async (req, res) => {
         const allLogs = await Log.find()
             .populate({
                 path: "user_id",
+                select: "fullname dashboard",
                 match: { role: "employee" },
             })
             .sort({ createdAt: -1 })
             .limit(limit)
             .skip(skipIndex)
+            .select("createdAt loginTime logoutTime")
             .exec();
 
         const filteredLogs = allLogs.filter((log) => log.user_id);
@@ -23,18 +25,12 @@ const getAllLogs = async (req, res) => {
         });
 
         res.status(200).json({
-            success: true,
             data: filteredLogs,
-            pageInfo: {
-                totalItems: totalCount,
-                currentPage: page,
-                itemsPerPage: limit,
-                totalPages: Math.ceil(totalCount / limit),
-            },
+            totalCount
         });
     } catch (error) {
         res.status(500).json({
-            success: false,
+            type: 'error',
             message: error.message,
         });
     }

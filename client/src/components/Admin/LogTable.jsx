@@ -1,57 +1,40 @@
-import React, { useEffect } from 'react';
-import { Table, message } from "antd";
+import React, { useEffect, useState } from "react";
+import { Table } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
-import {
-  allLogs,
-  setCurrentPage,
-  setPageSize,
-  deleteAllLogs
-} from "../../redux/Features/auth/logSlice";
+import { allLogs } from "../../redux/Features/auth/logSlice";
 import socket from "../../redux/api/socket";
+import { showMessage } from "../../redux/Features/message/messageSlice";
 
 const LogTable = () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   const dispatch = useDispatch();
 
-  const { allLogsData, totalItems, currentPage, pageSize,error,isLoading } = useSelector(
-    (state) => state.log
-  );
+  const { logsRes, isLoading } = useSelector((state) => state.log);
 
   useEffect(() => {
-    dispatch(allLogs());
+    dispatch(allLogs({ currentPage, pageSize }));
     socket.connect();
-
-    const timer = setTimeout(() => {
-      dispatch(deleteAllLogs());
-    }, 5000);
-
-
-    return () => {
-      clearTimeout(timer);
-    };
-
-
-  }, [dispatch, currentPage, pageSize,error.message, error.success]);
+  }, [dispatch, currentPage, pageSize]);
 
   useEffect(() => {
-    if (error.success === false) {
-      message.error(error.message);
+    if (logsRes.type && logsRes.message) {
+      dispatch(showMessage({ message: logsRes.message, type: logsRes.type }));
     }
-  }, [error.message, error.success]);
+  }, [logsRes, dispatch]);
 
   const handleTableChange = (pagination) => {
-    dispatch(setCurrentPage(pagination.current));
-    dispatch(setPageSize(pagination.pageSize));
+    setCurrentPage(pagination.current);
+    setPageSize(pagination.pageSize);
   };
 
   const calculateDuration = (loginTime, logoutTime) => {
     if (!logoutTime) return "0 hours";
-    const duration = moment(logoutTime).diff(moment(loginTime), 'hours', true);
+    const duration = moment(logoutTime).diff(moment(loginTime), "hours", true);
     return `${duration.toFixed(2)} hours`;
   };
-
-  
 
   const columns = [
     {
@@ -60,14 +43,6 @@ const LogTable = () => {
       key: "fullname",
       render: (text, record) => {
         return <>{record?.user_id?.fullname}</>;
-      },
-    },
-    {
-      title: "Email",
-      dataIndex: "email",
-      key: "email",
-      render: (text, record) => {
-        return <>{record?.user_id?.email}</>;
       },
     },
     {
@@ -99,30 +74,26 @@ const LogTable = () => {
       key: "logoutTime",
     },
     {
-      title: 'Duration',
-      key: 'duration',
-      render: (text, record) => calculateDuration(record.loginTime, record.logoutTime),
+      title: "Duration",
+      key: "duration",
+      render: (text, record) =>
+        calculateDuration(record.loginTime, record.logoutTime),
     },
   ];
-
-  
-
-  const dataSourceWithKeys = allLogsData?.data
-    ? allLogsData?.data.map((item,index) => ({ ...item, key: index }))
-    : [];
 
   return (
     <div>
       <Table
-        size="middle"
+        size="small"
         bordered
         columns={columns}
         loading={isLoading}
-        dataSource={dataSourceWithKeys}
+        rowKey={(record) => record._id}
+        dataSource={logsRes?.data}
         pagination={{
           current: currentPage,
           pageSize: pageSize,
-          total: totalItems,
+          total: logsRes?.totalCount,
         }}
         onChange={handleTableChange}
         scroll={{ x: true }}

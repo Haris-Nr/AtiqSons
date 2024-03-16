@@ -2,51 +2,26 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import authApi from "../../api/authApi";
 
 const initialState = {
-    allLogsData: [],
     isLoading: false,
-    error: {},
-    currentPage: 1,
-    pageSize: 10,
-    totalPages: 0,
-    totalItems: 0,
+    logsRes: {},
 };
 
 export const allLogs = createAsyncThunk(
     "user/logs",
-    async (_, { getState, rejectWithValue }) => {
-        const { currentPage, pageSize } = getState().log;
+    async ({currentPage, pageSize}, {rejectWithValue }) => {
         try {
-            const response = await authApi.getAllLogs(currentPage, pageSize);
-            return response;
+            return await authApi.getAllLogs(currentPage, pageSize);
         } catch (error) {
             return rejectWithValue(error);
         }
     }
 );
 
-export const deleteAllLogs = createAsyncThunk(
-    "logs/deleteAll",
-    async (_, { rejectWithValue }) => {
-        try {
-            const response = await authApi.deleteAllLogs();
-            return response;
-        } catch (error) {
-            return rejectWithValue(error);
-        }
-    }
-);
 
 export const logSlice = createSlice({
     name: "logs",
     initialState,
-    reducers: {
-        setCurrentPage(state, action) {
-            state.currentPage = action.payload;
-        },
-        setPageSize(state, action) {
-            state.pageSize = action.payload;
-        },
-    },
+    reducers: {},
 
     extraReducers: (builder) => {
         builder
@@ -56,28 +31,13 @@ export const logSlice = createSlice({
             })
             .addCase(allLogs.fulfilled, (state, action) => {
                 state.isLoading = false;
-                state.allLogsData = action.payload;
-                state.currentPage = action.payload.pageInfo.currentPage;
-                state.totalPages = action.payload.pageInfo.totalPages;
-                state.totalItems = action.payload.pageInfo.totalItems;
+                state.logsRes = action.payload
             })
             .addCase(allLogs.rejected, (state, action) => {
                 state.isLoading = false;
-                state.error = action.payload;
+                state.logsRes = action.payload;
             })
-            // delete all logs
-            .addCase(deleteAllLogs.pending, (state) => {
-                state.isLoading = true;
-            })
-            .addCase(deleteAllLogs.fulfilled, (state) => {
-                state.isLoading = false;
-            })
-            .addCase(deleteAllLogs.rejected, (state, action) => {
-                state.isLoading = false;
-                state.error = action.payload;
-            });
     },
 });
-export const { setCurrentPage, setPageSize } = logSlice.actions;
 
 export default logSlice.reducer;

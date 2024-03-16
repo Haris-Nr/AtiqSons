@@ -11,13 +11,18 @@ const signup = async (userData) => {
 };
 
 const login = async (userData) =>{
-        return await axiosInstance.post(`/api/user/login`, userData);
+    try {
+        const {data} = await axiosInstance.post(`/api/user/login`, userData);
+        return data;
+    } catch (error) {
+        throw error.response.data;
+    }
 }
 
 const currentUser = async () =>{
     try {
-        const response = await axiosInstance.get(`/api/user/currentuser`);
-        return response.data;  
+        const {data} = await axiosInstance.get(`/api/user/currentuser`);
+        return data;  
     } catch (error) {
         throw error.response.data;
     }
@@ -25,16 +30,20 @@ const currentUser = async () =>{
 
 const resetPassword = async (resetData) =>{
     try {
-        const response = await axiosInstance.patch(`/api/user/resetpassword`,resetData);
-        return response.data;  
+        const {data} = await axiosInstance.patch(`/api/user/resetpassword`,resetData);
+        return data;  
     } catch (error) {
         throw error.response.data;
     }
 }
 
 const logout = async (userId) => {
-    const {data} = await axiosInstance.post(`/api/user/logout`,{userId});
-    return data;
+    try {
+        const {data} = await axiosInstance.post(`/api/user/logout`,{userId});
+        return data;
+    } catch (error) {
+        throw error.response.data;
+    }
 }
 
 const getAllLogs = async (page,limit) => {
@@ -47,15 +56,6 @@ const getAllLogs = async (page,limit) => {
     }
 }
 
-const deleteAllLogs = async () => {
-    try {
-        const {data} = await axiosInstance.delete(`/api/log/logs`);
-        return data;
-    } catch (error) {
-        throw error.response.data;
-    }
-};
-
 const authApi = {
     signup,
     login,
@@ -63,7 +63,6 @@ const authApi = {
     resetPassword,
     logout,
     getAllLogs,
-    deleteAllLogs
 };
 
 export default authApi;

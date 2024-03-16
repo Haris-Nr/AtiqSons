@@ -1,34 +1,36 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useContext } from "react";
 import { LockOutlined, MailOutlined } from "@ant-design/icons";
-import { Button, Form, Input, message } from "antd";
+import { Button, Form, Input } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { loginUser, resetLoginState } from "../redux/Features/auth/authSlice";
+import {
+  loginUser,
+  resetresMessageState,
+} from "../redux/Features/auth/authSlice";
 import { fetchUser } from "../redux/Features/auth/fetchSlice";
+import { showMessage } from "../redux/Features/message/messageSlice";
 import { TimerContext } from "../contexts/TimerContext";
-
 
 const Login = () => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { loginData } = useSelector((state) => state.auth);
+  const { resMessage } = useSelector((state) => state.auth);
   const { user } = useSelector((state) => state.fetch);
 
-  const [clientReady, setClientReady] = useState(false);
+  const { handleClockIn, handleClockOut } = useContext(TimerContext);
 
-  const {
-    handleClockIn,
-    handleClockOut
-  } = useContext(TimerContext);
+  const onFinish = (values) => {
+    dispatch(loginUser(values));
+  };
+
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
-    setClientReady(true);
-    const token = localStorage.getItem("token");
     if (token) {
       dispatch(fetchUser());
     }
-  }, [dispatch, loginData]);
+  }, [dispatch, token]);
 
   useEffect(() => {
     if (user?.employee?.dashboard) {
@@ -38,35 +40,22 @@ const Login = () => {
       handleClockOut();
       navigate("/");
     }
-  }, [user, navigate]);
-
-
-  const onFinish = (values) => {
-    dispatch(loginUser(values));
-  };
+  }, [user, navigate, handleClockIn, handleClockOut]);
 
   useEffect(() => {
-    try {
-      if (loginData.success === true) {
-        localStorage.setItem("token", loginData.token);
-        if (!user) {
-          dispatch(fetchUser());
-        }
-        message.success(loginData.message);
-        dispatch(resetLoginState());
+    if (resMessage.type && resMessage.message) {
+      dispatch(
+        showMessage({ message: resMessage.message, type: resMessage.type })
+      );
+      dispatch(resetresMessageState());
+      if (resMessage.type === "success") {
+        localStorage.setItem("token", resMessage.token);
         if (user?.employee?.dashboard) {
           navigate(`/${user?.employee?.dashboard}`);
         }
-      } else if (loginData.success === false) {
-        message.error(loginData.message);
-        dispatch(resetLoginState());
       }
-    } catch (error) {
-      message.error(error);
     }
-  }, [dispatch, navigate, loginData, user]);
-
- 
+  }, [resMessage, dispatch, navigate, user]);
 
   return (
     <div>
@@ -99,7 +88,7 @@ const Login = () => {
             prefix={<MailOutlined className="site-form-item-icon" />}
             placeholder="Enter your Email"
             className="text-lg"
-            autoComplete="username"
+            autoComplete="email"
           />
         </Form.Item>
         <Form.Item
@@ -124,31 +113,16 @@ const Login = () => {
             Forgot password
           </Link>
         </Form.Item>
-        <Form.Item shouldUpdate>
-          {() => (
-            <Button
-              block
-              className="font-bold"
-              htmlType="submit"
-              shape="round"
-              disabled={
-                !clientReady ||
-                !form.isFieldsTouched(true) ||
-                !!form.getFieldsError().filter(({ errors }) => errors.length)
-                  .length
-              }
-            >
-              Log In
-            </Button>
-          )}
-        </Form.Item>
         <Form.Item>
-          Don&#39;t have an account?&nbsp;
-          <Link to="/signup" className="text-blue-400 underline">
-            register now!
-          </Link>
+          <Button block className="font-bold" htmlType="submit" shape="round">
+            Log In
+          </Button>
         </Form.Item>
       </Form>
+      Don&#39;t have an account?&nbsp;
+      <Link to="/signup" className="text-blue-400 underline">
+        register now!
+      </Link>
     </div>
   );
 };

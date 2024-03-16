@@ -1,37 +1,33 @@
-import React, { useEffect, useState } from "react";
-import { LockOutlined, MailOutlined } from "@ant-design/icons";
-import { Button, Form, Input, message } from "antd";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { LockOutlined, MailOutlined } from "@ant-design/icons";
+import { Button, Form, Input } from "antd";
 import {
-  resetPasswordState,
   resetUserPassword,
+  resetresMessageState,
 } from "../redux/Features/auth/authSlice";
 import { useNavigate } from "react-router-dom";
+import { showMessage } from "../redux/Features/message/messageSlice";
 
 const ResetPassword = () => {
-  const [form] = Form.useForm();
-  const [clientReady, setClientReady] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { resetData } = useSelector((state) => state.auth);
+  const { resMessage } = useSelector((state) => state.auth);
+
 
   useEffect(() => {
-    setClientReady(true);
-  }, []);
-
-  useEffect(() => {
-    if (resetData && resetData.message) {
-      if (resetData.success) {
-        message.success(resetData.message);
+    if (resMessage.type && resMessage.message) {
+      dispatch(
+        showMessage({ message: resMessage.message, type: resMessage.type })
+      );
+      dispatch(resetresMessageState());
+      if (resMessage.type === "success") {
         navigate("/");
-        dispatch(resetPasswordState());
-      } else {
-        message.error(resetData.message);
       }
     }
-  }, [resetData, navigate, dispatch]);
+  }, [resMessage, navigate, dispatch]);
 
-  const onFinish = async (values) => {
+  const onFinish = (values) => {
     dispatch(resetUserPassword(values));
   };
 
@@ -39,7 +35,6 @@ const ResetPassword = () => {
     <div>
       <h3 className="text-blue-800 font-bold text-lg  pb-5">Reset Password</h3>
       <Form
-        form={form}
         name="resetPassword"
         onFinish={onFinish}
         size="large"
@@ -82,23 +77,15 @@ const ResetPassword = () => {
           />
         </Form.Item>
 
-        <Form.Item shouldUpdate>
-          {() => (
+        <Form.Item>
             <Button
               block
               className="font-bold"
               htmlType="submit"
               shape="round"
-              disabled={
-                !clientReady ||
-                !form.isFieldsTouched(true) ||
-                !!form.getFieldsError().filter(({ errors }) => errors.length)
-                  .length
-              }
             >
               Reset Password
             </Button>
-          )}
         </Form.Item>
       </Form>
     </div>

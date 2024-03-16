@@ -4,7 +4,6 @@ import DashboardCard from "./DashboardCard";
 import { useDispatch, useSelector } from "react-redux";
 import socket from "../../redux/api/socket";
 import { getEmployee } from "../../redux/Features/Employees/employeeSlice";
-// import { getAllStats } from "../../redux/Features/Stats/statsSlice";
 import { Link } from "react-router-dom";
 import Timer from "./Timer";
 import Search from "./Search";
@@ -34,7 +33,6 @@ const Dashboard = () => {
     const currentHour = new Date().getHours();
     setPeriodOfDay(currentHour === 12 ? "noon" : getPeriodOfDay(currentHour));
     dispatch(getEmployee());
-    // dispatch(getAllStats());
     socket.connect();
 
     // Listen for user count updates

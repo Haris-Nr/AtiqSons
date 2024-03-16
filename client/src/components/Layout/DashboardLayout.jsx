@@ -27,7 +27,7 @@ const DashboardLayout = () => {
   const [permissionChanged, setPermissionChanged] = useState(false);
   const [userInteracted, setUserInteracted] = useState(false);
   const screenSharingStream = useRef(null);
-  const { user } = useSelector((state) => state.fetch);
+  const { user, error } = useSelector((state) => state.fetch);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -69,10 +69,10 @@ const DashboardLayout = () => {
       dispatch(fetchUser());
       socket.connect();
     }
-  }, [dispatch, navigate]);
+  }, [dispatch, navigate, error]);
 
   const toggleCollapsed = () => {
-    if ((isMobile, headerMobile)) {
+    if (isMobile && headerMobile) {
       setCollapsed(!collapsed);
     } else {
       setCollapsed(collapsed ? false : true);
@@ -229,11 +229,11 @@ const DashboardLayout = () => {
 
   return (
     <>
-      {/* <div
+      <div
         onClick={(e) => {
           setUserInteracted(true);
         }}
-      > */}
+      >
         {contextHolder}
         <Layout hasSider>
           <Sidenav
@@ -275,7 +275,7 @@ const DashboardLayout = () => {
             <Foot />
           </Layout>
         </Layout>
-      {/* </div> */}
+      </div>
     </>
   );
 };

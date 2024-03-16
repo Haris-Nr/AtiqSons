@@ -23,7 +23,7 @@ router.get("/getemployeedetails/:id", authMiddleware, adminCheck, getEmployeeDet
 router.delete("/delete/:id", authMiddleware, adminCheck, deleteEmployee);
 router.patch("/changestatus/:id", authMiddleware, adminCheck, changeStatus);
 router.get("/currentuser", authMiddleware, fetchUser);
-router.post("/logout",logout)
-router.get("/getadmin", authMiddleware,getAdmin);
+router.post("/logout", logout)
+router.get("/getadmin", authMiddleware, getAdmin);
 
 module.exports = router;
