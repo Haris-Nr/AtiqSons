@@ -7,11 +7,14 @@ const cors = require("cors");
 const path = require("path");
 const morgan = require("morgan");
 require("dotenv").config();
+
 const dbConnect = require("./config/dbConnect");
 dbConnect();
-const scheduleProductReminders = require('./util/scheduleNotifications');
-require('./util/dailyTaskScheduler');
 
+const scheduleProductReminders = require('./util/scheduleProductNotifications');
+require('./util/dailyTaskScheduler');
+require("./util/deleteLogsScheduler");
+scheduleProductReminders();
 
 
 const io = initSocket(server);
@@ -67,13 +70,12 @@ app.use('/api/fiance', fianceRoutes);
 app.use('/api/fullfilment', fullfilmentRoutes);
 app.use('/api/stats', statsRoutes);
 
-scheduleProductReminders();
 
 
 
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "dist/index.html"));
-});
+// app.get("*", (req, res) => {
+//   res.sendFile(path.join(__dirname, "dist/index.html"));
+// });
 
 const PORT = process.env.PORT;
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));

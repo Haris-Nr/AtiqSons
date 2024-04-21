@@ -19,23 +19,21 @@ const LahoreProductTable = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { selectItemValue, company } = useParams();
-  const {
-    user: { employee },
-  } = useSelector((state) => state.fetch);
 
   const [productsList, setProductsList] = useState([]);
 
   const {
-    fetchProductData,
+    productdata,
     selectItemProducts,
     isLoading,
-    totalItems,
     currentPage,
     pageSize,
     search,
     priceLow,
     priceHigh,
   } = useSelector((state) => state.product);
+
+  console.log(productdata)
 
   const [localPriceLow, setLocalPriceLow] = useState(priceLow);
   const [localPriceHigh, setLocalPriceHigh] = useState(priceHigh);
@@ -65,15 +63,14 @@ const LahoreProductTable = () => {
 
   useEffect(() => {
     if (!selectItemValue) {
-      if (employee?._id && company) {
-        dispatch(Productsbyemployee({ productDataId: employee?._id, company }));
+      if (company) {
+        dispatch(Productsbyemployee({ company }));
       }
     } else {
       dispatch(fetchProductsBySelectItem(selectItemValue));
     }
   }, [
     dispatch,
-    employee,
     currentPage,
     pageSize,
     search,
@@ -87,10 +84,10 @@ const LahoreProductTable = () => {
     if (selectItemValue) {
       setProductsList(selectItemProducts);
     } else {
-      setProductsList(fetchProductData);
+      setProductsList(productdata.data);
     }
   }, [
-    fetchProductData,
+    productdata,
     selectItemProducts,
     selectItemValue,
     priceLow,
@@ -256,10 +253,6 @@ const LahoreProductTable = () => {
             .toLowerCase()
             .includes(search.toLowerCase())
         )
-        .map((item, index) => ({
-          ...item,
-          key: index,
-        }))
     : [];
 
   return (
@@ -269,6 +262,7 @@ const LahoreProductTable = () => {
         bordered
         loading={isLoading}
         title={() => heading}
+        rowKey={(record)=>record._id}
         columns={columns}
         dataSource={dataSourceWithKeys}
         pagination={{
@@ -276,7 +270,7 @@ const LahoreProductTable = () => {
           showSizeChanger: true,
           current: currentPage,
           pageSize: pageSize,
-          total: totalItems,
+          total: productdata.totalItems,
         }}
         onChange={handleTableChange}
         scroll={{

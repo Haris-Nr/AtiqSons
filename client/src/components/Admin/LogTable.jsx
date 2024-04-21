@@ -23,7 +23,7 @@ const LogTable = () => {
     if (logsRes.type && logsRes.message) {
       dispatch(showMessage({ message: logsRes.message, type: logsRes.type }));
     }
-  }, [logsRes, dispatch]);
+  }, [logsRes.type,logsRes.message, dispatch]);
 
   const handleTableChange = (pagination) => {
     setCurrentPage(pagination.current);

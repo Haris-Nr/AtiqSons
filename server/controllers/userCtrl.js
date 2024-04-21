@@ -151,23 +151,25 @@ const loginUser = async (req, res) => {
 const getEmployee = async (req, res) => {
   try {
 
+    const page = parseInt(req.query.page);
+    const limit = parseInt(req.query.limit);
+    const skip = (page - 1) * limit;
+
     const employees = await User.find({ role: "employee" })
       .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
       .select("fullname email mobile dashboard status createdAt");
+    const totalEmployees = await User.countDocuments({ role: "employee" });
 
-    const total = await User.countDocuments({ role: "employee" });
-
-     // Prepare to fetch the latest log for each employee
-     const employeesWithLogs = await Promise.all(
+    // Prepare to fetch the latest log for each employee
+    const employeesWithLogs = await Promise.all(
       employees.map(async (employee) => {
-        // Find the latest log for the current employee
         const latestLog = await Log.findOne({ user_id: employee._id }).sort({ createdAt: -1 });
-
-        // If a log exists, attach action and logstatus to the employee object
         if (latestLog) {
-          employee = employee.toObject(); // Convert the Mongoose document to a plain JavaScript object
+          employee = employee.toObject();
           employee.action = latestLog.action;
-          employee.logstatus = latestLog.logstatus;
+          employee.status = latestLog.logstatus;
         }
         return employee;
       })
@@ -175,11 +177,11 @@ const getEmployee = async (req, res) => {
 
     res.status(200).json({
       data: employeesWithLogs,
-      total,
+      totalEmployees
     });
   } catch (error) {
     res.status(500).json({
-      success: false,
+      type: "error",
       message: error.message,
     });
   }
@@ -222,16 +224,23 @@ const deleteEmployee = async (req, res) => {
   try {
     const { id } = req.params;
     const deletedEmployee = await User.findByIdAndDelete(id);
+
+    //// task delete function add karna hai.....
+    
+    // if(deletedEmployee){
+    //   await Task.de
+    // }
+    
     if (!deletedEmployee) {
       throw new Error("Employee already deleted");
     }
     res.status(200).json({
-      success: true,
+      type: "success",
       message: "Employee deleted successfully",
     });
   } catch (error) {
     res.status(500).json({
-      success: false,
+      type: "error",
       message: error.message,
     });
   }
@@ -262,12 +271,12 @@ const changeStatus = async (req, res) => {
     await User.findByIdAndUpdate(id, { status }, { new: true });
 
     res.status(200).json({
-      success: true,
+      type: "success",
       message: "Status change successfully",
     });
   } catch (error) {
     res.status(500).json({
-      success: false,
+      type: "error",
       message: error.message,
     });
   }
@@ -348,11 +357,13 @@ const logout = async (req, res) => {
     }
 
     res.status(200).json({
+      success: "logout",
       type: "success",
       message: "Logged out successfully",
     });
   } catch (error) {
     res.status(500).json({
+      success: "logout",
       type: "error",
       message: error.message,
     });
@@ -387,27 +398,55 @@ const getEmployeeDetails = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({
-      success: false,
+      type: "error",
       message: error.message,
     });
   }
 };
 
+// all admin 
 const getAdmin = async (req, res) => {
   try {
+
+    const page = parseInt(req.query.page);
+    const limit = parseInt(req.query.limit);
+    const skip = (page - 1) * limit;
+
     const admins = await User.find({ role: "admin" })
       .sort({ createdAt: -1 })
       .select("fullname email mobile dashboard status createdAt")
+      .skip(skip)
+      .limit(limit);
+
+    const totalAdmin = await User.countDocuments({ role: "admin" });
 
     res.status(200).json({
       data: admins,
+      totalAdmin,
     });
   } catch (error) {
     res.status(500).json({
+      type: "error",
       message: error.message,
     });
   }
 };
+
+// employee name & id
+const getEmployeeNameAndId = async (req, res) => {
+  try {
+    const employee = await User.find().select('_id fullname')
+
+    res.status(200).json({
+      data: employee,
+    });
+  } catch (error) {
+    res.status(500).json({
+      type:"error",
+      message: error.message,
+    });
+  }
+}
 
 module.exports = {
   createUser,
@@ -420,4 +459,5 @@ module.exports = {
   logout,
   getEmployeeDetails,
   getAdmin,
+  getEmployeeNameAndId,
 };

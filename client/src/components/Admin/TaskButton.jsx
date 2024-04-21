@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Button, Modal, Form, Select, message } from "antd";
 import { PlusCircleOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import { getEmployee } from "../../redux/Features/Employees/employeeSlice";
+import { getEmployeeNameAndId } from "../../redux/Features/Employees/employeeSlice";
 
 import { DatePicker } from "antd";
 import TextArea from "antd/es/input/TextArea";
@@ -37,10 +37,8 @@ const TaskButton = () => {
   }, [Addtaskdata, dispatch]);
 
   useEffect(() => {
-    if (!getEmployeedata.data) {
-      dispatch(getEmployee());
-    }
-  }, [dispatch, getEmployeedata.data]);
+      dispatch(getEmployeeNameAndId());
+  }, [dispatch]);
 
   const onFinish = (values) => {
     dispatch(addTask(values)).then(()=>{
@@ -76,7 +74,7 @@ const TaskButton = () => {
     resetFormAndCloseModal();
   };
 
-  const employee = getEmployeedata?.map((emp) => ({
+  const employee = getEmployeedata.data?.map((emp) => ({
     value: emp._id,
     label: emp.fullname,
   }));

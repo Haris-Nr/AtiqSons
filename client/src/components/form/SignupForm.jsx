@@ -5,12 +5,14 @@ import PhoneInput from "react-phone-number-input";
 import { useSelector, useDispatch } from "react-redux";
 import { showMessage } from "../../redux/Features/message/messageSlice";
 import { resetresMessageState } from "../../redux/Features/auth/authSlice";
+import "react-phone-number-input/style.css";
 
-const SignupForm = ({ onFinish, dashboard, role, navigate, handleCancel }) => {
+const SignupForm = ({ onFinish, dashboard, role, navigate, handleCancel,isEmployeePage }) => {
+
   const dispatch = useDispatch();
   const [form] = Form.useForm();
   const { resMessage } = useSelector((state) => state.auth);
-
+  
   useEffect(() => {
     if (resMessage.type && resMessage.message) {
       dispatch(
@@ -21,7 +23,7 @@ const SignupForm = ({ onFinish, dashboard, role, navigate, handleCancel }) => {
         form.resetFields();
         handleCancel && handleCancel();
         navigate && navigate("/");
-      }
+        }
     }
   }, [dispatch, navigate, resMessage, form, handleCancel]);
 
@@ -138,7 +140,7 @@ const SignupForm = ({ onFinish, dashboard, role, navigate, handleCancel }) => {
         )}
         <Form.Item>
           <Button block className="font-bold" htmlType="submit" shape="round">
-            Sign Up
+            {isEmployeePage ? "Add Employee" : "Sign Up"}
           </Button>
         </Form.Item>
       </Form>

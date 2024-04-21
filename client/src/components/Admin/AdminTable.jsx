@@ -1,37 +1,41 @@
 import React, { useState,useEffect } from "react";
 import { Table, Tag } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { getAdmin } from "../../redux/Features/Employees/employeeSlice";
+import { getAdmin, resetgetEmployeedataState } from "../../redux/Features/Employees/employeeSlice";
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
 import EmployeeButton from "./EmployeeButton";
 import socket from "../../redux/api/socket";
+import { showMessage } from "../../redux/Features/message/messageSlice";
 
 const AdminTable = () => {
 
   const dispatch = useDispatch();
-  const [pagination, setPagination] = useState({
-    current: 1,
-    pageSize: 10,
-  });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
-  const { getAdmindata, isLoading } = useSelector((state) => state.employee);
+  const { getEmployeedata, isLoading } = useSelector((state) => state.employee);
   const navigate = useNavigate();
 
 
   useEffect(() => {
-    dispatch(getAdmin());
-    socket.connect();
-    
-    
-  }, [dispatch]);
+    dispatch(getAdmin({ page: currentPage, limit: pageSize }));
+    socket.connect();    
+  }, [dispatch,currentPage, pageSize]);
+
+  useEffect(()=>{
+    if (getEmployeedata.type && getEmployeedata.message) {
+      dispatch(
+        showMessage({ message: getEmployeedata.message, type: getEmployeedata.type })
+      );
+      dispatch(resetgetEmployeedataState())
+    }
+  },[dispatch,getEmployeedata.message,getEmployeedata.type])
+
 
   const handleTableChange = (newPagination) => {
-    setPagination({
-      ...pagination,
-      current: newPagination.current,
-      pageSize: newPagination.pageSize,
-    });
+    setCurrentPage(newPagination.current);
+    setPageSize(newPagination.pageSize);
   };
 
   const columns = [
@@ -39,7 +43,7 @@ const AdminTable = () => {
       title: "SrNo",
       key: "srNo",
       render: (text, record, index) => {
-        return (pagination.current - 1) * pagination.pageSize + index + 1;
+        return (currentPage - 1) * pageSize + index + 1;
       },
     },
     {
@@ -92,17 +96,9 @@ const AdminTable = () => {
     };
   };
 
-  const dataSourceWithKeys = getAdmindata
-    ? getAdmindata
-        .map((item,index) => ({
-          ...item,
-          key: index,
-        }))
-    : [];
-
   const heading = (
     <div className="flex justify-end">
-      <EmployeeButton />
+      <EmployeeButton currentPage={currentPage} pageSize={pageSize} />
     </div>
   );
 
@@ -114,10 +110,15 @@ const AdminTable = () => {
        size="small"
         title={() => heading}
         columns={columns}
-        dataSource={dataSourceWithKeys}
+        rowKey={(record) => record._id}
+        dataSource={getEmployeedata.data}
         scroll={{ x: true }}
         onRow={onRowClick}
-        pagination={pagination}
+        pagination={{
+          current: currentPage,
+          pageSize: pageSize,
+          total: getEmployeedata.totalAdmin,
+        }}
         onChange={handleTableChange}
       />
     </div>

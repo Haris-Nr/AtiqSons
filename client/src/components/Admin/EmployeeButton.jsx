@@ -11,7 +11,8 @@ import socket from "../../redux/api/socket";
 import { useLocation } from "react-router-dom";
 import SignupForm from "../form/SignupForm";
 
-const EmployeeButton = () => {
+const EmployeeButton = ({ currentPage, pageSize }) => {
+
   const location = useLocation();
   const dispatch = useDispatch();
 
@@ -42,9 +43,9 @@ const EmployeeButton = () => {
   const onFinish = (values) => {
     dispatch(signupUser(values)).then(() => {
       if (isEmployeePage) {
-        dispatch(getEmployee());
+        dispatch(getEmployee({ page: currentPage, limit: pageSize }));
       } else {
-        dispatch(getAdmin());
+        dispatch(getAdmin({ page: currentPage, limit: pageSize }));
       }
     });
   };
@@ -83,6 +84,7 @@ const EmployeeButton = () => {
           dashboard={dashboard}
           role={role}
           handleCancel={handleCancel}
+          isEmployeePage={isEmployeePage}
         />
       </Modal>
     </>

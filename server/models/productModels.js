@@ -63,10 +63,6 @@ const productSchema = new Schema(
             type: String,
             required: true,
         },
-        employeeName: {
-            type: String,
-            required: true,
-        },
         tracking: {
             type: String,
             enum: ["tracking", "tracked", "pending"],

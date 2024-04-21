@@ -1,6 +1,5 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import "react-phone-number-input/style.css";
 import { useDispatch } from "react-redux";
 import { signupUser } from "../redux/Features/auth/authSlice";
 import SignupForm from "../components/form/SignupForm";
@@ -9,16 +8,10 @@ const Signup = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const onFinish = async (values) => {
+  const onFinish = (values) => {
     dispatch(signupUser(values));
   };
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      navigate("/");
-    }
-  }, [navigate]);
 
   const dashboard = [
     {

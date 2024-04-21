@@ -103,7 +103,6 @@ const SingleProductPage = () => {
     }
   }, [trackStatusData, dispatch]);
 
-
   const items = [
     {
       key:'0',
@@ -279,7 +278,7 @@ const SingleProductPage = () => {
             )}
 
             { (!(user?.employee?.role === "admin" ||
-              user?.employee?.role === "superadmin") &&  user?.employee?._id === product?.createdBy ) &&  <ProductButton productId={id} productData={SingleProductData?.data}/>}
+              user?.employee?.role === "superadmin") &&  user?.employee?._id === product?.createdBy ) &&  <ProductButton productId={id} initialProductData={SingleProductData?.data}/>}
             {!(user?.employee?.dashboard === "dubai") ? (
               <DeleteButton onConfirmDelete={() => handleDelete(id)} />
             ) : (

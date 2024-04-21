@@ -129,7 +129,7 @@ const Sidenav = ({
 
     //admin
     employeeDashboard === "admin" && {
-      label: "Employee",
+      label: "Employees",
       key: "employees",
       icon: <BsPersonFill />,
     },

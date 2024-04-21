@@ -7,7 +7,7 @@ const CrumBread = () => {
   const location = useLocation();
   const { pathname } = location;
   const pathnames = pathname.split("/").filter((item) => item);
-  const { employeeDetails } = useSelector((state) => state.employee);
+  const { getEmployeedata } = useSelector((state) => state.employee);
   const { SingleProductData } = useSelector((state) => state.product);
 
   const isObjectId = (item) => {
@@ -15,8 +15,8 @@ const CrumBread = () => {
   };
   const getTitle = (item) => {
     if (isObjectId(item)) {
-      if (employeeDetails?.employee?._id === item) {
-        return employeeDetails.employee.fullname;
+      if (getEmployeedata?.employee?._id === item) {
+        return getEmployeedata.employee.fullname;
       } else if(SingleProductData?.data?._id === item){
         return SingleProductData?.data?.productName;
       }

@@ -11,24 +11,27 @@ const createProduct = async (req, res) => {
   try {
     // find product by asin NO
     const findProductByAsin = await Product.findOne({ asin: req.body.asin });
+    console.log(findProductByAsin)
     if (findProductByAsin) {
       return res.status(400).json({
-        success: false,
-        message: "Product with this ASIN already exists in the product list added by " + findProductByAsin.seller,
+        type: "error",
+        message: "Product with this ASIN already exists in the product list",
       });
     }
 
     const findProductBySku = await Product.findOne({ sku: req.body.sku });
     if (findProductBySku) {
       return res.status(400).json({
-        success: false,
-        message: "Product with this SKU already exists in the product list added by " + findProductBySku.seller,
+        type: "error",
+        message: "Product with this SKU already exists in the product list",
       });
     }
 
     if (req.body.selectItem === "tracking") {
       req.body.tracking = "tracking";
     }
+
+    console.log(req.file)
 
     let image = "";
     if (req.file) {
@@ -87,12 +90,12 @@ const createProduct = async (req, res) => {
     }
 
     res.status(201).json({
-      success: true,
+      type: "success",
       message: "Product created successfully",
     });
   } catch (error) {
     res.status(500).json({
-      success: false,
+      type: "error",
       message: error.message,
     });
   }
@@ -106,18 +109,15 @@ const fetchProducts = async (req, res) => {
     const skip = (page - 1) * limit;
     const search = req.query.search;
     const priceLow = parseFloat(req.query.priceLow);
-    const priceHigh = parseFloat(req.query.priceHigh); 
-
-    if (!req.body.createdBy) {
-      throw new Error("Creator ID (createdBy) must be provided");
-    }
+    const priceHigh = parseFloat(req.query.priceHigh);
+    const company = req.query.company;
 
     let query = {
-      createdBy: req.body.createdBy,
+      createdBy: req.body.userId,
     };
 
-    if (req.body.company) {
-      query.company = req.body.company;
+    if (company) {
+      query.company = company;
     }
 
     if (!isNaN(priceLow) && !isNaN(priceHigh)) {
@@ -131,10 +131,10 @@ const fetchProducts = async (req, res) => {
       query.$or = [
         { productName: { $regex: search, $options: "i" } },
         { asin: { $regex: search, $options: "i" } },
-        {sku: { $regex: search, $options: "i" } },
+        { sku: { $regex: search, $options: "i" } },
       ];
-      if (req.body.company) {
-        query.company = req.body.company;
+      if (company) {
+        query.company = company;
       }
     }
 
@@ -150,16 +150,10 @@ const fetchProducts = async (req, res) => {
     res.status(200).json({
       data: products,
       totalItems: totalCount,
-      currentPage: page,
-      itemsPerPage: limit,
-      search: search,
-      priceLow:priceLow,
-      priceHigh:priceHigh,
     });
   } catch (error) {
-    console.log(error);
     res.status(500).json({
-      success: false,
+      type: "error",
       message: error.message,
     });
   }
@@ -174,11 +168,11 @@ const allProduct = async (req, res) => {
     const search = req.query.search;
     const company = req.query.company;
     const priceLow = parseFloat(req.query.priceLow);
-    const priceHigh = parseFloat(req.query.priceHigh); 
+    const priceHigh = parseFloat(req.query.priceHigh);
 
     let queryObj = {};
 
-    
+
 
     if (search) {
       queryObj = {
@@ -202,27 +196,25 @@ const allProduct = async (req, res) => {
     }
 
     const products = await Product.find(queryObj)
+      .populate({
+        path: "createdBy",
+        select: "fullname -_id",
+      })
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
-      .select("image productName asin status employeeName price currency sku")
+      .select("image productName asin status price currency sku")
       .exec();
 
     const totalProduct = await Product.countDocuments(queryObj);
 
     res.status(200).json({
       data: products,
-      page: page,
-      limit: limit,
       totalProduct: totalProduct,
-      search: search,
-      priceLow:priceLow,
-      priceHigh:priceHigh,
     });
   } catch (error) {
-    console.log(error.message)
     res.status(400).json({
-      success: false,
+      type: "error",
       message: error.message,
     });
   }
@@ -302,8 +294,7 @@ const changeStatus = async (req, res) => {
       io,
       null,
       updatedProduct.createdBy,
-      `${updatedProduct.productName.slice(0, 20)} has been ${status} by ${
-        user.fullname
+      `${updatedProduct.productName.slice(0, 20)} has been ${status} by ${user.fullname
       }`,
       "Product Status Updated",
       user.fullname,
@@ -369,8 +360,7 @@ const changeTrackStatus = async (req, res) => {
       io,
       null,
       updatedProduct.createdBy,
-      `${updatedProduct.productName.slice(0, 20)} add in ${tracking} state by ${
-        admin.fullname
+      `${updatedProduct.productName.slice(0, 20)} add in ${tracking} state by ${admin.fullname
       }`,
       "Product Status Updated",
       admin.fullname,
@@ -428,7 +418,7 @@ const trackProduct = async (req, res) => {
 const gettrackproduct = async (req, res) => {
   try {
     const id = req.params.id;
-    
+
     const trackProduct = await Track.find({ productId: id });
 
     res.json({
@@ -549,7 +539,7 @@ const fetchProductsBySelectItem = async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
     const priceLow = parseFloat(req.query.priceLow);
-    const priceHigh = parseFloat(req.query.priceHigh); 
+    const priceHigh = parseFloat(req.query.priceHigh);
     const { search, selectItem, createdBy } = req.query;
 
     let query = { selectItem };
@@ -571,7 +561,7 @@ const fetchProductsBySelectItem = async (req, res) => {
         { asin: { $regex: search, $options: "i" } },
         { employeeName: { $regex: search, $options: "i" } },
         { company: { $regex: search, $options: "i" } },
-        {sku: { $regex: search, $options:"i" } },
+        { sku: { $regex: search, $options: "i" } },
       ];
     }
 
@@ -592,8 +582,8 @@ const fetchProductsBySelectItem = async (req, res) => {
       itemsPerPage: limit,
       totalPages: Math.ceil(totalCount / limit),
       search: search,
-      priceLow:priceLow,
-      priceHigh:priceHigh,
+      priceLow: priceLow,
+      priceHigh: priceHigh,
     });
   } catch (error) {
     res.status(500).json({
@@ -613,7 +603,7 @@ const updateProduct = async (req, res) => {
 
     if (!product) {
       return res.status(404).json({
-        success: false,
+        type: "error",
         message: "Product not found",
       });
     }
@@ -648,19 +638,18 @@ const updateProduct = async (req, res) => {
 
     if (!updatedProduct) {
       return res.status(404).json({
-        success: false,
+        type: "error",
         message: "Product not found",
       });
     }
 
     res.status(200).json({
-      success: true,
+      type: "success",
       message: "Product updated successfully",
-      data: updatedProduct,
     });
   } catch (error) {
     res.status(500).json({
-      success: false,
+      type: "error",
       message: error.message,
     });
   }
@@ -680,31 +669,31 @@ const deleteTrack = async (req, res) => {
 
 const searchProducts = async (req, res) => {
   try {
-      const { query } = req.query;
+    const { query } = req.query;
 
-      if (query) {
-          const regex = new RegExp(query, 'i');
-          const searchCriteria = [
-              { sku: regex },
-              { productName: regex },
-              { description: regex },
-              { asin: regex },
-              { seller: regex },
-              { company: regex },
-              { seasonalCategory: regex }
-          ];
+    if (query) {
+      const regex = new RegExp(query, 'i');
+      const searchCriteria = [
+        { sku: regex },
+        { productName: regex },
+        { description: regex },
+        { asin: regex },
+        { seller: regex },
+        { company: regex },
+        { seasonalCategory: regex }
+      ];
 
-          const products = await Product.find({ $or: searchCriteria });
+      const products = await Product.find({ $or: searchCriteria });
 
-          // Send the found products as a response
-          res.status(200).json(products);
-      } else {
-          // If no query is provided, don't perform a search. Return an empty array or a specific message.
-          res.status(200).json({ message: "Please provide a search term." });
-      }
+      // Send the found products as a response
+      res.status(200).json(products);
+    } else {
+      // If no query is provided, don't perform a search. Return an empty array or a specific message.
+      res.status(200).json({ message: "Please provide a search term." });
+    }
   } catch (error) {
     console.log(error.message)
-      res.status(500).json({ message: "Error searching for products", error: error.message });
+    res.status(500).json({ message: "Error searching for products", error: error.message });
   }
 };
 

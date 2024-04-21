@@ -2,12 +2,12 @@ import axiosInstance from './axiosInstance';
 
 const addProduct = async (productData) => {
     try {
-        const response = await axiosInstance.post(`/api/product/addproduct`, productData, {
+        const {data} = await axiosInstance.post(`/api/product/addproduct`, productData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }
         });
-        return response.data;
+        return data;
     } catch (error) {
         throw error.response.data
     }
@@ -23,18 +23,15 @@ const fetchProductsBySelectItem = async (selectItem,page,limit,search, priceLow,
     }
 }
 
-const fetchProductsbyemployee = async ( productDataId, company ,page,limit,search, priceLow, priceHigh) => {
+const fetchProductsbyemployee = async ( company ,page,limit,search, priceLow, priceHigh) => {
     try {
 
-        const queryParams = `?page=${page}&limit=${limit}&search=${search}&priceLow=${priceLow}&priceHigh=${priceHigh}`;
+        const queryParams = `?page=${page}&limit=${limit}&search=${search}&priceLow=${priceLow}&priceHigh=${priceHigh}&company=${company}`;
 
-        const response = await axiosInstance.post(`/api/product/fetchProductsbyemployee${queryParams}`, {
-            createdBy: productDataId,
-            company: company,
-        });
-        return response.data;
+        const {data} = await axiosInstance.get(`/api/product/fetchProductsbyemployee${queryParams}`);
+        return data;
     } catch (error) {
-        throw (error.response && error.response.data) ? error.response.data : error;
+        throw error.response.data
     }
 };
 
@@ -50,8 +47,8 @@ const getSingleProduct = async (id) => {
 
 const getAllProduct = async (page, limit, search,company, priceLow, priceHigh) => {
     try {
-        const response = await axiosInstance.get(`/api/product/fetchallProduct?page=${page}&limit=${limit}&search=${search}&company=${company}&priceLow=${priceLow}&priceHigh=${priceHigh}`);
-        return response.data;
+        const {data} = await axiosInstance.get(`/api/product/fetchallProduct?page=${page}&limit=${limit}&search=${search}&company=${company}&priceLow=${priceLow}&priceHigh=${priceHigh}`);
+        return data;
     } catch (error) {
         throw error.response.data;
     }
@@ -124,12 +121,12 @@ const dubaiProduct = async (page,limit,search) => {
 
 const updateProduct = async (id, productData) => {
     try {
-        const response = await axiosInstance.put(`/api/product/update/${id}`, productData, {
+        const {data} = await axiosInstance.put(`/api/product/update/${id}`, productData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }
         });
-        return response.data;
+        return data;
     } catch (error) {
         throw error.response.data;
     }

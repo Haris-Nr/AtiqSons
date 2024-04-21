@@ -3,7 +3,7 @@ import statsApi from "../../api/statsApi";
 
 const initialState = {
     statsData: {},
-    loading: false,
+    empTaskData: [],
     error: null,
 };
 
@@ -12,10 +12,20 @@ export const getAllStats = createAsyncThunk(
     "stats/",
     async (timeFrame, { rejectWithValue }) => {
         try {
-            const response = await statsApi.getAllStats(
+            return await statsApi.getAllStats(
                 timeFrame
             );
-            return response;
+        } catch (error) {
+            return rejectWithValue(error);
+        }
+    }
+);
+
+export const getAllCompletedDailyTasksWithEmployeeDetails = createAsyncThunk(
+    "stats/completed-tasks",
+    async (_, { rejectWithValue }) => {
+        try {
+            return await statsApi.getAllCompletedDailyTasksWithEmployeeDetails();
         } catch (error) {
             return rejectWithValue(error);
         }
@@ -27,19 +37,21 @@ const statsSlice = createSlice({
     name: "stats",
     initialState,
     reducers: {},
-    extraReducers:(builder) => {
+    extraReducers: (builder) => {
         builder
-            .addCase(getAllStats.pending, (state) => {
-                state.loading = true;
-            })
             .addCase(getAllStats.fulfilled, (state, action) => {
-                state.loading = false;
                 state.statsData = action.payload;
             })
             .addCase(getAllStats.rejected, (state, action) => {
-                state.loading = false;
                 state.error = action.payload;
             })
+            // all completed task by employees
+            .addCase(getAllCompletedDailyTasksWithEmployeeDetails.fulfilled, (state, action) => {
+                state.empTaskData = action.payload;
+            })
+            .addCase(getAllCompletedDailyTasksWithEmployeeDetails.rejected, (state, action) => {
+                state.error = action.payload;
+            });
     },
 });
 

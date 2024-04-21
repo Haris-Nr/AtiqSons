@@ -19,12 +19,12 @@ const LogoutButton = () => {
   const { resMessage } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    if (resMessage.type && resMessage.message) {
+    if (resMessage.type && resMessage.message && resMessage.success) {
       dispatch(
         showMessage({ message: resMessage.message, type: resMessage.type })
       );
       dispatch(resetresMessageState());
-      if (resMessage.type === "success") {
+      if (resMessage.type === "success" && resMessage.success === "logout") {
         localStorage.removeItem("token");
         handleClockOut();
         socket.disconnect();

@@ -40,7 +40,9 @@ router.post(
   upload.single("image"),
   createProduct
 );
-router.post("/fetchProductsbyemployee", authMiddleware, fetchProducts);
+router.get("/fetchProductsbyemployee", authMiddleware, fetchProducts);
+
+router.get("/fetchallProduct", authMiddleware, adminCheck, allProduct);
 
 router.put("/update/:id", authMiddleware, upload.single("image"),updateProduct);
 
@@ -57,7 +59,6 @@ router.patch(
   changeStatus
 );
 
-router.get("/fetchallProduct", authMiddleware, adminCheck, allProduct);
 
 router.post("/trackProduct", authMiddleware, trackProduct);
 

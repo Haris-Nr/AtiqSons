@@ -13,6 +13,7 @@ const initialState = {
   data: [],
 
   productdata: {},
+  
   SingleProductData: {},
   deleteProductData: {},
   productStatusData: {},
@@ -22,12 +23,10 @@ const initialState = {
 
   currentPage: 1,
   pageSize: 10,
-  totalItems: 0,
   search: "",
-  totalProduct: 0,
   priceLow:null,
   priceHigh:null,
-
+  
   isLoading: false,
   error: {},
 };
@@ -36,8 +35,7 @@ export const addProduct = createAsyncThunk(
   "product/addProduct",
   async (addproductData, thunkAPI) => {
     try {
-      const response = await productApi.addProduct(addproductData);
-      return response;
+      return await productApi.addProduct(addproductData);
     } catch (error) {
       return thunkAPI.rejectWithValue(error);
     }
@@ -46,11 +44,10 @@ export const addProduct = createAsyncThunk(
 
 export const Productsbyemployee = createAsyncThunk(
   "product/Productsbyemployee",
-  async ({ productDataId, company }, { getState, rejectWithValue }) => {
+  async ({ company }, { getState, rejectWithValue }) => {
     try {
       const { currentPage, pageSize, search,priceLow,priceHigh } = getState().product;
-      const response = await productApi.fetchProductsbyemployee(
-        productDataId,
+      return await productApi.fetchProductsbyemployee(
         company,
         currentPage,
         pageSize,
@@ -58,7 +55,7 @@ export const Productsbyemployee = createAsyncThunk(
         priceLow,
         priceHigh
       );
-      return response;
+      
     } catch (error) {
       return rejectWithValue(error);
     }
@@ -102,7 +99,7 @@ export const AllProduct = createAsyncThunk(
   async (company, { getState, rejectWithValue }) => {
     try {
       const { currentPage, pageSize, search,priceLow,priceHigh } = getState().product;
-      const response = await productApi.getAllProduct(
+      return await productApi.getAllProduct(
         currentPage,
         pageSize,
         search,
@@ -110,7 +107,6 @@ export const AllProduct = createAsyncThunk(
         priceLow,
         priceHigh,
       );
-      return response;
     } catch (error) {
       return rejectWithValue(error);
     }
@@ -222,8 +218,7 @@ export const updateProductById = createAsyncThunk(
   "product/updateProductById",
   async ({ id, updatedProductData }, thunkAPI) => {
     try {
-      const response = await productApi.updateProduct(id, updatedProductData);
-      return response;
+      return await productApi.updateProduct(id, updatedProductData);
     } catch (error) {
       return thunkAPI.rejectWithValue(error);
     }
@@ -293,15 +288,10 @@ export const productSlice = createSlice({
   extraReducers: (builder) => {
     builder
       // add product
-      .addCase(addProduct.pending, (state) => {
-        state.isLoading = true;
-      })
       .addCase(addProduct.fulfilled, (state, action) => {
-        state.isLoading = false;
         state.productdata = action.payload;
       })
       .addCase(addProduct.rejected, (state, action) => {
-        state.isLoading = false;
         state.productdata = action.payload;
       })
 
@@ -311,17 +301,11 @@ export const productSlice = createSlice({
       })
       .addCase(Productsbyemployee.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.fetchProductData = action.payload.data;
-        state.currentPage = action.payload?.currentPage;
-        state.pageSize = action.payload?.itemsPerPage;
-        state.totalItems = action.payload?.totalItems;
-        state.search = action.payload?.search;
-        state.priceHigh = action.payload?.priceHigh
-        state.priceLow = action.payload?.priceLow
+        state.productdata = action.payload;
       })
       .addCase(Productsbyemployee.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
+        state.productdata = action.payload;
       })
       // products by select item
       .addCase(fetchProductsBySelectItem.pending, (state) => {
@@ -359,17 +343,11 @@ export const productSlice = createSlice({
       })
       .addCase(AllProduct.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.AllProductData = action?.payload?.data;
-        state.currentPage = action.payload?.page;
-        state.pageSize = action.payload?.limit;
-        state.totalProduct = action.payload?.totalProduct;
-        state.search = action.payload?.search;
-        state.priceLow = action.payload?.priceLow;
-        state.priceHigh = action.payload?.priceHigh;
+        state.productdata = action.payload;
       })
       .addCase(AllProduct.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
+        state.productdata = action.payload;
       })
       // delete product
       .addCase(deleteProductbyId.pending, (state) => {
@@ -461,17 +439,15 @@ export const productSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload;
       })
-      .addCase(updateProductById.pending, (state) => {
-        state.isLoading = true;
-      })
+      
+      // update product
       .addCase(updateProductById.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.updateProduct = action.payload;
+        state.productdata = action.payload;
       })
       .addCase(updateProductById.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload;
+        state.productdata = action.payload;
       })
+
       .addCase(AllTrackingProduct.pending, (state) => {
         state.isLoading = true;
       })

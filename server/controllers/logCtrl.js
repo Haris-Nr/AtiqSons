@@ -36,23 +36,4 @@ const getAllLogs = async (req, res) => {
     }
 };
 
-const deleteAllLogs = async (req, res) => {
-    try {
-        const date30DaysAgo = new Date(
-            new Date().setDate(new Date().getDate() - 30)
-        );
-
-        await Log.deleteMany({
-            createdAt: { $lt: date30DaysAgo },
-        });
-
-        res
-            .status(200)
-            .send("Logs older than 30 days have been deleted successfully.");
-    } catch (error) {
-        console.error("Failed to delete logs:", error);
-        res.status(500).send("Error deleting logs.");
-    }
-};
-
-module.exports = { getAllLogs, deleteAllLogs };
+module.exports = { getAllLogs };

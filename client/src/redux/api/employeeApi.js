@@ -1,9 +1,10 @@
 import axiosInstance from './axiosInstance';
 
 
-const getEmployee = async () => {
+const getEmployee = async (page,limit) => {
     try {
-        const { data } = await axiosInstance.get(`/api/user/getemployee`);
+        const queryParams = `?page=${page}&limit=${limit}`;
+        const { data } = await axiosInstance.get(`/api/user/getemployee${queryParams}`);
         return data;
     } catch (error) {
         throw error.response.data;
@@ -13,8 +14,8 @@ const getEmployee = async () => {
 
 const deleteEmployee = async (id) => {
     try {
-        const response = await axiosInstance.delete(`/api/user/delete/${id}`);
-        return response.data;
+        const {data} = await axiosInstance.delete(`/api/user/delete/${id}`);
+        return data;
     } catch (error) {
         throw error.response.data;
     }
@@ -22,8 +23,8 @@ const deleteEmployee = async (id) => {
 
 const changeStatus = async (id, newStatus) => {
     try {
-        const response = await axiosInstance.patch(`/api/user/changestatus/${id}`,{ status: newStatus });
-        return response.data;
+        const {data} = await axiosInstance.patch(`/api/user/changestatus/${id}`,{ status: newStatus });
+        return data;
     } catch (error) {
         throw error.response.data;
     }
@@ -38,10 +39,20 @@ const getEmployeeDetails = async (id) => {
     }
 };
 
-
-const getAdmin = async () => {
+const getAdmin = async (page,limit) => {
     try {
-        const {data} = await axiosInstance.get(`/api/user/getadmin`);
+        const queryParams = `?page=${page}&limit=${limit}`;
+        const {data} = await axiosInstance.get(`/api/user/getadmin${queryParams}`);
+        return data;
+    } catch (error) {
+        throw error.response.data;
+    }
+    
+};
+
+const getEmployeeNameAndId = async () => {
+    try {
+        const {data} = await axiosInstance.get(`/api/user/getempnameid`);
         return data;
     } catch (error) {
         throw error.response.data;
@@ -55,6 +66,7 @@ const employeeApi = {
     changeStatus,
     getEmployeeDetails,
     getAdmin,
+    getEmployeeNameAndId,
 };
 
 export default employeeApi;

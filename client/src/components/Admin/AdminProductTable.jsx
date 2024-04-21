@@ -25,16 +25,17 @@ const AdminProductTable = () => {
   const { selectItemValue,company } = useParams();
   const [productsList, setProductsList] = useState([]);
   const {
-    AllProductData,
+    productdata,
     selectItemProducts,
     isLoading,
     currentPage,
     pageSize,
-    totalProduct,
     search,
     priceLow,
     priceHigh,
   } = useSelector((state) => state.product);
+
+  console.log(productdata)
 
   const [localPriceLow, setLocalPriceLow] = useState(priceLow);
   const [localPriceHigh, setLocalPriceHigh] = useState(priceHigh);
@@ -89,9 +90,9 @@ const AdminProductTable = () => {
     if(selectItemValue){
       setProductsList(selectItemProducts);
     } else{
-      setProductsList(AllProductData);
+      setProductsList(productdata.data);
     }
-  }, [selectItemProducts, AllProductData, selectItemValue,company,priceLow,
+  }, [selectItemProducts, productdata.data, selectItemValue,company,priceLow,
     priceHigh,]);
 
 
@@ -136,7 +137,7 @@ const AdminProductTable = () => {
       title: "Employee Name",
       dataIndex:'employeeName',
       key: "Employee Name",
-      render: (text) => renderColumnWithHighlight(text),
+      render: (text,record) => renderColumnWithHighlight(record.createdBy.fullname),
     },
     {
       title: "Asin No",
@@ -260,7 +261,7 @@ const AdminProductTable = () => {
           showSizeChanger: true,
           current: currentPage,
           pageSize: pageSize,
-          total: totalProduct,
+          total: productdata.totalProduct,
         }}
         onChange={handleTableChange}
         onRow={onRowClick}

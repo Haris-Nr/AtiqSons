@@ -24,8 +24,8 @@ const Login = () => {
     dispatch(loginUser(values));
   };
 
+  
   const token = localStorage.getItem("token");
-
   useEffect(() => {
     if (token) {
       dispatch(fetchUser());

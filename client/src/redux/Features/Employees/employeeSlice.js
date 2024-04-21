@@ -2,23 +2,15 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import employeeApi from "../../api/employeeApi";
 
 const initialState = {
-
-    getEmployeedata: [],
-    getAdmindata: [],
-    deleteEmployeedata: {},
-    changeStatusdata: {},
-    employeeDetails: {},
+    getEmployeedata: {},
     isLoading: false,
-    error: {},
-    totalItems:null
 };
 
 export const getEmployee = createAsyncThunk(
     "user/getemployee",
-    async (_, { rejectWithValue }) => {
+    async ({page,limit}, { rejectWithValue }) => {
         try {
-            const response = await employeeApi.getEmployee();
-            return response;
+            return await employeeApi.getEmployee(page, limit);
         } catch (error) {
             return rejectWithValue(error);
         }
@@ -27,10 +19,10 @@ export const getEmployee = createAsyncThunk(
 
 export const getAdmin = createAsyncThunk(
     "user/getAdmin",
-    async (_, { rejectWithValue }) => {
+    async ({page,limit}, { rejectWithValue }) => {
         try {
-            const response = await employeeApi.getAdmin();
-            return response;
+            return await employeeApi.getAdmin(page,limit);
+            
         } catch (error) {
             return rejectWithValue(error);
         }
@@ -41,8 +33,7 @@ export const deleteEmployee = createAsyncThunk(
     "user/delete",
     async (id, thunkAPI) => {
         try {
-            const response = await employeeApi.deleteEmployee(id);
-            return response;
+            return await employeeApi.deleteEmployee(id);
         } catch (error) {
             return thunkAPI.rejectWithValue(error);
         }
@@ -53,8 +44,7 @@ export const changeUserStatus = createAsyncThunk(
     "user/changeStatus",
     async ({ id, newStatus }, thunkAPI) => {
         try {
-            const response = await employeeApi.changeStatus(id, newStatus);
-            return response;
+            return await employeeApi.changeStatus(id, newStatus);
         } catch (error) {
             return thunkAPI.rejectWithValue(error);
         }
@@ -73,15 +63,23 @@ export const getEmployeeDetails = createAsyncThunk(
     }
 );
 
+export const getEmployeeNameAndId = createAsyncThunk(
+    "user/getempnameid",
+    async (_, { rejectWithValue }) => {
+        try {
+            return await employeeApi.getEmployeeNameAndId();
+        } catch (error) {
+            return rejectWithValue(error);
+        }
+    }
+);
+
 export const employeeSlice = createSlice({
     name: "employee",
     initialState,
     reducers: {
-        resetDeleteState: (state) => {
-            state.deleteEmployeedata = {};
-        },
-        resetStatusState: (state) => {
-            state.changeStatusdata = {};
+        resetgetEmployeedataState: (state) => {
+            state.getEmployeedata = {};
         },
     },
     extraReducers: (builder) => {
@@ -93,11 +91,11 @@ export const employeeSlice = createSlice({
             })
             .addCase(getAdmin.fulfilled, (state, action) => {
                 state.isLoading = false;
-                state.getAdmindata = action.payload.data;
+                state.getEmployeedata = action.payload;
             })
             .addCase(getAdmin.rejected, (state, action) => {
                 state.isLoading = false;
-                state.error = action.payload;
+                state.getEmployeedata = action.payload;
             })
 
             // employee
@@ -106,57 +104,47 @@ export const employeeSlice = createSlice({
             })
             .addCase(getEmployee.fulfilled, (state, action) => {
                 state.isLoading = false;
-                state.getEmployeedata = action.payload.data;
-                state.totalItems = action.payload.total;
+                state.getEmployeedata = action.payload;
             })
             .addCase(getEmployee.rejected, (state, action) => {
                 state.isLoading = false;
-                state.error = action.payload;
+                state.getEmployeedata = action.payload;
             })
 
             // deleteEmployee
-            .addCase(deleteEmployee.pending, (state) => {
-                state.isLoading = true;
-            })
             .addCase(deleteEmployee.fulfilled, (state, action) => {
-                state.isLoading = false;
-                state.deleteEmployeedata = action.payload;
+                state.getEmployeedata = action.payload;
             })
             .addCase(deleteEmployee.rejected, (state, action) => {
-                state.isLoading = false;
-                state.deleteEmployeedata = action.payload;
+                state.getEmployeedata = action.payload;
             })
 
             // change status
-            .addCase(changeUserStatus.pending, (state) => {
-                state.isLoading = true;
-            })
             .addCase(changeUserStatus.fulfilled, (state, action) => {
-                state.isLoading = false;
-                state.changeStatusdata = action.payload;
+                state.getEmployeedata = action.payload;
             })
             .addCase(changeUserStatus.rejected, (state, action) => {
-                state.isLoading = false;
-                state.changeStatusdata = action.payload;
+                state.getEmployeedata = action.payload;
             })
             
             // employeeDetails
-            .addCase(getEmployeeDetails.pending, (state) => {
-                state.isLoading = true;
-            })
             .addCase(getEmployeeDetails.fulfilled, (state, action) => {
-                state.isLoading = false;
-                state.employeeDetails = action.payload;
+                state.getEmployeedata = action.payload;
             })
             .addCase(getEmployeeDetails.rejected, (state, action) => {
-                state.isLoading = false;
-                state.error = action.payload;
-            });
+                state.getEmployeedata = action.payload;
+            })
+            // employee Name and id
+            .addCase(getEmployeeNameAndId.fulfilled, (state, action) => {
+                state.getEmployeedata = action.payload;
+            })
+            .addCase(getEmployeeNameAndId.rejected, (state, action) => {
+                state.getEmployeedata = action.payload;
+            })
     },
 });
 
 export const {
-    resetDeleteState,
-    resetStatusState,
+    resetgetEmployeedataState
 } = employeeSlice.actions;
 export default employeeSlice.reducer;

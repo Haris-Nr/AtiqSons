@@ -13,6 +13,7 @@ const {
     logout,
     getEmployeeDetails,
     getAdmin,
+    getEmployeeNameAndId,
 } = require("../controllers/userCtrl");
 
 router.post("/signup", createUser);
@@ -25,5 +26,6 @@ router.patch("/changestatus/:id", authMiddleware, adminCheck, changeStatus);
 router.get("/currentuser", authMiddleware, fetchUser);
 router.post("/logout", logout)
 router.get("/getadmin", authMiddleware, getAdmin);
+router.get("/getempnameid", authMiddleware,adminCheck, getEmployeeNameAndId);
 
 module.exports = router;

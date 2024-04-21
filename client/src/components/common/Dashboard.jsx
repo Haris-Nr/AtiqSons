@@ -3,7 +3,6 @@ import { UserOutlined,CoffeeOutlined, ProductOutlined } from "@ant-design/icons"
 import DashboardCard from "./DashboardCard";
 import { useDispatch, useSelector } from "react-redux";
 import socket from "../../redux/api/socket";
-import { getEmployee } from "../../redux/Features/Employees/employeeSlice";
 import { Link } from "react-router-dom";
 import Timer from "./Timer";
 import Search from "./Search";
@@ -17,7 +16,6 @@ const Dashboard = () => {
     user: { employee },
   } = useSelector((state) => state.fetch);
 
-  const { totalItems } = useSelector((state) => state.employee);
   const { statsData } = useSelector((state) => state.stats);
 
   const getPeriodOfDay = (hour) =>
@@ -32,7 +30,6 @@ const Dashboard = () => {
   useEffect(() => {
     const currentHour = new Date().getHours();
     setPeriodOfDay(currentHour === 12 ? "noon" : getPeriodOfDay(currentHour));
-    dispatch(getEmployee());
     socket.connect();
 
     // Listen for user count updates
@@ -86,10 +83,9 @@ const Dashboard = () => {
                           />
                         }
                         title={`Employees`}
-                        value={`${totalItems}/${userCount}`}
+                        value={`${userCount}`}
                       />
                     </Link>
-                    <Link to={"productTable/selectItem/:selectItemValue"}>
                       <DashboardCard
                         icon={
                           <ProductOutlined
@@ -104,8 +100,6 @@ const Dashboard = () => {
                         title={`Total Products`}
                         value={statsData.totalproduct}
                       />
-                    </Link>
-                    <Link to={"productTable/selectItem/:selectItemValue"}>
                       <DashboardCard
                         icon={
                           <CoffeeOutlined
@@ -120,7 +114,6 @@ const Dashboard = () => {
                         title={`Pending Products`}
                         value={statsData.pendingCount}
                       />
-                    </Link>
                   </div>
                 )}
               </div>

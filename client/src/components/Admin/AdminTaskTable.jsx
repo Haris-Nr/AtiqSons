@@ -48,7 +48,7 @@ useEffect(() => {
       title: "Employee Name",
       dataIndex: "fullname",
       render:(_,record)=>(
-        record.employee.fullname
+        record?.employee?.fullname
       )
     },
     {

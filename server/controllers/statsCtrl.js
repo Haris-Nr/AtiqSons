@@ -36,7 +36,7 @@ const productInfo = async (req, res) => {
     const { timeFrame } = req.query;
 
     const { start, end } = getStartEndDate(timeFrame);
-
+    const totalEmployee = await User.countDocuments({role:"employee"})
     const approvedCount = await Product.countDocuments({ status: "approved" });
     const rejectedCount = await Product.countDocuments({ status: "rejected" });
     const pendingCount = await Product.countDocuments({ status: "pending" });
@@ -87,10 +87,10 @@ const productInfo = async (req, res) => {
       seasonalCount,
       priorityCount,
       totalproduct,
+      totalEmployee,
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json(error.message);
+    res.status(500).json({type:"error",message:error.message});
   }
 };
 

@@ -1,12 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Badge, Button, Descriptions, message, Modal, Spin } from "antd";
+import { Badge, Button, Descriptions, Modal, Spin } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import {
   changeUserStatus,
   deleteEmployee,
   getEmployeeDetails,
-  resetDeleteState,
-  resetStatusState,
+  resetgetEmployeedataState,
 } from "../../redux/Features/Employees/employeeSlice";
 import {
   createScreenShot,
@@ -19,6 +18,7 @@ import socket from "../../redux/api/socket";
 import { useNavigate } from "react-router-dom";
 
 import SimplePeer from "simple-peer";
+import { showMessage } from "../../redux/Features/message/messageSlice";
 
 const UserInfo = () => {
   const navigate = useNavigate();
@@ -35,7 +35,7 @@ const UserInfo = () => {
   const screenShareTimeout = useRef(null);
   const [screenShotData, setScreenShotData] = useState(null);
 
-  const { employeeDetails, deleteEmployeedata, changeStatusdata } = useSelector(
+  const { getEmployeedata } = useSelector(
     (state) => state.employee
   );
 
@@ -46,13 +46,10 @@ const UserInfo = () => {
       dispatch(getEmployeeDetails(id));
       socket.connect();
     }
-    if (employeeDetails.success === false) {
-      message.error(employeeDetails.message);
-    }
-  }, [dispatch, id, employeeDetails.message, employeeDetails.success]);
+  }, [dispatch, id]);
 
-  const employee = employeeDetails?.employee;
-  const log = employeeDetails.logs;
+  const employee = getEmployeedata?.employee;
+  const log = getEmployeedata?.logs;
 
   const handleStatus = (id, newStatus) => {
     dispatch(changeUserStatus({ id, newStatus })).then(() => {
@@ -60,31 +57,18 @@ const UserInfo = () => {
     });
   };
 
-  useEffect(() => {
-    if (changeStatusdata.success === true) {
-      message.success(changeStatusdata.message);
-      dispatch(resetStatusState());
-    } else if (changeStatusdata.success === false) {
-      message.error(changeStatusdata.message);
-      dispatch(resetStatusState());
-    }
-  }, [changeStatusdata, dispatch]);
-
   const handleDelete = (id) => {
     dispatch(deleteEmployee(id)).then(() => {
       navigate("..", { relative: "path" });
     });
   };
 
-  useEffect(() => {
-    if (deleteEmployeedata.success === true) {
-      message.success(deleteEmployeedata.message);
-      dispatch(resetDeleteState());
-    } else if (deleteEmployeedata.success === false) {
-      message.error(deleteEmployeedata.message);
-      dispatch(resetDeleteState());
+  useEffect(()=>{
+    if(getEmployeedata.type && getEmployeedata.message){
+      dispatch(showMessage(({ message: getEmployeedata.message, type: getEmployeedata.type })))
+      dispatch(resetgetEmployeedataState())
     }
-  }, [deleteEmployeedata, dispatch]);
+  },[dispatch,getEmployeedata.type,getEmployeedata.message])
 
   const items = [
     {
@@ -124,7 +108,7 @@ const UserInfo = () => {
     },
     {
       key: "7",
-      label: "Created At",
+      label: "Registration Date",
       children: moment(employee?.createdAt).format("DD/MM/YYYY"),
     },
     {
@@ -178,9 +162,7 @@ const UserInfo = () => {
     const isOnline = await isEmployeeOnline();
 
     if (!isOnline) {
-      return message.error(
-        "Employee is not online. Please try again some other time."
-      );
+    return dispatch(showMessage(({ message:"Employee is not online. Please try again some other time.", type: "error" })))
     }
     setScreenShareLoading(true);
     setShowScreenShareModal(true);
@@ -261,9 +243,7 @@ const UserInfo = () => {
   useEffect(() => {
     if (screenShareLoading) {
       screenShareTimeout.current= setTimeout(() => {
-          message.error(
-            "Screen Share request timed out. Most probable reason is that screen share is not allowed by Employee yet. Please try again."
-          );
+          dispatch(showMessage(({ message: "Screen Share request timed out. Most probable reason is that screen share is not allowed by Employee yet. Please try again.", type: "error" })))
           setScreenShareLoading(false);
           setShowScreenShareModal(false);
         
@@ -272,15 +252,13 @@ const UserInfo = () => {
       clearTimeout(screenShareTimeout.current);
     }
 
-  }, [screenShareLoading]);
+  }, [screenShareLoading,dispatch]);
 
   async function handleCaptureScreenShotClick() {
     const isOnline = await isEmployeeOnline();
 
     if (!isOnline) {
-      return message.error(
-        "Employee is not online. Please try again some other time."
-      );
+    return dispatch(showMessage(({ message:"Employee is not online. Please try again some other time.", type: "error" })))
     }
 
     setScreenShotLoading(true);
@@ -288,9 +266,7 @@ const UserInfo = () => {
     socket.emit("request-screen-shot", user.employee._id, id);
     socket.on("screen-shot-received", function ({ imageData }) {
       if (!imageData) {
-        return message.error(
-          "Employee has not allowed screen sharing yet. Please try again later."
-        );
+        return   dispatch(showMessage(({ message:  "Employee has not allowed screen sharing yet. Please try again later.", type: "error" })))
       }
       setScreenShotLoading(false);
       setScreenShotData(imageData);
@@ -318,12 +294,12 @@ const UserInfo = () => {
     formData.append("user", id);
 
     const onSuccess = () => {
-      message.success("Screen shot saved successfully.");
+      dispatch(showMessage(({ message: "Screen shot saved successfully.", type: "success" })))
       hideScreenShotModal();
     };
 
     const onFail = () => {
-      message.error("Failed to save screen shot. Please try again later.");
+      dispatch(showMessage(({ message: "Failed to save screen shot. Please try again later.", type: "error" })))
       hideScreenShotModal();
     };
 
